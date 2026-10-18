@@ -13,7 +13,7 @@ upstream source:
 | `scripts/lib/manifest.mjs` | `apps/plugin-market-generator/src/packages.ts` (`isBundle`, `dshRange`) and `packages/boot/app-boot/src/plugin-compatibility.ts` (`evaluatePluginCompatibility`) |
 | `scripts/lib/display.mjs` | `apps/plugin-market-generator/src/metadata.ts` |
 | `scripts/lib/npm.mjs` | `apps/plugin-market-generator/src/fetchers.ts` (npm part) |
-| `scripts/lib/index-doc.mjs` | `apps/plugin-market-generator/src/generate.ts` (`entryOf`, npm release selection) |
+| `scripts/lib/pipeline.mjs` | `apps/plugin-market-generator/src/generate.ts` (`entryOf`, npm release selection) |
 
 That code is used under the following license:
 
