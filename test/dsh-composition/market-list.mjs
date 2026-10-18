@@ -15,9 +15,9 @@ import { extname, join, resolve, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { parseArgs } from 'node:util'
 
-const { values } = parseArgs({ options: { dsh: { type: 'string' }, dist: { type: 'string', default: '.cache/e2e-dist' } } })
+const { values } = parseArgs({ options: { dsh: { type: 'string' }, dist: { type: 'string', default: '.cache/e2e-dist' }, url: { type: 'string' } } })
 if (values.dsh === undefined) {
-  console.error('usage: node test/dsh-composition/market-list.mjs --dsh <DSH checkout> [--dist <built index dir>]')
+  console.error('usage: node test/dsh-composition/market-list.mjs --dsh <DSH checkout> [--dist <built index dir> | --url <published index URL>]')
   process.exit(2)
 }
 const checkout = resolve(values.dsh)
@@ -38,8 +38,9 @@ const server = createServer((request, response) => {
   if (!ok) { response.writeHead(404).end(); return }
   response.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'application/octet-stream' }).end(readFileSync(path))
 })
-await new Promise(done => server.listen(0, '127.0.0.1', done))
-const url = `http://127.0.0.1:${server.address().port}/index.json`
+// `--url` reads a published index instead, such as the GitHub Pages deployment.
+if (values.url === undefined) await new Promise(done => server.listen(0, '127.0.0.1', done))
+const url = values.url ?? `http://127.0.0.1:${server.address().port}/index.json`
 
 const home = realpathSync(mkdtempSync(join(tmpdir(), 'vibedev-index-dsh-home-')))
 process.env.DSH_HOME = home
@@ -105,7 +106,7 @@ try {
   }, null, 2))
 } finally {
   try { await ctx?.fiber.dispose() } finally {
-    server.close()
+    if (server.listening) server.close()
     rmSync(home, { recursive: true, force: true })
   }
 }

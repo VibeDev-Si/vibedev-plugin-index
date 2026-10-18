@@ -7,6 +7,8 @@ Checks, against a built DSH checkout, that DSH's own plugin market reads an inde
 ```sh
 node scripts/build.mjs --catalog test/fixtures/e2e-plugins.yml --out .cache/e2e-dist
 node test/dsh-composition/market-list.mjs --dsh /path/to/dsh-checkout --dist .cache/e2e-dist
+# 读取已发布的索引 / read the published index instead:
+node test/dsh-composition/market-list.mjs --dsh /path/to/dsh-checkout --url https://vibedev-si.github.io/vibedev-plugin-index/index.json
 ```
 
 脚本在 `http://127.0.0.1:<随机端口>/index.json` 提供索引，用 `@deepseek-ai/dsh-app-boot` 的 `boot()` 启动 Loader，profile 里挂载真实的 `config-editor`、`settings`、`plugin-manager` 和 `plugin-market`（`indexes` 指向该 URL），然后打印 `listIndexes()`、`search()`（默认顺序、中文文本、标签筛选）和 `entry()` 的结果：标题、默认版本、安装状态、每个版本的兼容性和安装参数。
