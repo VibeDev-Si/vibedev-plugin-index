@@ -1,0 +1,54 @@
+name: Upstream release check
+
+# Weekly report of versions newer than the reviewed ones. It only opens, updates, or closes an issue;
+# nothing is added to plugins.yml or the index.
+on:
+  schedule:
+    - cron: '17 2 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: upstream-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Find versions newer than the reviewed ones
+        # Registry problems are part of the report, so they also reach the issue.
+        run: node scripts/check-updates.mjs --output report.md --count-file count.txt || echo "registry problems are listed in the report"
+      - name: Open, update, or close the review issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          count=$(cat count.txt)
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+          existing=$(gh issue list --repo "$REPO" --state open --label upstream-release --json number --jq '.[0].number // empty')
+          if [ "$count" = "0" ]; then
+            if [ -n "$existing" ]; then
+              gh issue close "$existing" --repo "$REPO" --comment "No versions are pending review as of $(date -u +%F). 截至 $(date -u +%F) 没有待审核的新版本。"
+            fi
+            echo "nothing pending"
+            exit 0
+          fi
+          gh label create upstream-release --repo "$REPO" --color FBCA04 --description "New upstream versions awaiting review" --force
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --repo "$REPO" --body-file report.md
+          else
+            gh issue create --repo "$REPO" --title "待审核的上游新版本 / Upstream releases awaiting review" --label upstream-release --body-file report.md
+          fi

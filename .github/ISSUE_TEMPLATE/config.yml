@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: VibeDev 插件生态中心 / VibeDev Plugin Center (official plugins)
+    url: https://github.com/VibeDev-Si/dsh-ecosystem
+    about: VibeDev 官方插件的问题请到这里 / Issues with official VibeDev plugins go here

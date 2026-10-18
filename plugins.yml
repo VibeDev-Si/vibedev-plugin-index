@@ -1,0 +1,51 @@
+# VibeDev 精选插件索引 — 收录清单（schema 1）
+# VibeDev curated plugin index — the source list (schema 1).
+#
+# 只有这里记录过审核的精确版本才会进入 dist/index.json；插件发新版不会自动收录。
+# Only the exact versions reviewed and recorded here reach dist/index.json; a new upstream release is never
+# included automatically. See README.md for the inclusion criteria and the review checklist.
+
+schema: 1
+
+index:
+  title:
+    en: VibeDev Curated Plugins
+    zh: VibeDev 精选插件
+  description:
+    en: Community plugins reviewed by the VibeDev team. Only reviewed, exact versions are listed; plugins are third-party code.
+    zh: 经 VibeDev 团队审核的社区插件。只收录审核过的精确版本；插件仍是第三方代码。
+
+target:
+  # The DSH runtime version VibeDev ships (@deepseek-ai/dsh-app-boot). Every listed version must be compatible with it.
+  # 当前 VibeDev 内置的 DSH 版本。每个收录版本都必须与之兼容。
+  dsh: 0.2.1-rc.2
+
+policy:
+  # Largest unpacked package accepted without review.sizeException (20 MiB).
+  maxUnpackedBytes: 20971520
+  # Icons up to this size are embedded in index.json as data: URLs; larger icons are published under icons/.
+  inlineIconBytes: 16384
+
+categories:
+  tools: { en: Tools, zh: 工具与能力 }
+  ui: { en: Interface, zh: 界面增强 }
+  theme: { en: Themes, zh: 主题与外观 }
+  session: { en: Sessions, zh: 会话与消息 }
+  memory: { en: Memory, zh: 记忆 }
+  workflow: { en: Workflow, zh: 工作流 }
+  browser: { en: Browser and Web, zh: 浏览器与网页 }
+  docs: { en: Documents, zh: 文档 }
+  media: { en: Media, zh: 媒体 }
+  dev: { en: Development, zh: 开发 }
+  usage: { en: Usage and Cost, zh: 用量与费用 }
+  integration: { en: Integrations, zh: 服务集成 }
+
+# Curator tags (metadata.labels). Capability labels (network, child-process, writes-files, writes-config,
+# install-scripts) are added by the build from the review records and cannot be declared here.
+labels:
+  vibedev: { en: Made by VibeDev, zh: VibeDev 出品 }
+
+# 尚无正式收录。候选见 CANDIDATES.md，经产品负责人批准后按 README 的审核清单逐个加入。
+# No production entries yet. Candidates are proposed in CANDIDATES.md; each is added here only after approval and a
+# completed review (README.md, review checklist).
+plugins: []

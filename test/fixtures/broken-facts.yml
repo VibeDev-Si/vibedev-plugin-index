@@ -1,0 +1,56 @@
+# Deliberately broken list (facts): structurally valid, but every version breaks an inclusion rule that only npm
+# and the package itself can reveal. CI requires `node scripts/validate.mjs --catalog test/fixtures/broken-facts.yml`
+# to FAIL with one error per case below.
+schema: 1
+index:
+  title: { en: Broken fixture }
+target:
+  dsh: 0.2.1-rc.2
+policy:
+  maxUnpackedBytes: 1048576             # 1 MiB, so the 3.26 MiB package below is over the limit
+  inlineIconBytes: 16384
+categories:
+  tools: { en: Tools }
+plugins:
+  - name: dsh-context
+    category: tools
+    tags: []
+    maintainer: https://github.com/bowenliang123/dsh-context/issues
+    versions:
+      - version: 0.73.2                 # integrity does not match npm (last characters changed)
+        integrity: sha512-C1UQrNogShFx/uYpg/aED0Qd7x7oX8Tay2gwfhYy89VxDOg1sPIeML3yttvFDfzPLeGpP1JU9qksTNyYoY8YAB==
+        review: &review
+          reviewer: test-fixture
+          date: 2026-10-19
+          license: Apache-2.0
+          testedOn: [0.2.1-rc.2]
+          capabilities: { network: [], files: none, config: none, childProcess: [] }
+          installScripts: []
+          notes: broken on purpose
+      - version: 99.0.0                 # not published on npm
+        integrity: sha512-C1UQrNogShFx/uYpg/aED0Qd7x7oX8Tay2gwfhYy89VxDOg1sPIeML3yttvFDfzPLeGpP1JU9qksTNyYoY8YAA==
+        review: *review
+  - name: "@struktoai/mirage-dsh"
+    category: tools
+    tags: []
+    maintainer: https://github.com/strukto-ai/mirage/issues
+    versions:
+      - version: 0.0.6                  # engines.dsh 0.1.1-rc.2: incompatible with the target DSH
+        integrity: sha512-zFvcwKhLANDGfOLaFCDq7Kips3u/U7miQU37ebdpBcbBUSwutO6hynXkc8qrcP78c3jVIzxZtkWtRzggypnuSQ==
+        review: { reviewer: test-fixture, date: 2026-10-19, license: Apache-2.0, testedOn: [0.2.1-rc.2], capabilities: { network: [], files: none, config: none, childProcess: [] }, installScripts: [], notes: broken on purpose }
+  - name: "@smalltailqwq/dsh-client-ui-skin-maid-atelier"
+    category: tools
+    tags: []
+    maintainer: https://github.com/Small-tailqwq/dsh-deep-whale/issues
+    versions:
+      - version: 0.1.8                  # "SEE LICENSE IN LICENSE" is not an OSI-approved SPDX license
+        integrity: sha512-Z7ES+CK6y/hivAj/gnMIpr+G9ezZCjqxo3/x71QLnoQkqEIK19nUl3c6yd/3NZOFRMUJHrC7AoLYFA68cZAGaQ==
+        review: { reviewer: test-fixture, date: 2026-10-19, license: MIT, testedOn: [0.2.1-rc.2], capabilities: { network: [], files: none, config: none, childProcess: [] }, installScripts: [], notes: broken on purpose }
+  - name: "@nanmicoder/dsh-agent-teams"
+    category: tools
+    tags: []
+    maintainer: https://github.com/NanmiCoder/dsh-agent-teams/issues
+    versions:
+      - version: 0.1.25                 # 3.26 MiB > policy 1 MiB; review.license differs from package.json (MIT)
+        integrity: sha512-p8ElanLgY2Tp+/MvpmZiVCFg8feE43stctPa/FHC6fYmxou5G7oblBLQoSc5HuK1d3vxieJptwDOJwXdz47IBg==
+        review: { reviewer: test-fixture, date: 2026-10-19, license: Apache-2.0, testedOn: [0.2.1-rc.2], capabilities: { network: [], files: write, config: none, childProcess: [] }, installScripts: [], notes: broken on purpose }

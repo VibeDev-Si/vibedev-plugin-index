@@ -1,0 +1,71 @@
+name: 收录申请 / Plugin request
+description: 申请把一个 npm 上的 DSH 插件版本收录进 VibeDev 精选索引 / Ask for an npm DSH plugin version to be listed
+title: "[收录申请] <package>@<version>"
+labels: ["plugin-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请先阅读 README 的「收录标准」。只收录发布在 npm、声明了 `dsh.bundle` 的精确版本；提交不代表一定收录。
+        Please read the inclusion criteria in the README first. Only exact npm versions that declare `dsh.bundle` are listed; a request is not a promise.
+  - type: input
+    id: package
+    attributes:
+      label: npm 包名与版本 / Package and exact version
+      placeholder: "@scope/dsh-example@1.2.3"
+    validations:
+      required: true
+  - type: input
+    id: repository
+    attributes:
+      label: 源码仓库 / Source repository
+      placeholder: https://github.com/owner/repo
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 功能说明 / What it does
+      description: 一两段话，以及建议的分类 / One or two paragraphs and a suggested category
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: 行为声明 / Declared behavior
+      description: 访问哪些网络主机、读写哪些文件、是否修改 DSH 配置、启动哪些程序、是否有遥测 / Network hosts, files read or written, DSH settings changed, programs started, telemetry
+      value: |
+        - 网络 / Network:
+        - 文件 / Files:
+        - DSH 配置 / DSH settings:
+        - 子进程 / Child processes:
+        - 遥测 / Telemetry:
+    validations:
+      required: true
+  - type: input
+    id: license
+    attributes:
+      label: 许可证（SPDX）/ License (SPDX)
+      placeholder: MIT
+    validations:
+      required: true
+  - type: input
+    id: tested
+    attributes:
+      label: 测试过的 DSH / VibeDev 版本 / DSH or VibeDev version tested on
+      placeholder: DSH 0.2.1-rc.2
+  - type: input
+    id: maintainer
+    attributes:
+      label: 维护者联系方式 / Maintainer contact
+      description: issue 地址或邮箱 / Issue tracker URL or e-mail
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认 / Confirm
+      options:
+        - label: 包没有 preinstall/install/postinstall 脚本，或我已在上面说明 / The package has no install scripts, or they are explained above
+          required: true
+        - label: 我是维护者，或已征得维护者同意 / I maintain the plugin or have the maintainer's agreement

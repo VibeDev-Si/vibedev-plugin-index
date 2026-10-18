@@ -1,0 +1,49 @@
+name: Validate
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Unit tests
+        run: npm test
+      - name: Validate plugins.yml against npm and the inclusion rules
+        run: node scripts/validate.mjs
+      - name: Build, then check the built index is valid and reproducible
+        run: |
+          node scripts/build.mjs --out dist
+          node scripts/validate.mjs --index dist/index.json
+      - name: Full pipeline on real npm data (test fixture)
+        run: node scripts/validate.mjs --catalog test/fixtures/e2e-plugins.yml
+      - name: Deliberately broken lists must be rejected
+        run: |
+          for list in test/fixtures/broken-structure.yml test/fixtures/broken-facts.yml; do
+            set +e
+            GITHUB_STEP_SUMMARY= node scripts/validate.mjs --catalog "$list"
+            status=$?
+            set -e
+            if [ "$status" -eq 0 ]; then
+              echo "::error::$list was accepted"
+              exit 1
+            fi
+            echo "$list was rejected (exit $status), as expected"
+          done

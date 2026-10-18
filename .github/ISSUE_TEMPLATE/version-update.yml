@@ -1,0 +1,33 @@
+name: 版本更新 / Version update
+description: 申请审核已收录插件的新版本 / Ask for a new version of a listed plugin to be reviewed
+title: "[版本更新] <package>@<version>"
+labels: ["version-update"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        新版本不会自动上架：审核人按清单复审后，通过 PR 写进 `plugins.yml`。每周的定时检查也会列出新版本。
+        New versions are never listed automatically; a reviewer re-runs the checklist and records the version in a PR. The weekly check also lists new versions.
+  - type: input
+    id: package
+    attributes:
+      label: npm 包名与新版本 / Package and new exact version
+      placeholder: "@scope/dsh-example@1.3.0"
+    validations:
+      required: true
+  - type: textarea
+    id: changes
+    attributes:
+      label: 变更内容 / What changed
+      description: 发布说明链接，以及行为、权限、依赖或兼容性的变化 / Release notes link and any change in behavior, capabilities, dependencies, or compatibility
+    validations:
+      required: true
+  - type: dropdown
+    id: older
+    attributes:
+      label: 旧版本 / Older versions
+      options:
+        - 保留旧版本 / Keep older versions
+        - 下架旧版本（说明原因）/ Remove older versions (explain why)
+    validations:
+      required: true

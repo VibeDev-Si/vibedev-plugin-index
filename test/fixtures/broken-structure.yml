@@ -1,0 +1,39 @@
+# Deliberately broken list (structure): every entry violates a rule that is checked before any network access.
+# CI requires `node scripts/validate.mjs --catalog test/fixtures/broken-structure.yml` to FAIL.
+schema: 1
+index:
+  title: { en: Broken fixture }
+target:
+  dsh: ">=0.2.0"                        # not an exact DSH version
+policy:
+  maxUnpackedBytes: 20971520
+  inlineIconBytes: 16384
+categories:
+  tools: { en: Tools }
+plugins:
+  - name: dsh-context
+    category: usage                     # undeclared category
+    tags: [popular]                     # undeclared label
+    maintainer: someone                 # neither an https URL nor an e-mail address
+    autoUpdate: true                    # unknown field
+    versions:
+      - version: ^0.73.0                # a range, not a pinned version
+        integrity: sha1-abc             # not a sha512 integrity
+        review:
+          reviewer: test-fixture
+          date: 2026-13-45              # not a date
+          license: Apache-2.0
+          testedOn: []                  # empty
+          capabilities:
+            network: [models.dev]
+            files: maybe                # not none/read/write
+            config: none                # childProcess missing
+          installScripts: []
+          notes: broken on purpose
+      - version: latest                 # a dist-tag, not a version
+        integrity: sha512-C1UQrNogShFx/uYpg/aED0Qd7x7oX8Tay2gwfhYy89VxDOg1sPIeML3yttvFDfzPLeGpP1JU9qksTNyYoY8YAA==
+  - name: dsh-context                   # duplicate plugin
+    category: tools
+    tags: []
+    maintainer: https://github.com/bowenliang123/dsh-context/issues
+    versions: []                        # no reviewed version

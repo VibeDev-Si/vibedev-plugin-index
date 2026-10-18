@@ -1,0 +1,34 @@
+name: 问题报告 / Problem report
+description: 已收录插件有问题或需要下架 / A listed plugin misbehaves or should be removed
+title: "[问题] <package>@<version>"
+labels: ["problem-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        安全漏洞请不要公开填写，改用仓库 Security → Report a vulnerability 私下报告。
+        Do not file security vulnerabilities here; use Security → Report a vulnerability.
+  - type: input
+    id: package
+    attributes:
+      label: npm 包名与版本 / Package and version
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: 问题描述 / What happened
+      description: 复现步骤、VibeDev 版本、操作系统、日志 / Steps, VibeDev version, OS, logs
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 严重程度 / Severity
+      options:
+        - 功能问题 / Functional problem
+        - 未声明的行为（网络、文件、配置、进程）/ Undeclared behavior (network, files, settings, processes)
+        - 许可证问题 / License problem
+        - 建议下架 / Removal requested
+    validations:
+      required: true

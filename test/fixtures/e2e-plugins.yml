@@ -1,0 +1,63 @@
+# TEST FIXTURE ONLY — not a production list and not a production review.
+# Real npm versions used by CI (the full build path against npm) and by the DSH composition test
+# (test/dsh-composition/). Nothing here is published by the Pages workflow.
+schema: 1
+index:
+  title: { en: VibeDev Curated Plugins (test fixture), zh: VibeDev 精选插件（测试数据） }
+  description: { en: Test fixture with real npm versions., zh: 使用真实 npm 版本的测试数据。 }
+target:
+  dsh: 0.2.1-rc.2
+policy:
+  maxUnpackedBytes: 20971520
+  inlineIconBytes: 16384
+categories:
+  usage: { en: Usage and Cost, zh: 用量与费用 }
+  workflow: { en: Workflow, zh: 工作流 }
+labels:
+  vibedev: { en: Made by VibeDev, zh: VibeDev 出品 }
+plugins:
+  - name: dsh-context
+    category: usage
+    tags: []
+    maintainer: https://github.com/bowenliang123/dsh-context/issues
+    display:
+      description:
+        en: Context window, token usage, and cost panel for DSH sessions.
+        zh: DSH 会话的上下文窗口、Token 用量与费用面板。
+    versions:
+      - version: 0.73.2
+        integrity: sha512-C1UQrNogShFx/uYpg/aED0Qd7x7oX8Tay2gwfhYy89VxDOg1sPIeML3yttvFDfzPLeGpP1JU9qksTNyYoY8YAA==
+        review: &fixture-review
+          reviewer: test-fixture
+          date: 2026-10-19
+          license: Apache-2.0
+          testedOn: [0.2.1-rc.2]
+          capabilities:
+            network: [models.dev, registry.npmjs.org, registry.npmmirror.com, api.deepseek.com]
+            files: none
+            config: none
+            childProcess: []
+          installScripts: []
+          notes: TEST FIXTURE ONLY. Facts from scripts/inspect.mjs; not a production review.
+      - version: 0.73.1
+        integrity: sha512-IlLwyAP5h2K/mku6nxdKMMJY86r8kL43GSuWcCClnhzelFLLqmBbO8WQrfi0/61dAFeBtvyEBVfVm1W7nLDQYA==
+        review: *fixture-review
+  - name: "@nanmicoder/dsh-agent-teams"
+    category: workflow
+    tags: []
+    maintainer: https://github.com/NanmiCoder/dsh-agent-teams/issues
+    versions:
+      - version: 0.1.25
+        integrity: sha512-p8ElanLgY2Tp+/MvpmZiVCFg8feE43stctPa/FHC6fYmxou5G7oblBLQoSc5HuK1d3vxieJptwDOJwXdz47IBg==
+        review:
+          reviewer: test-fixture
+          date: 2026-10-19
+          license: MIT
+          testedOn: [0.2.1-rc.2]
+          capabilities:
+            network: []
+            files: write
+            config: none
+            childProcess: []
+          installScripts: []
+          notes: TEST FIXTURE ONLY. Facts from scripts/inspect.mjs; not a production review.

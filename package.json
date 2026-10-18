@@ -1,0 +1,24 @@
+{
+  "name": "vibedev-plugin-index",
+  "version": "0.1.0",
+  "private": true,
+  "description": "VibeDev curated plugin index: reviewed, exact plugin versions published as a DSH plugin market index (format 1)",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "validate": "node scripts/validate.mjs",
+    "check-updates": "node scripts/check-updates.mjs",
+    "inspect": "node scripts/inspect.mjs",
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "@deepseek-ai/dsh-plugin-market-index": "0.2.1-rc.2",
+    "resolve.exports": "2.0.4",
+    "semver": "7.8.5",
+    "yaml": "2.9.1"
+  }
+}
