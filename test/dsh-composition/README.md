@@ -19,8 +19,46 @@ The script serves the index on `http://127.0.0.1:<random port>/index.json`, boot
 
 ```sh
 node test/dsh-composition/install-trial.mjs --dsh /path/to/dsh-checkout --pnpm /path/to/pnpm.mjs --out report.json name@1.2.3
+# 可选 / optional: --call "GET /api/x" --invoke service.method --approve-builds pkg \
+#                  --extra-start-env DO_NOT_TRACK=1 --extra-start-reset telemetry/pkg
 ```
 
-在临时 DSH_HOME、临时用户目录和临时 pnpm 仓库里启动检出的 `web` profile，用 `pluginManager.installBundle` 安装精确版本（「发现」页的安装路径），再重启一次。报告包括条目状态、注册的技能/工具/路由、子进程、`fetch` 调用、凭据读取，以及每个外连；本地代理只放行 npm registry，其余拒绝并记录。
+通常不直接运行它，而是通过 `npm run review` 调用，选项会原样传入。
 
-Boots the checkout's `web` profile in temporary directories, installs exact versions through `pluginManager.installBundle` (the Discover path), restarts once, and reports entry states, registered skills/tools/routes, child processes, fetch calls, credential reads, and every outbound connection; a local proxy admits only the npm registry and records the rest.
+脚本在临时 DSH_HOME、用户目录、APPDATA、TEMP 和 pnpm 仓库里启动检出的 `web` profile，用 `pluginManager.installBundle` 安装精确版本（「发现」页的安装路径），再重启一次。报告包括：
+
+- 条目状态，以及注册的技能、工具和路由；
+- 子进程、`fetch` 调用和凭据读取；
+- 经本地代理的每个外连：代理只放行 npm registry，其余拒绝并记录；
+- 写入临时目录的文件，以及 profile 补丁中的行；
+- Windows 上整个进程树的监听端口、绕过代理的直接外连和进程，每隔 1–3 秒采样一次（`Get-NetTCPConnection`、`Get-NetUDPEndpoint`、`Win32_Process`）；最后一次停止后仍在运行的进程会被记录并结束。
+
+采样有间隔，不继承代理环境变量的子进程如果只建立了极短的连接，可能会被漏掉。
+
+可选步骤：
+
+| 选项 | 作用 |
+|---|---|
+| `--call` | 调用一次插件注册的路由。 |
+| `--invoke` | 无参数调用一次插件提供的服务方法。 |
+| `--approve-builds` | 在依赖的构建脚本待批准时，用 `approvedBuilds` 重试一次，与「插件」页的「允许这些脚本并重试」相同。 |
+| `--extra-start-env`、`--extra-start-reset` | 先删除 DSH_HOME 下的指定文件，再带额外的环境变量启动第三次。 |
+
+Usually run through `npm run review`, which passes these options through. The script boots the checkout's `web` profile in temporary DSH_HOME, user, APPDATA, TEMP, and pnpm store directories, installs exact versions through `pluginManager.installBundle` (the Discover path), and restarts once. It reports:
+
+- entry states and registered skills, tools, and routes;
+- child processes, fetch calls, and credential reads;
+- every outbound connection through a local proxy, which admits only the npm registry and records the rest;
+- files written under the temporary directories, and the rows of the profile patch;
+- on Windows, the listening sockets, direct (non-proxied) connections, and processes of the whole process tree, sampled every 1–3 seconds (`Get-NetTCPConnection`, `Get-NetUDPEndpoint`, `Win32_Process`). Processes still running after the last stop are reported and killed.
+
+Sampling has gaps: a very short connection from a child process that ignores the proxy variables can be missed.
+
+Optional steps:
+
+| Option | Effect |
+|---|---|
+| `--call` | Call a registered route once. |
+| `--invoke` | Call a provided service method once, without arguments. |
+| `--approve-builds` | When dependency build scripts are pending, retry once with `approvedBuilds`, like the Plugins page's "Allow these scripts and retry". |
+| `--extra-start-env`, `--extra-start-reset` | Delete the listed files under DSH_HOME, then start a third time with extra environment variables. |

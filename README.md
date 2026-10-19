@@ -123,7 +123,22 @@ node test/dsh-composition/market-list.mjs --dsh <已构建的 DSH 检出> --dist
 node test/dsh-composition/install-trial.mjs --dsh <已构建的 DSH 检出> --pnpm <pnpm.mjs> --out report.json <name@version>...
 ```
 
-`install-trial.mjs` 在临时 DSH_HOME、临时用户目录和临时 pnpm 仓库里启动 DSH 的 `web` profile，用 `pluginManager.installBundle` 安装精确版本（与「发现」页安装相同的路径），再重启一次。它记录每个条目的状态、注册的工具/技能/路由、启动的子进程、`fetch` 调用、凭据读取，以及经本地代理的每个外连。代理只放行 npm registry，其余一律拒绝并记录。
+`install-trial.mjs` 在临时 DSH_HOME、用户目录、APPDATA、TEMP 和 pnpm 仓库里启动 DSH 的 `web` profile，用 `pluginManager.installBundle` 安装精确版本（与「发现」页安装相同的路径），再重启一次。它记录以下内容：
+
+- 每个条目的状态，以及注册的工具、技能和路由；
+- 启动的子进程、`fetch` 调用和凭据读取；
+- 经本地代理的每个外连：代理只放行 npm registry，其余一律拒绝并记录；
+- 写入的文件，以及 profile 补丁中的行；
+- 在 Windows 上，每隔几秒采样一次整个进程树的监听端口、绕过代理的直接外连和进程；最后一次停止后仍在运行的进程会被记录并结束。
+
+`npm run review` 会把下面这些选项原样传给试用：
+
+| 选项 | 作用 |
+|---|---|
+| `--call "METHOD /path"` | 安装后调用一次插件注册的路由。 |
+| `--invoke <服务>.<方法>` | 安装后无参数调用一次插件提供的服务方法，例如界面第一次使用时会调用的启动动作。 |
+| `--approve-builds <包名>` | 安装因依赖的构建脚本待批准而停止时，模拟用户在「插件」页点击「允许这些脚本并重试」。 |
+| `--extra-start-env KEY=VALUE`、`--extra-start-reset <DSH_HOME 下的路径>` | 先删除指定文件，再带额外的环境变量启动第三次，例如删除遥测状态后带 `DO_NOT_TRACK=1` 启动，检查开关是否生效。 |
 
 需要 Node.js 22.12 或更高版本。依赖只有 4 个，全部锁定精确版本：`@deepseek-ai/dsh-plugin-market-index`（与 DSH 自己使用的 format 1 校验器相同，版本与 `target.dsh` 一致）、`semver`、`yaml`、`resolve.exports`。
 
@@ -235,7 +250,16 @@ A removal needs only steps 3–6: delete the version or the whole plugin from `p
 
 ### Layout and commands
 
-See the [Chinese section](#仓库结构与命令) for the file tree and commands. Review records live in `reviews/` (one `.md` and `.json` per reviewed version); `npm run review` writes them, and validation warns when a listed version has none. `--pnpm` defaults to the pnpm bundled with VibeDev; `DSH_CHECKOUT` and `PNPM_MJS` can replace `--dsh` and `--pnpm`, and without a DSH checkout the record says the trial did not run. Node.js 22.12 or later. The four dependencies are pinned exactly: `@deepseek-ai/dsh-plugin-market-index` (the format-1 validator DSH itself uses, at the `target.dsh` version), `semver`, `yaml`, and `resolve.exports`; `.npmrc` disables install scripts.
+See the [Chinese section](#仓库结构与命令) for the file tree and commands. Review records live in `reviews/` (one `.md` and `.json` per reviewed version); `npm run review` writes them, and validation warns when a listed version has none. `--pnpm` defaults to the pnpm bundled with VibeDev; `DSH_CHECKOUT` and `PNPM_MJS` can replace `--dsh` and `--pnpm`, and without a DSH checkout the record says the trial did not run.
+
+The trial (`test/dsh-composition/install-trial.mjs`) runs in temporary DSH_HOME, user, APPDATA, TEMP, and pnpm store directories. Besides entry states, registrations, child processes, fetch calls, credential reads, and the connections through its npm-only proxy, it records the files written and the rows of the profile patch. On Windows it also samples, every few seconds, the listening sockets, direct (non-proxied) connections, and processes of the whole process tree, and it reports and kills processes still running after the last stop. `npm run review` passes these trial options through:
+
+| Option | Effect |
+|---|---|
+| `--call "METHOD /path"` | Call a registered route once after installation. |
+| `--invoke <service>.<method>` | Call a service method once without arguments, such as the action the plugin's UI runs on first use. |
+| `--approve-builds <package>` | Answer the Plugins page's "Allow these scripts and retry" when an installation stops on pending dependency build scripts. |
+| `--extra-start-env KEY=VALUE`, `--extra-start-reset <path under DSH_HOME>` | Delete the listed files, then start a third time with extra environment variables. For example, delete a telemetry state file and start with `DO_NOT_TRACK=1` to check that the switch works. | Node.js 22.12 or later. The four dependencies are pinned exactly: `@deepseek-ai/dsh-plugin-market-index` (the format-1 validator DSH itself uses, at the `target.dsh` version), `semver`, `yaml`, and `resolve.exports`; `.npmrc` disables install scripts.
 
 ### Mirroring to the VibeDev download server
 

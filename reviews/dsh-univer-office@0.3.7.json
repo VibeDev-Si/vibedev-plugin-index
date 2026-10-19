@@ -1,0 +1,738 @@
+{
+  "schema": 1,
+  "package": "dsh-univer-office",
+  "version": "0.3.7",
+  "date": "2026-10-20",
+  "target": "0.2.1-rc.2",
+  "command": "npm run review -- dsh-univer-office@0.3.7 --dsh C:\\vdp-wt\\vdmerge --invoke univer.ensureGateway --extra-start-env DO_NOT_TRACK=1 --extra-start-reset telemetry/dsh-univer-office",
+  "tool": {
+    "index": "35e0ff5",
+    "dsh": "bbc7df9778 (DSH 0.2.1-rc.2)"
+  },
+  "static": {
+    "name": "dsh-univer-office",
+    "version": "0.3.7",
+    "published": "2026-10-08T08:45:18.938Z",
+    "distTags": {
+      "alpha": "0.2.0-alpha",
+      "latest": "0.3.7"
+    },
+    "versionsPublished": 24,
+    "versionsLast30Days": 5,
+    "deprecated": null,
+    "integrity": "sha512-2eEi35ZzTOZiFQEEuNiF68MKWGKlXhVJiaOwCO5gdgNj0ZA+VesdoRxmT8hhFspbMtPfRp/0CoSo7PwFwBbBWw==",
+    "license": "Apache-2.0",
+    "licenseAccepted": true,
+    "licenseFiles": [
+      "LICENSE"
+    ],
+    "provenance": null,
+    "bundle": true,
+    "enginesDsh": null,
+    "dshPeers": {
+      "@deepseek-ai/dsh-attachment": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-host-webserver": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-llm": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-session": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-settings": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-skill": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-tools": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1"
+    },
+    "otherPeers": {},
+    "indexEnginesDsh": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1",
+    "declaresDsh": true,
+    "target": "0.2.1-rc.2",
+    "compatibleInDiscover": true,
+    "compatibleAtInstall": true,
+    "unmet": {},
+    "installScripts": [],
+    "npmHasInstallScript": false,
+    "unpackedBytes": 226850899,
+    "fileCount": 282,
+    "tarballBytes": 49184591,
+    "dependencies": {
+      "@puppeteer/browsers": "^3.2.0",
+      "@univerjs-pro/cli-assets": "0.1.0",
+      "libsql": "^0.5.29",
+      "puppeteer-core": "^25.7.0",
+      "@univerjs-pro/engine-formula-rust-binding": "1.0.1",
+      "@univerjs-pro/exchange-node-binding": "1.0.1"
+    },
+    "optionalDependencies": {},
+    "description": "DSH × Univer integration with a bundled collaboration Gateway and Viewer: inline previews, live floating Worktree windows, and session-end review actions in DeepSeek Harness.",
+    "keywords": [
+      "dsh",
+      "dsh-plugin",
+      "deepseek-harness",
+      "univer",
+      "spreadsheet",
+      "preview",
+      "worktree"
+    ],
+    "repository": "https://github.com/dream-num/dsh-univer-office",
+    "homepage": "https://github.com/dream-num/dsh-univer-office",
+    "bugs": "https://github.com/dream-num/dsh-univer-office/issues",
+    "maintainers": [
+      "jikkai",
+      "hexf00"
+    ],
+    "hints": {
+      "childProcess": [
+        "lib/index.js",
+        "scripts/telemetry-entry.mjs"
+      ],
+      "network": [
+        "artifacts/viewer/assets/it-IT-D5BBLf48.js",
+        "lib/client.js",
+        "lib/index.js",
+        "lib/telemetry-entry.js"
+      ],
+      "fileWrites": [
+        "lib/index.js",
+        "scripts/copy-gateway-dependencies.mjs"
+      ],
+      "configWrites": [],
+      "configReads": [],
+      "credentials": [],
+      "environment": [
+        "lib/index.js",
+        "lib/telemetry-entry.js"
+      ],
+      "dynamicCode": [
+        "lib/index.js"
+      ],
+      "selfUpdate": [],
+      "telemetry": [
+        "lib/index.js",
+        "lib/telemetry-entry.js",
+        "scripts/telemetry-entry.mjs"
+      ]
+    },
+    "hosts": {
+      "127.0.0.1": [
+        "lib/index.js"
+      ],
+      "47.100.177.253": [
+        "lib/index.js"
+      ],
+      "avatars.githubusercontent.com": [
+        "lib/index.js"
+      ],
+      "baidu.com": [
+        "lib/index.js"
+      ],
+      "docs.univer.ai": [
+        "lib/index.js"
+      ],
+      "pro.univer.ai": [
+        "artifacts/viewer/assets/ca-ES-BykbLOyS.js",
+        "artifacts/viewer/assets/de-DE-Dy5C1AHy.js",
+        "artifacts/viewer/assets/en-US-DMf5Tplg.js",
+        "artifacts/viewer/assets/es-ES-C3b4fe0f.js",
+        "artifacts/viewer/assets/fr-FR-C35WCJjm.js",
+        "artifacts/viewer/assets/id-ID-CBvLNOVz.js",
+        "artifacts/viewer/assets/it-IT-D5BBLf48.js",
+        "artifacts/viewer/assets/ja-JP-wrZh524k.js",
+        "artifacts/viewer/assets/ko-KR-BpfoAckH.js",
+        "artifacts/viewer/assets/pl-PL-DD1zcIqt.js",
+        "artifacts/viewer/assets/pt-BR-ga01HmuL.js",
+        "artifacts/viewer/assets/ru-RU-CURf7YbO.js",
+        "artifacts/viewer/assets/sk-SK-B9uZ-ArR.js",
+        "artifacts/viewer/assets/vi-VN-PRZluW2X.js",
+        "artifacts/viewer/assets/zh-CN-wySozyro.js",
+        "artifacts/viewer/assets/zh-HK-DRy_GzU4.js",
+        "artifacts/viewer/assets/zh-TW-EJQHQJs6.js"
+      ],
+      "rxjs.dev": [
+        "lib/index.js"
+      ],
+      "support.google.com": [
+        "artifacts/viewer/assets/ca-ES-BykbLOyS.js",
+        "artifacts/viewer/assets/de-DE-Dy5C1AHy.js",
+        "artifacts/viewer/assets/en-US-DMf5Tplg.js",
+        "artifacts/viewer/assets/es-ES-C3b4fe0f.js",
+        "artifacts/viewer/assets/fr-FR-C35WCJjm.js",
+        "artifacts/viewer/assets/id-ID-CBvLNOVz.js",
+        "artifacts/viewer/assets/it-IT-D5BBLf48.js",
+        "artifacts/viewer/assets/ja-JP-wrZh524k.js",
+        "artifacts/viewer/assets/ko-KR-BpfoAckH.js",
+        "artifacts/viewer/assets/pl-PL-DD1zcIqt.js",
+        "artifacts/viewer/assets/pt-BR-ga01HmuL.js",
+        "artifacts/viewer/assets/ru-RU-CURf7YbO.js",
+        "artifacts/viewer/assets/sk-SK-B9uZ-ArR.js",
+        "artifacts/viewer/assets/vi-VN-PRZluW2X.js",
+        "artifacts/viewer/assets/zh-CN-wySozyro.js",
+        "artifacts/viewer/assets/zh-TW-BA0p9R2Z-DdVKxLVS.js"
+      ],
+      "support.microsoft.com": [
+        "artifacts/viewer/assets/ca-ES-BykbLOyS.js",
+        "artifacts/viewer/assets/de-DE-Dy5C1AHy.js",
+        "artifacts/viewer/assets/en-US-DMf5Tplg.js",
+        "artifacts/viewer/assets/es-ES-C3b4fe0f.js",
+        "artifacts/viewer/assets/fr-FR-C35WCJjm.js",
+        "artifacts/viewer/assets/id-ID-CBvLNOVz.js",
+        "artifacts/viewer/assets/it-IT-D5BBLf48.js",
+        "artifacts/viewer/assets/ja-JP-wrZh524k.js",
+        "artifacts/viewer/assets/ko-KR-BpfoAckH.js",
+        "artifacts/viewer/assets/pl-PL-DD1zcIqt.js",
+        "artifacts/viewer/assets/pt-BR-ga01HmuL.js",
+        "artifacts/viewer/assets/ru-RU-CURf7YbO.js",
+        "artifacts/viewer/assets/sk-SK-B9uZ-ArR.js",
+        "artifacts/viewer/assets/vi-VN-PRZluW2X.js",
+        "artifacts/viewer/assets/zh-CN-wySozyro.js",
+        "artifacts/viewer/assets/zh-TW-BA0p9R2Z-DdVKxLVS.js",
+        "lib/index.js"
+      ],
+      "univer.ai": [
+        "artifacts/viewer/assets/ca-ES-BykbLOyS.js",
+        "artifacts/viewer/assets/de-DE-Dy5C1AHy.js",
+        "artifacts/viewer/assets/en-US-DMf5Tplg.js",
+        "artifacts/viewer/assets/es-ES-C3b4fe0f.js",
+        "artifacts/viewer/assets/fr-FR-C35WCJjm.js",
+        "artifacts/viewer/assets/id-ID-CBvLNOVz.js",
+        "artifacts/viewer/assets/it-IT-D5BBLf48.js",
+        "artifacts/viewer/assets/ja-JP-wrZh524k.js",
+        "artifacts/viewer/assets/ko-KR-BpfoAckH.js",
+        "artifacts/viewer/assets/pl-PL-DD1zcIqt.js",
+        "artifacts/viewer/assets/pt-BR-ga01HmuL.js",
+        "artifacts/viewer/assets/ru-RU-CURf7YbO.js",
+        "artifacts/viewer/assets/sk-SK-B9uZ-ArR.js",
+        "artifacts/viewer/assets/vi-VN-PRZluW2X.js",
+        "artifacts/viewer/assets/zh-CN-wySozyro.js",
+        "artifacts/viewer/assets/zh-HK-DRy_GzU4.js",
+        "artifacts/viewer/assets/zh-TW-EJQHQJs6.js",
+        "lib/build-info.json",
+        "lib/index.js"
+      ],
+      "www.wps.cn": [
+        "artifacts/viewer/assets/ca-ES-BykbLOyS.js",
+        "artifacts/viewer/assets/de-DE-Dy5C1AHy.js",
+        "artifacts/viewer/assets/en-US-DMf5Tplg.js",
+        "artifacts/viewer/assets/es-ES-C3b4fe0f.js",
+        "artifacts/viewer/assets/fr-FR-C35WCJjm.js",
+        "artifacts/viewer/assets/id-ID-CBvLNOVz.js",
+        "artifacts/viewer/assets/it-IT-D5BBLf48.js",
+        "artifacts/viewer/assets/ja-JP-wrZh524k.js",
+        "artifacts/viewer/assets/ko-KR-BpfoAckH.js",
+        "artifacts/viewer/assets/pl-PL-DD1zcIqt.js",
+        "artifacts/viewer/assets/pt-BR-ga01HmuL.js",
+        "artifacts/viewer/assets/ru-RU-CURf7YbO.js",
+        "artifacts/viewer/assets/sk-SK-B9uZ-ArR.js",
+        "artifacts/viewer/assets/vi-VN-PRZluW2X.js",
+        "artifacts/viewer/assets/zh-CN-wySozyro.js",
+        "artifacts/viewer/assets/zh-TW-BA0p9R2Z-DdVKxLVS.js"
+      ]
+    },
+    "envVars": {
+      "NODE_PATH": [
+        "lib/index.js"
+      ],
+      "UNIVER_DSH_GATEWAY_DEBUG": [
+        "lib/index.js"
+      ],
+      "UNIVER_LICENSE": [
+        "lib/index.js"
+      ],
+      "WS_NO_BUFFER_UTIL": [
+        "lib/index.js"
+      ],
+      "WS_NO_UTF_8_VALIDATE": [
+        "lib/index.js"
+      ]
+    },
+    "dependencyTree": {
+      "count": 49,
+      "truncated": false,
+      "packages": [
+        {
+          "name": "@libsql/darwin-arm64",
+          "version": "0.5.29",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@libsql/darwin-x64",
+          "version": "0.5.29",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@libsql/linux-arm-gnueabihf",
+          "version": "0.5.29",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@libsql/linux-arm-musleabihf",
+          "version": "0.5.29",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@libsql/linux-arm64-gnu",
+          "version": "0.5.29",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@libsql/linux-arm64-musl",
+          "version": "0.5.29",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@libsql/linux-x64-gnu",
+          "version": "0.5.29",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@libsql/linux-x64-musl",
+          "version": "0.5.29",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@libsql/win32-x64-msvc",
+          "version": "0.5.29",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@neon-rs/load",
+          "version": "0.0.4",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@puppeteer/browsers",
+          "version": "3.2.5",
+          "license": "Apache-2.0",
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/cli-assets",
+          "version": "0.1.0",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/engine-formula-rust-binding",
+          "version": "1.0.1",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/engine-formula-rust-binding-darwin-arm64",
+          "version": "1.0.1",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/engine-formula-rust-binding-darwin-x64",
+          "version": "1.0.1",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/engine-formula-rust-binding-linux-arm64-gnu",
+          "version": "1.0.1",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/engine-formula-rust-binding-linux-x64-gnu",
+          "version": "1.0.1",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/engine-formula-rust-binding-win32-x64-msvc",
+          "version": "1.0.1",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/exchange-node-binding",
+          "version": "1.0.1",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/exchange-node-binding-darwin-arm64",
+          "version": "1.0.1",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/exchange-node-binding-darwin-x64",
+          "version": "1.0.1",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/exchange-node-binding-linux-arm64-gnu",
+          "version": "1.0.1",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/exchange-node-binding-linux-x64-gnu",
+          "version": "1.0.1",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/exchange-node-binding-win32-x64-msvc",
+          "version": "1.0.1",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "ansi-regex",
+          "version": "6.4.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "ansi-styles",
+          "version": "6.2.3",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "chromium-bidi",
+          "version": "157.0.8090-0",
+          "license": "Apache-2.0",
+          "installScript": false
+        },
+        {
+          "name": "cliui",
+          "version": "9.0.1",
+          "license": "ISC",
+          "installScript": false
+        },
+        {
+          "name": "detect-libc",
+          "version": "2.0.2",
+          "license": "Apache-2.0",
+          "installScript": false
+        },
+        {
+          "name": "devtools-protocol",
+          "version": "0.0.1696802",
+          "license": "BSD-3-Clause",
+          "installScript": false
+        },
+        {
+          "name": "emoji-regex",
+          "version": "10.6.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "escalade",
+          "version": "3.2.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "get-caller-file",
+          "version": "2.0.5",
+          "license": "ISC",
+          "installScript": false
+        },
+        {
+          "name": "get-east-asian-width",
+          "version": "1.7.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "libsql",
+          "version": "0.5.29",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "mitt",
+          "version": "3.0.1",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "modern-tar",
+          "version": "0.8.6",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "puppeteer-core",
+          "version": "25.14.0",
+          "license": "Apache-2.0",
+          "installScript": false
+        },
+        {
+          "name": "string-width",
+          "version": "7.2.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "string-width",
+          "version": "8.3.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "strip-ansi",
+          "version": "7.2.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "typed-query-selector",
+          "version": "2.12.3",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "webdriver-bidi-protocol",
+          "version": "1.0.1",
+          "license": "Apache-2.0",
+          "installScript": false
+        },
+        {
+          "name": "wrap-ansi",
+          "version": "9.0.2",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "ws",
+          "version": "8.22.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "y18n",
+          "version": "5.0.8",
+          "license": "ISC",
+          "installScript": false
+        },
+        {
+          "name": "yargs",
+          "version": "18.2.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "yargs-parser",
+          "version": "22.0.0",
+          "license": "ISC",
+          "installScript": false
+        },
+        {
+          "name": "zod",
+          "version": "4.6.7",
+          "license": "MIT",
+          "installScript": false
+        }
+      ],
+      "withInstallScripts": [],
+      "licensesOutsideList": [
+        "@univerjs-pro/cli-assets@0.1.0 (null)",
+        "@univerjs-pro/engine-formula-rust-binding@1.0.1 (null)",
+        "@univerjs-pro/engine-formula-rust-binding-darwin-arm64@1.0.1 (null)",
+        "@univerjs-pro/engine-formula-rust-binding-darwin-x64@1.0.1 (null)",
+        "@univerjs-pro/engine-formula-rust-binding-linux-arm64-gnu@1.0.1 (null)",
+        "@univerjs-pro/engine-formula-rust-binding-linux-x64-gnu@1.0.1 (null)",
+        "@univerjs-pro/engine-formula-rust-binding-win32-x64-msvc@1.0.1 (null)",
+        "@univerjs-pro/exchange-node-binding@1.0.1 (null)",
+        "@univerjs-pro/exchange-node-binding-darwin-arm64@1.0.1 (null)",
+        "@univerjs-pro/exchange-node-binding-darwin-x64@1.0.1 (null)",
+        "@univerjs-pro/exchange-node-binding-linux-arm64-gnu@1.0.1 (null)",
+        "@univerjs-pro/exchange-node-binding-linux-x64-gnu@1.0.1 (null)",
+        "@univerjs-pro/exchange-node-binding-win32-x64-msvc@1.0.1 (null)"
+      ],
+      "unresolved": []
+    }
+  },
+  "trial": {
+    "dshVersion": "0.2.1-rc.2",
+    "ok": true,
+    "installs": [
+      {
+        "spec": "dsh-univer-office@0.3.7",
+        "application": "applied",
+        "version": "0.3.7"
+      }
+    ],
+    "entries": {
+      "afterInstall": [
+        "univer=ACTIVE"
+      ],
+      "afterRestart": [
+        "univer=ACTIVE"
+      ],
+      "afterExtraStart": [
+        "univer=ACTIVE"
+      ]
+    },
+    "extraStart": {
+      "env": {
+        "DO_NOT_TRACK": "1"
+      },
+      "reset": [
+        "telemetry/dsh-univer-office"
+      ]
+    },
+    "network": {
+      "supported": true,
+      "samples": 24,
+      "dshWeb": [
+        "127.0.0.1:61600"
+      ],
+      "listeners": [
+        "TCP 127.0.0.1:9080 — node.exe（invoke univer.ensureGateway）"
+      ],
+      "loopbackOnly": true,
+      "direct": [],
+      "processes": [
+        "invoke univer.ensureGateway: node.exe <tmp>\\dsh-home\\profiles\\web\\node_modules\\dsh-univer-office\\artifacts\\gatewa…"
+      ]
+    },
+    "leftoverProcesses": [],
+    "files": [
+      {
+        "checkpoint": "install",
+        "counts": {
+          "added": 3,
+          "changed": 1,
+          "removed": 0
+        },
+        "added": [
+          "home/profiles/web/.plugin-manager/logs/operation-u5HaUm/pnpm.log (1831 B)",
+          "home/profiles/web/pnpm-lock.yaml (15562 B)",
+          "home/telemetry/dsh-univer-office/state.json (176 B)"
+        ],
+        "changed": [
+          "home/profiles/web/package.json (342 B)"
+        ],
+        "removed": []
+      },
+      {
+        "checkpoint": "restart",
+        "counts": {
+          "added": 0,
+          "changed": 1,
+          "removed": 0
+        },
+        "added": [],
+        "changed": [
+          "home/profiles/web/cordis.yml (223 B)"
+        ],
+        "removed": []
+      },
+      {
+        "checkpoint": "extra start",
+        "counts": {
+          "added": 0,
+          "changed": 1,
+          "removed": 1
+        },
+        "added": [],
+        "changed": [
+          "home/profiles/web/cordis.yml (223 B)"
+        ],
+        "removed": [
+          "home/telemetry/dsh-univer-office/state.json (176 B)"
+        ]
+      }
+    ],
+    "patch": [
+      {
+        "checkpoint": "baseline",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      },
+      {
+        "checkpoint": "install",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      },
+      {
+        "checkpoint": "restart",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      },
+      {
+        "checkpoint": "extra start",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      }
+    ],
+    "registrations": {
+      "tools": [
+        "univer_api",
+        "univer_compile_svg",
+        "univer_execute",
+        "univer_export",
+        "univer_import",
+        "univer_inspect",
+        "univer_lint",
+        "univer_new",
+        "univer_print_pdf",
+        "univer_resources",
+        "univer_screenshot",
+        "univer_status",
+        "univer_unit",
+        "univer_worktree"
+      ],
+      "skills": [],
+      "webRoutes": [
+        "/uf",
+        "/univer-api",
+        "/univer-viewer"
+      ],
+      "connectionRoutes": []
+    },
+    "processes": [
+      "invoke univer.ensureGateway: <node> <tmp>\\dsh-home\\profiles\\web\\node_modules\\dsh-univer-off…"
+    ],
+    "programs": [
+      "node"
+    ],
+    "installTraffic": [
+      "registry.npmjs.org:443 ×33"
+    ],
+    "connections": [
+      "install: univer.ai:443 (refused) ×2"
+    ],
+    "fetches": [
+      "install: POST https://univer.ai/api/telemetry/cli ×2",
+      "invoke univer.ensureGateway: GET http://127.0.0.1:9080/ ×11"
+    ],
+    "credentialReads": [],
+    "calls": [
+      {
+        "call": "invoke univer.ensureGateway",
+        "kind": "service",
+        "status": "returned",
+        "body": "{\"ok\":true,\"gateway\":\"http://127.0.0.1:9080\",\"reused\":false}",
+        "credentialReads": [],
+        "fetches": [
+          "GET http://127.0.0.1:9080/ ×11"
+        ],
+        "spawns": [
+          "<node> <tmp>\\dsh-home\\profiles\\web\\node_modules\\dsh-univer-off…"
+        ],
+        "connections": []
+      }
+    ]
+  }
+}
