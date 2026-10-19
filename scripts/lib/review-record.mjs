@@ -164,7 +164,9 @@ export function compareFacts(previous, current, files) {
   const p = previous.report
   const c = current.report
   add('许可证 · License', `${p.license} (${p.licenseFiles.join(', ') || 'no LICENSE file'})`, `${c.license} (${c.licenseFiles.join(', ') || 'no LICENSE file'})`, true)
-  add('构建来源 · Provenance', provenanceText(p), provenanceText(c), (p.provenance?.repository ?? null) !== (c.provenance?.repository ?? null))
+  const sameSource = (p.provenance?.repository ?? null) === (c.provenance?.repository ?? null) && (p.provenance?.workflow ?? null) === (c.provenance?.workflow ?? null)
+  add('构建来源 · Provenance', provenanceText(p), provenanceText(c), !sameSource,
+    provenanceText(p) === provenanceText(c) ? '无变化 · unchanged' : sameSource ? '新 tag/commit，仓库与工作流相同 · new tag/commit, same repository and workflow' : '仓库或工作流变了 · repository or workflow changed')
   add('DSH 声明 · engines / peers', compatText(p), compatText(c), true)
   add(`兼容 ${c.target} · Compatible`, `发现 ${yes(p.compatibleInDiscover)} 安装 ${yes(p.compatibleAtInstall)}`, `发现 ${yes(c.compatibleInDiscover)} 安装 ${yes(c.compatibleAtInstall)}`, true)
   add('安装脚本 · Install scripts', p.installScripts, c.installScripts, true)
@@ -274,6 +276,26 @@ export function inferCapabilities(report, trial) {
   }
 }
 
+const LEVEL = { none: 0, read: 1, write: 2 }
+/**
+ * Capabilities for a new version of a listed plugin: the reviewed version's judgment, widened by what is new since the
+ * version it was compared with (hosts that appear in code, programs the trial started, file or settings access hints).
+ */
+function carryOver(reviewed, inferred, report, previousReport, trial) {
+  const newHosts = [...Object.keys(report.hosts).filter(host => !Object.hasOwn(previousReport.hosts, host)), ...trialHosts(trial).filter(host => !reviewed.network.includes(host))]
+    .filter((host, position, all) => all.indexOf(host) === position && !reviewed.network.includes(host))
+  const higher = (a, b) => (LEVEL[b] > LEVEL[a] ? b : a)
+  return {
+    newHosts,
+    capabilities: {
+      network: unique([...reviewed.network, ...newHosts]).sort(),
+      files: report.hints.fileWrites.length > previousReport.hints.fileWrites.length ? higher(reviewed.files, inferred.files) : reviewed.files,
+      config: higher(reviewed.config, report.hints.configWrites.length > previousReport.hints.configWrites.length ? inferred.config : 'none'),
+      childProcess: unique([...reviewed.childProcess, ...inferred.childProcess]).sort(),
+    },
+  }
+}
+
 /** A factual summary for `review.notes`; the reviewer adds judgment. */
 export function autoNotes({ report, trial, delta, previous }) {
   const parts = []
@@ -296,8 +318,11 @@ export function autoNotes({ report, trial, delta, previous }) {
     }
   } else parts.push(`No install trial (${trial?.skipped ?? 'not run'}).`)
   if (delta && previous) {
-    const changed = delta.rows.filter(row => row.changed).map(row => row.label.split(' · ').pop())
-    parts.push(`Changes since ${previous}: ${changed.length === 0 ? 'none in the compared facts' : changed.join(', ')}.`)
+    const highlights = delta.highlights.map(label => label.split(' · ').pop())
+    const files = delta.files === undefined ? '' : ` Package files since ${previous}: ${delta.files.added.length} added, ${delta.files.removed.length} removed, ${delta.files.changed.length} changed${delta.files.changed.length > 0 ? ` (${delta.files.changed.slice(0, 5).map(item => item.path).join(', ')}${delta.files.changed.length > 5 ? ', …' : ''})` : ''}.`
+    parts.push(highlights.length === 0
+      ? `Changes since ${previous}: none in license, provenance source, DSH compatibility, install scripts, dependencies, hosts in code, code hints, or trial behavior.${files}`
+      : `Changes since ${previous} to review: ${highlights.join(', ')}.${files}`)
   }
   return parts.join(' ')
 }
@@ -351,12 +376,15 @@ function pluginYaml(plugin, versions, comments = {}) {
  * `versions` item; a new plugin is a whole entry. Only the verdict, the risk notes, and display text stay TODO.
  * @returns {{ kind: 'listed' | 'update' | 'new', yaml: string }} the draft and where it goes.
  */
-export function draftEntry({ report, trial, listing, categories, delta, previous, today, reviewer = 'VibeDev' }) {
+export function draftEntry({ report, trial, listing, categories, delta, previous, previousReport, today, reviewer = 'VibeDev' }) {
   if (listing.version !== undefined) {
     return { kind: 'listed', yaml: pluginYaml(listing.plugin, [listing.version]) }
   }
   const trialPassed = trial && !trial.skipped && trial.ok
-  const capabilities = inferCapabilities(report, trial)
+  const inferred = inferCapabilities(report, trial)
+  const base = listing.plugin?.versions?.find(item => item.version === previous)
+  const carried = base !== undefined && previousReport !== undefined ? carryOver(base.review.capabilities, inferred, report, previousReport, trial) : undefined
+  const capabilities = carried?.capabilities ?? inferred
   const version = {
     version: report.version,
     integrity: report.integrity,
@@ -367,7 +395,9 @@ export function draftEntry({ report, trial, listing, categories, delta, previous
       notes: autoNotes({ report, trial, delta, previous }),
     },
     comments: {
-      network: '代码中出现的主机和试用中连接过的主机；删去只是链接的 · hosts in code and seen in the trial; drop link-only hosts',
+      network: carried !== undefined
+        ? `沿用 ${base.version} 的审核判断${carried.newHosts.length ? `，新增 ${carried.newHosts.join(', ')}（请确认）` : ''} · carried over from ${base.version}${carried.newHosts.length ? `; new: ${carried.newHosts.join(', ')} (confirm)` : ''}`
+        : '代码中出现的主机和试用中连接过的主机；删去只是链接的 · hosts in code and seen in the trial; drop link-only hosts',
       ...report.hints.childProcess.length > 0 && capabilities.childProcess.length === 0
         ? { childProcess: `代码有子进程线索（${report.hints.childProcess.slice(0, 3).join(', ')}），请确认启动的程序 · child-process hints; name the programs` }
         : {},

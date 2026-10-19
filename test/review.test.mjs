@@ -106,6 +106,18 @@ test('an update draft is one versions item; a failed trial leaves testedOn empty
   assert.match(item.review.notes, /No install trial/u)
 })
 
+test('an update draft carries the reviewed capabilities forward and adds only new hosts', () => {
+  const reviewed = { reviewer: 'VibeDev', date: '2026-10-01', license: 'MIT', testedOn: ['0.2.1-rc.2'], installScripts: [], notes: 'n',
+    capabilities: { network: ['api.example.com'], files: 'write', config: 'read', childProcess: [] } }
+  const listed = { name: 'dsh-example', category: 'usage', tags: [], maintainer: 'm@x.io', versions: [{ version: '1.0.0', integrity: `sha512-${'B'.repeat(86)}==`, review: reviewed }] }
+  const previousReport = fakeReport({ version: '1.0.0', hosts: { 'api.example.com': ['lib/index.js'], 'docs.example.dev': ['lib/client.js'] } })
+  const report = fakeReport({ hosts: { 'api.example.com': ['lib/index.js'], 'docs.example.dev': ['lib/client.js'], 'new.example.net': ['lib/index.js'] } })
+  const draft = draftEntry({ report, trial: summarizeTrial(rawTrial, { names: ['dsh-example'] }), listing: { plugin: listed }, categories, today: '2026-10-19', previous: '1.0.0', previousReport })
+  const [item] = parseYaml(draft.yaml.split('\n').map(line => line.slice(6)).join('\n'))
+  assert.deepEqual(item.review.capabilities, { network: ['api.example.com', 'new.example.net'], files: 'write', config: 'read', childProcess: ['bsk'] })
+  assert.match(draft.yaml, /carried over from 1\.0\.0; new: new\.example\.net/u)
+})
+
 test('the record puts Chinese before English and lists TODOs for an unlisted version', () => {
   const report = fakeReport()
   const trial = summarizeTrial(rawTrial, { names: ['dsh-example'] })

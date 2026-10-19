@@ -5,7 +5,8 @@
  * credential reads, registrations), and a review record: reviews/<name>@<version>.md (Chinese first, then English)
  * with a draft plugins.yml entry, plus the facts in reviews/<name>@<version>.json. With --previous the record also
  * compares the two versions, so an update needs only the delta reviewed; the previous version's trial facts come from
- * its committed record when there is one.
+ * its committed record when there is one. For a new version of a listed plugin, --previous defaults to the newest
+ * listed version below it, and the draft carries that version's reviewed capabilities forward, adding only what is new.
  *
  * Usage: npm run review -- <name>@<version> [--previous <version>] [--dsh <DSH checkout>] [--pnpm <pnpm.mjs>]
  *        [--call "METHOD /path"]... [--no-trial] [--force] [--out reviews]
@@ -18,6 +19,7 @@ import { homedir, tmpdir } from 'node:os'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
+import semver from 'semver'
 import { loadCatalog } from './lib/catalog.mjs'
 import { inspectVersion } from './lib/inspection.mjs'
 import { compareFacts, diffFiles, draftEntry, FACTS_SCHEMA, renderRecord, summarizeTrial } from './lib/review-record.mjs'
@@ -116,11 +118,21 @@ step(trialBlocker === undefined ? `install trial of ${name}@${version} on ${dsh}
 const trial = await runTrial(`${name}@${version}`)
 
 // ---- previous version --------------------------------------------------------------------------------------------
+// Without --previous, a new version of a listed plugin is compared with the newest listed version below it.
+const plugin = catalog?.plugins?.find?.(item => item.name === name)
+const listedVersions = (plugin?.versions ?? []).map(item => item.version)
+const listedBelow = listedVersions.filter(listed => semver.valid(listed) !== null && semver.lt(listed, version)).sort(semver.rcompare)
+if (values.previous === undefined && listedBelow.length > 0 && !listedVersions.includes(version)) {
+  values.previous = listedBelow[0]
+  step(`comparing with ${values.previous}, the newest listed version below ${version}`)
+}
 let delta
 let previousTrialSource
+let previousReport
 if (values.previous !== undefined) {
   step(`static inspection of ${name}@${values.previous}`)
   const previous = await inspectVersion(name, values.previous, { target, deps: true })
+  previousReport = previous.report
   const previousFacts = join(outDir, `${name}@${values.previous}.json`)
   let previousTrial
   if (existsSync(previousFacts)) {
@@ -139,9 +151,8 @@ if (values.previous !== undefined) {
 }
 
 // ---- record ------------------------------------------------------------------------------------------------------
-const plugin = catalog?.plugins?.find?.(item => item.name === name)
 const listing = { plugin, version: plugin?.versions?.find(item => item.version === version) }
-const draft = draftEntry({ report, trial, listing, categories: catalog.categories ?? {}, delta, previous: values.previous, today })
+const draft = draftEntry({ report, trial, listing, categories: catalog.categories ?? {}, delta, previous: values.previous, previousReport, today })
 const quote = text => (/[\s"]/u.test(text) ? JSON.stringify(text) : text)
 const command = ['npm run review --', `${name}@${version}`, ...values.previous ? ['--previous', values.previous] : [],
   ...dsh && !values['no-trial'] ? ['--dsh', quote(dsh)] : [], ...calls.flatMap(call => ['--call', quote(call)]), ...values['no-trial'] ? ['--no-trial'] : []].join(' ')
