@@ -59,12 +59,14 @@ plugins:
         zh: BrowserSkill 浏览器操作
       description:
         en: >-
-          Lets the agent drive a real browser through Tencent BrowserSkill. Requires the separate bsk command-line tool
-          (github.com/Tencent/BrowserSkill) on PATH: the plugin launches bsk processes, and the browser visits the sites
-          the agent chooses. Session recovery records are kept in ~/.bsk.
+          Lets the agent drive a real browser through Tencent BrowserSkill. Install first, both at version 0.3.3: the bsk
+          command-line tool on PATH and the BrowserSkill extension connected in Chrome or Edge (github.com/Tencent/BrowserSkill,
+          Quick start); restart VibeDev afterwards so it finds bsk. The plugin launches bsk processes, and the browser
+          visits the sites the agent chooses. Session recovery records are kept in ~/.bsk.
         zh: >-
-          让 Agent 通过腾讯 BrowserSkill 操作真实浏览器。需要另行安装 bsk 命令行工具（github.com/Tencent/BrowserSkill）并加入
-          PATH：插件会启动 bsk 进程，浏览器会访问 Agent 选择的网站。会话恢复记录保存在 ~/.bsk。
+          让 Agent 通过腾讯 BrowserSkill 操作真实浏览器。安装前先装好两样，版本都要是 0.3.3：bsk 命令行工具（加入 PATH），以及
+          Chrome 或 Edge 里已连接 bsk 的 BrowserSkill 扩展（见 github.com/Tencent/BrowserSkill 的 Quick start）；装好后重启
+          VibeDev，它才能找到 bsk。插件会启动 bsk 进程，浏览器会访问 Agent 选择的网站。会话恢复记录保存在 ~/.bsk。
     versions:
       - version: 0.3.3
         integrity: sha512-YleWGGDN7re7arDD8PVgcIuTeMXHne4JKilLaKmvO9L1EzvOKNKVXZ3eHq7CXbgF7uooxRjnYviMH2QMRqZv+A==
