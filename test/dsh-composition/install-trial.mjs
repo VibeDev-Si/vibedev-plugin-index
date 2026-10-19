@@ -6,8 +6,11 @@
  * processes, fetch calls, credential reads, and every outbound connection, which a local proxy logs and refuses
  * unless the host is on the allow list (the npm registry, so pnpm can install). The profile is then booted a second
  * time to observe startup with the bundles installed. Nothing outside the temporary directories is written.
+ * `--call "METHOD /path"` invokes a route a bundle registered (on the connection fetch bridge or the web server) once
+ * after installation, with an empty JSON body, and records what that call reads and requests.
  *
- * Usage: node test/dsh-composition/install-trial.mjs --dsh <checkout> --pnpm <pnpm.mjs> [--allow host]... [--out report.json] <name@version>...
+ * Usage: node test/dsh-composition/install-trial.mjs --dsh <checkout> --pnpm <pnpm.mjs> [--allow host]...
+ *        [--call "METHOD /path"]... [--settle ms] [--out report.json] <name@version>...
  */
 import childProcess from 'node:child_process'
 import { mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
@@ -24,17 +27,25 @@ const { values, positionals } = parseArgs({
   allowPositionals: true,
   options: {
     dsh: { type: 'string' }, pnpm: { type: 'string' }, allow: { type: 'string', multiple: true },
-    out: { type: 'string' }, settle: { type: 'string', default: '20000' },
+    call: { type: 'string', multiple: true }, out: { type: 'string' }, settle: { type: 'string', default: '20000' },
   },
 })
+const calls = (values.call ?? []).map((text) => {
+  const match = /^\s*(GET|HEAD|POST|PUT|PATCH|DELETE)\s+(\/\S*)\s*$/iu.exec(text)
+  if (match === null) {
+    console.error(`--call must look like "POST /api/example": ${JSON.stringify(text)}`)
+    process.exit(2)
+  }
+  return { method: match[1].toUpperCase(), path: match[2] }
+})
 if (values.dsh === undefined || values.pnpm === undefined || positionals.length === 0) {
-  console.error('usage: node test/dsh-composition/install-trial.mjs --dsh <checkout> --pnpm <pnpm.mjs> [--allow host]... [--out file] <name@version>...')
+  console.error('usage: node test/dsh-composition/install-trial.mjs --dsh <checkout> --pnpm <pnpm.mjs> [--allow host]... [--call "METHOD /path"]... [--out file] <name@version>...')
   process.exit(2)
 }
 const allow = new Set(values.allow ?? ['registry.npmjs.org'])
 const settleMs = Number(values.settle)
 const started = Date.now()
-const log = { spawns: [], fetches: [], connections: [], credentials: [], tools: [], skills: [], webRoutes: [], connectionRoutes: [], installs: [], states: {}, exercises: {} }
+const log = { spawns: [], fetches: [], connections: [], credentials: [], tools: [], skills: [], webRoutes: [], connectionRoutes: [], installs: [], states: {}, calls: [] }
 let phase = 'setup'
 const stamp = () => ({ t: Math.round((Date.now() - started) / 100) / 10, phase })
 const short = (value, size = 160) => (String(value).length > size ? `${String(value).slice(0, size)}…` : String(value))
@@ -108,7 +119,8 @@ Object.assign(process.env, env)
 
 const checkout = resolve(values.dsh)
 const load = async path => await import(pathToFileURL(join(checkout, path)).href)
-const { loadLayeredEnv } = await load('packages/boot/app-boot/lib/index.js')
+const { loadLayeredEnv, getDshRuntimeVersion } = await load('packages/boot/app-boot/lib/index.js')
+log.dshVersion = getDshRuntimeVersion()
 const { runProfile } = await load('apps/cli/lib/profile-boot.js')
 const port = await new Promise((done) => { const probe = net.createServer().listen(0, '127.0.0.1', () => { const { port: free } = probe.address(); probe.close(() => done(free)) }) })
 const packageManager = { command: process.execPath, args: [resolve(values.pnpm)] }
@@ -173,22 +185,50 @@ try {
   }
   phase = 'states1'
   for (const name of names) log.states[`boot1:${name}`] = await bundleStates(ctx, name)
-
-  phase = 'exercise:dsh-context-balance'
   const bridge = connectionRoutes(ctx)
   log.connectionRoutes = bridge.filter(route => !baselineRoutes.has(route.path)).map(route => ({ path: route.path, methods: route.methods }))
-  const balance = bridge.find(route => route.path === '/api/dsh-context/balance')
-  if (balance !== undefined) {
-    const before = log.credentials.length
-    const response = await balance.fetch(new Request('http://127.0.0.1/api/dsh-context/balance', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }))
-    log.exercises.dshContextBalance = { status: response.status, body: short(await response.text(), 300), credentialReads: log.credentials.slice(before).map(item => item.name) }
-  }
-  phase = 'exercise:skills-manager-updater'
-  const updater = log.webRoutes.find(item => item.path === '/api/michengai/dsh-skills-manager/update')
-  if (updater !== undefined) {
-    const reply = { status: 0, body: '' }
-    await updater.route.handler({ method: 'GET', url: updater.path, headers: {} }, { writeHead(status) { reply.status = status; return this }, setHeader() {}, end(body) { reply.body = String(body ?? '') } })
-    log.exercises.skillsManagerUpdaterGet = { status: reply.status, body: short(reply.body, 400) }
+
+  for (const { method, path } of calls) {
+    phase = `call:${method} ${path}`
+    const before = { credentials: log.credentials.length, fetches: log.fetches.length, spawns: log.spawns.length, connections: log.connections.length }
+    const record = { method, path, kind: 'missing' }
+    try {
+      const viaBridge = bridge.find(route => route.path === path && route.methods.includes(method))
+      const viaServer = log.webRoutes.find(item => item.path === path && typeof item.route?.handler === 'function')
+      const body = method === 'GET' || method === 'HEAD' ? undefined : '{}'
+      if (viaBridge !== undefined) {
+        record.kind = 'connection'
+        const response = await viaBridge.fetch(new Request(`http://127.0.0.1${path}`, { method, headers: { 'content-type': 'application/json' }, body }))
+        Object.assign(record, { status: response.status, body: short(await response.text(), 300) })
+      } else if (viaServer !== undefined) {
+        record.kind = 'webServer'
+        const reply = { status: 0, chunks: [] }
+        const request = Object.assign(new (await import('node:stream')).Readable({ read() { this.push(body ?? null); if (body !== undefined) this.push(null) } }),
+          { method, url: path, headers: { host: '127.0.0.1', 'content-type': 'application/json' } })
+        await new Promise((done) => {
+          const response = {
+            statusCode: 200,
+            writeHead(status) { reply.status = status; return this },
+            setHeader() {}, getHeader() {}, write(chunk) { reply.chunks.push(String(chunk)); return true },
+            end(chunk) { if (chunk !== undefined) reply.chunks.push(String(chunk)); if (reply.status === 0) reply.status = this.statusCode; done() },
+            on() { return this }, once() { return this },
+          }
+          Promise.resolve(viaServer.route.handler(request, response)).catch((error) => { reply.status = -1; reply.chunks.push(String(error)); done() })
+          setTimeout(done, 15000).unref()
+        })
+        Object.assign(record, { status: reply.status, body: short(reply.chunks.join(''), 300) })
+      }
+    } catch (error) {
+      record.error = short(error instanceof Error ? error.message : error, 300)
+    }
+    await sleep(1000)
+    Object.assign(record, {
+      credentialReads: log.credentials.slice(before.credentials).map(item => item.name),
+      fetches: log.fetches.slice(before.fetches).map(item => `${item.method ?? ''} ${item.url}${item.authorization ? ' (Authorization)' : ''}`.trim()),
+      spawns: log.spawns.slice(before.spawns).map(item => [item.file, ...item.args].join(' ')),
+      connections: log.connections.slice(before.connections).map(item => `${item.target}${item.allowed ? '' : ' (refused)'}`),
+    })
+    log.calls.push(record)
   }
   await ctx.fiber.dispose()
   ctx = undefined
