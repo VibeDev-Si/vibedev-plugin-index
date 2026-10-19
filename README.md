@@ -38,11 +38,36 @@ VibeDev 使用上游 DeepSeek Harness 自带的插件市场：Host 端服务 `@d
 8. **维护者可联系且有响应**：记录 issue 地址或邮箱；仓库未归档，最近 90 天有提交或 issue 回复。安全问题报告 7 天内无回应的，可以先下架。
 9. **其他**：不自我更新、不修改其他插件或 VibeDev 内置插件、不在运行时下载并执行未审核的代码；不与 VibeDev 内置功能重复。
 
+### 新增收录 / 更新版本
+
+从申请到用户看到一共六步，不需要发布 VibeDev 桌面版。
+
+1. **审核**：在本地运行一条命令。
+
+   ```sh
+   npm run review -- <name>@<version> --dsh <已构建的 DSH 检出>
+   # 更新已收录的插件时，会自动与最新收录的版本对比；也可以用 --previous <版本> 指定
+   ```
+
+   它会依次完成：
+   - 静态检查：tarball、provenance、依赖树、代码线索；
+   - 安装试用：在临时 profile 里用 `installBundle` 安装并重启，记录子进程、外连、凭据读取和注册项；
+   - 写出审核记录 `reviews/<name>@<version>.md`（中文在前）和对应的 `.json`。
+
+   记录末尾是 `plugins.yml` 草稿：新插件给出整段条目；新版本给出一条 `versions` 记录，并沿用上一版本的审核判断。
+2. **判断**：阅读记录（更新时主要看「与 X 相比」一节），填写 TODO：结论、风险提示和显示文字。把草稿粘进 `plugins.yml`，运行 `npm run validate`；只要还有 TODO，校验就不会通过。
+3. **PR**：提交 `plugins.yml` 和 `reviews/` 下的记录，开 PR。`main` 受保护，只能通过 PR 合并，并且 Validate 检查必须通过。
+4. **合并**：Pages 工作流会自动构建并发布 `index.json`，大约 1–2 分钟。
+5. **镜像**：运行 `npm run mirror -- --ssh … --identity … --known-hosts … --apply`，同步到 `https://download.vibedev.studio/plugin-index/index.json`，详见下文「镜像到 VibeDev 下载服务器」。
+6. **生效**：DSH 读取索引后会缓存 10 分钟，之后「发现」页就会显示新插件或新版本；点刷新按钮会立即重新读取。已安装旧版本的用户会看到「有更新」。前提是 VibeDev 已把本索引设为默认源（计划中），或者用户已手动添加。
+
+下架只需第 3–6 步：在 `plugins.yml` 里删除对应版本或整个插件即可。
+
 ### 审核清单
 
 审核人对每个版本逐项完成，并把结果写进 PR：
 
-- [ ] 运行 `npm run inspect -- <name>@<version> --deps`，把输出附在 PR 里（许可证、兼容性、安装脚本、体量、依赖树、代码线索）。
+- [ ] 运行 `npm run review -- <name>@<version> --dsh <DSH 检出>`，把 `reviews/` 下生成的记录一起提交。记录包含许可证、兼容性、安装脚本、体量、依赖树、代码线索和安装试用结果。
 - [ ] 许可证是 OSI 许可证，与仓库和包内 LICENSE 一致。
 - [ ] `dsh.bundle` 存在；`engines.dsh`（或 dsh peers）允许 `target.dsh`。
 - [ ] 包和依赖树都没有未审核的安装脚本。
@@ -51,7 +76,7 @@ VibeDev 使用上游 DeepSeek Harness 自带的插件市场：Host 端服务 `@d
 - [ ] 在 VibeDev（目标 DSH 版本）里实际安装、启用、使用主要功能、停用、卸载：无报错，不改动无关配置，卸载后无残留进程。
 - [ ] 维护者联系方式可用，项目仍在维护。
 - [ ] 在 `plugins.yml` 写完整审核记录：`reviewer`、`date`、`license`、`testedOn`、`capabilities`、`installScripts`、`notes`（必要时 `sizeException`）。
-- [ ] `npm run validate` 通过；由另一位维护者批准后合并。
+- [ ] `npm run validate` 通过，PR 的 Validate 检查通过后合并。目前只有一位维护者，所以不要求批准；有第二位维护者后，改为要求 1 个批准。
 
 ### 如何提交或申请更新
 
@@ -64,21 +89,23 @@ VibeDev 使用上游 DeepSeek Harness 自带的插件市场：Host 端服务 `@d
 
 - **从不自动收录。** 索引只包含 `plugins.yml` 里的版本，发现页安装的永远是记录过的 `name@version`。
 - 每周一（02:17 UTC）定时任务运行 `scripts/check-updates.mjs`，把收录插件比已审核版本更新的版本列成表（发布时间、`engines.dsh`、与目标 DSH 是否兼容、安装脚本、体量、许可证），新建或更新一个带 `upstream-release` 标签的 issue；没有待审版本时关闭它。
-- 审核人按清单复审新版本，在 PR 里加上新版本（旧版本可以保留或删除）；合并后 Pages 自动重新发布。已安装旧版本的用户会在发现页看到「有更新」。
+- 审核人运行 `npm run review -- <name>@<新版本>`，它会自动与最新收录的版本对比，通常只需要看「变化」一节。然后在 PR 里加上新版本（旧版本可以保留或删除），合并后 Pages 自动重新发布。已安装旧版本的用户会在发现页看到「有更新」。
 - **紧急下架**：删除对应版本（或整个插件）并合并，Pages 几分钟内更新；客户端最多缓存 10 分钟。已经安装的副本不会被自动卸载，需要在 issue 和发布说明里通知用户。
 
 ### 仓库结构与命令
 
 ```text
 plugins.yml                 收录清单（唯一的数据来源）
-CANDIDATES.md               待批准的候选插件与初审
+CANDIDATES.md               候选插件与审核结论
+reviews/                    每个审核过的版本一份记录：<name>@<version>.md（中文在前）和 .json
+scripts/review.mjs          一条命令完成审核：静态检查、安装试用、记录与 plugins.yml 草稿
 scripts/build.mjs           生成 dist/index.json、dist/icons/、dist/index.html
 scripts/validate.mjs        校验清单、npm 事实与生成的索引
 scripts/check-updates.mjs   每周的上游新版本报告
 scripts/inspect.mjs         审核辅助：一个版本的事实与 plugins.yml 片段（--grep 查看代码出处）
 scripts/mirror.mjs          把 dist/ 发布到 VibeDev 下载服务器（默认只演练）
 scripts/lib/                共用模块（部分改编自 DSH 参考生成器，见 NOTICE.md）
-test/unit.test.mjs          离线单元测试
+test/*.test.mjs             离线单元测试
 test/fixtures/              e2e 测试清单与两个故意写错的清单
 test/dsh-composition/       用 DSH 源码检出做真实组合测试：market-list.mjs（读索引）、install-trial.mjs（安装试用）
 .github/                    CI、Pages 发布、每周检查、issue 与 PR 模板
@@ -89,7 +116,8 @@ npm ci                                   # 依赖已锁定精确版本；.npmrc 
 npm test                                 # 离线单元测试
 npm run validate                         # 校验 plugins.yml（需要访问 npm）
 npm run build                            # 生成 dist/
-npm run inspect -- dsh-context@0.73.2 --deps
+npm run review -- dsh-context@0.73.3 --dsh <已构建的 DSH 检出>   # 审核一个版本，见上文
+npm run inspect -- dsh-context@0.73.2 --grep "user/balance"   # 查看某条代码线索的原文
 npm run check-updates
 node test/dsh-composition/market-list.mjs --dsh <已构建的 DSH 检出> --dist .cache/e2e-dist
 node test/dsh-composition/install-trial.mjs --dsh <已构建的 DSH 检出> --pnpm <pnpm.mjs> --out report.json <name@version>...
@@ -160,9 +188,27 @@ A version must meet all of these; `npm run validate` checks the machine-checkabl
 8. **Responsive maintainer**: an issue tracker or e-mail is recorded; the repository is not archived and shows commits or issue replies within 90 days. A security report without an answer in 7 days can lead to removal.
 9. **Other**: no self-updating, no changes to other or built-in plugins, no downloading and running unreviewed code at runtime, no duplicate of a VibeDev built-in feature.
 
+### Adding a plugin or a new version
+
+Six steps take a plugin from request to users; no VibeDev desktop release is needed.
+
+1. **Review**: run one command, `npm run review -- <name>@<version> --dsh <built DSH checkout>`. A new version of a listed plugin is compared with the newest listed version automatically; `--previous <version>` picks another. The command:
+   - runs the static inspection: tarball, provenance, dependency tree, and code hints;
+   - runs an install trial: `installBundle` in a temporary profile, then a restart, recording child processes, outbound connections, credential reads, and registrations;
+   - writes `reviews/<name>@<version>.md` (Chinese first) and `.json`.
+
+   The record ends with a `plugins.yml` draft: a whole entry for a new plugin, or one `versions` item for a new version, which carries the previous version's reviewed capabilities forward.
+2. **Decide**: read the record (for an update, mostly the "Changes since" section) and fill in the TODOs: verdict, risk notes, and display text. Paste the draft into `plugins.yml` and run `npm run validate`; it fails while any TODO remains.
+3. **Pull request**: commit `plugins.yml` and the record under `reviews/`, and open a pull request. `main` is protected: changes land only through a pull request whose Validate check passed.
+4. **Merge**: the Pages workflow builds and publishes `index.json` in about 1–2 minutes.
+5. **Mirror**: run `npm run mirror -- --ssh … --identity … --known-hosts … --apply` to publish it at `https://download.vibedev.studio/plugin-index/index.json` (see Mirroring below).
+6. **Live**: DSH caches an index for 10 minutes. After that, Discover shows the new plugin or version, and its refresh button rereads the index at once; users with an older version see **Update available**. This assumes VibeDev uses this index as its default source (planned) or the user has added it.
+
+A removal needs only steps 3–6: delete the version or the whole plugin from `plugins.yml`.
+
 ### Review checklist
 
-- [ ] Run `npm run inspect -- <name>@<version> --deps` and attach the output to the PR.
+- [ ] Run `npm run review -- <name>@<version> --dsh <DSH checkout>` and commit the record it writes under `reviews/`. The record covers license, compatibility, install scripts, size, the dependency tree, code hints, and the install trial.
 - [ ] License is OSI-approved and matches the repository and the packaged LICENSE.
 - [ ] `dsh.bundle` exists; `engines.dsh` (or the dsh peers) admits `target.dsh`.
 - [ ] No unreviewed install scripts in the package or its dependency tree.
@@ -171,7 +217,7 @@ A version must meet all of these; `npm run validate` checks the machine-checkabl
 - [ ] Install, enable, use, disable, and uninstall it in VibeDev on the target DSH: no errors, no unrelated configuration changes, no processes left behind.
 - [ ] The maintainer contact works and the project is maintained.
 - [ ] Write the complete review record in `plugins.yml`.
-- [ ] `npm run validate` passes; a second maintainer approves the PR.
+- [ ] `npm run validate` passes, and the PR's Validate check passes before merging. With a single maintainer no approval is required for now; once there is a second maintainer, require 1 approval.
 
 ### Submitting and requesting updates
 
@@ -184,12 +230,12 @@ A version must meet all of these; `npm run validate` checks the machine-checkabl
 
 - **Never automatic.** The index holds only the versions in `plugins.yml`; Discover installs exactly that `name@version`.
 - Every Monday (02:17 UTC) a scheduled workflow runs `scripts/check-updates.mjs`, lists versions newer than the newest reviewed one with their facts, and opens or updates one issue labelled `upstream-release`; it closes the issue when nothing is pending.
-- A reviewer runs the checklist for the new version and adds it in a PR (keeping or dropping older versions); merging redeploys Pages, and users with an older version see **Update available**.
+- A reviewer runs `npm run review -- <name>@<new version>`, which compares it with the newest listed version automatically, so usually only the "Changes since" section needs reading. The reviewer then adds the version in a PR, keeping or dropping older versions. Merging redeploys Pages, and users with an older version see **Update available**.
 - **Emergency removal**: delete the version or plugin and merge; Pages updates within minutes and clients cache for at most 10 minutes. Installed copies stay installed, so announce the removal.
 
 ### Layout and commands
 
-See the [Chinese section](#仓库结构与命令) for the file tree and commands. Node.js 22.12 or later. The four dependencies are pinned exactly: `@deepseek-ai/dsh-plugin-market-index` (the format-1 validator DSH itself uses, at the `target.dsh` version), `semver`, `yaml`, and `resolve.exports`; `.npmrc` disables install scripts.
+See the [Chinese section](#仓库结构与命令) for the file tree and commands. Review records live in `reviews/` (one `.md` and `.json` per reviewed version); `npm run review` writes them, and validation warns when a listed version has none. `--pnpm` defaults to the pnpm bundled with VibeDev; `DSH_CHECKOUT` and `PNPM_MJS` can replace `--dsh` and `--pnpm`, and without a DSH checkout the record says the trial did not run. Node.js 22.12 or later. The four dependencies are pinned exactly: `@deepseek-ai/dsh-plugin-market-index` (the format-1 validator DSH itself uses, at the `target.dsh` version), `semver`, `yaml`, and `resolve.exports`; `.npmrc` disables install scripts.
 
 ### Mirroring to the VibeDev download server
 

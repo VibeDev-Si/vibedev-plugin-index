@@ -1,0 +1,160 @@
+{
+  "schema": 1,
+  "package": "@wxg-prc-cpg/browser-skill-dsh-plugin",
+  "version": "0.3.3",
+  "date": "2026-10-19",
+  "target": "0.2.1-rc.2",
+  "command": "npm run review -- @wxg-prc-cpg/browser-skill-dsh-plugin@0.3.3 --dsh C:\\vdp-wt\\vdmerge --call \"GET /bsk-observation/state\"",
+  "tool": {
+    "index": "3c8c251",
+    "dsh": "882964566b (DSH 0.2.1-rc.2)"
+  },
+  "static": {
+    "name": "@wxg-prc-cpg/browser-skill-dsh-plugin",
+    "version": "0.3.3",
+    "published": "2026-10-15T02:53:49.469Z",
+    "distTags": {
+      "latest": "0.3.3"
+    },
+    "versionsPublished": 9,
+    "versionsLast30Days": 3,
+    "deprecated": null,
+    "integrity": "sha512-YleWGGDN7re7arDD8PVgcIuTeMXHne4JKilLaKmvO9L1EzvOKNKVXZ3eHq7CXbgF7uooxRjnYviMH2QMRqZv+A==",
+    "license": "MIT",
+    "licenseAccepted": true,
+    "licenseFiles": [
+      "LICENSE"
+    ],
+    "provenance": null,
+    "bundle": true,
+    "enginesDsh": null,
+    "dshPeers": {
+      "@deepseek-ai/dsh-attachment": "^0.1.5-rc.3 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-client-ui-primitives": "^0.1.5-rc.3 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-client-ui-tool": "^0.1.5-rc.3 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-llm": "^0.1.5-rc.3 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-tools": "^0.1.5-rc.3 || ^0.2.0-rc.1"
+    },
+    "otherPeers": {
+      "react": "^18.2.0"
+    },
+    "indexEnginesDsh": "^0.1.5-rc.3 || ^0.2.0-rc.1",
+    "declaresDsh": true,
+    "target": "0.2.1-rc.2",
+    "compatibleInDiscover": true,
+    "compatibleAtInstall": true,
+    "unmet": {},
+    "installScripts": [],
+    "npmHasInstallScript": false,
+    "unpackedBytes": 476152,
+    "fileCount": 14,
+    "tarballBytes": 117500,
+    "dependencies": {},
+    "optionalDependencies": {},
+    "description": "DeepSeek Harness tool plugin that exposes BrowserSkill browser automation (bsk_* tools) to the model",
+    "keywords": [
+      "dsh-plugin",
+      "deepseek-harness",
+      "browserskill",
+      "browser-automation"
+    ],
+    "repository": "https://github.com/Tencent/BrowserSkill",
+    "homepage": "https://github.com/Tencent/BrowserSkill/tree/main/packages/dsh-plugin-browserskill#readme",
+    "bugs": "https://github.com/Tencent/BrowserSkill/issues",
+    "maintainers": [
+      "wxg-prc-cpg"
+    ],
+    "hints": {
+      "childProcess": [
+        "lib/index.mjs"
+      ],
+      "network": [
+        "lib/client.cjs"
+      ],
+      "fileWrites": [
+        "lib/index.mjs"
+      ],
+      "configWrites": [],
+      "configReads": [],
+      "credentials": [],
+      "environment": [
+        "lib/index.mjs"
+      ],
+      "dynamicCode": [],
+      "selfUpdate": [],
+      "telemetry": []
+    },
+    "hosts": {},
+    "envVars": {
+      "BSK_HOME": [
+        "lib/index.mjs"
+      ]
+    },
+    "dependencyTree": {
+      "count": 0,
+      "truncated": false,
+      "packages": [],
+      "withInstallScripts": [],
+      "licensesOutsideList": [],
+      "unresolved": []
+    }
+  },
+  "trial": {
+    "dshVersion": "0.2.1-rc.2",
+    "ok": true,
+    "installs": [
+      {
+        "spec": "@wxg-prc-cpg/browser-skill-dsh-plugin@0.3.3",
+        "application": "applied",
+        "version": "0.3.3"
+      }
+    ],
+    "entries": {
+      "afterInstall": [
+        "browserskill=ACTIVE"
+      ],
+      "afterRestart": [
+        "browserskill=ACTIVE"
+      ]
+    },
+    "registrations": {
+      "tools": [],
+      "skills": [
+        "browser-skill (bundled)"
+      ],
+      "webRoutes": [
+        "/bsk-observation/events",
+        "/bsk-observation/interrupt",
+        "/bsk-observation/state",
+        "/bsk-observation/stop",
+        "/bsk-observation/thumbnail"
+      ],
+      "connectionRoutes": []
+    },
+    "processes": [
+      "install: bsk --version --json",
+      "restart: bsk --version --json"
+    ],
+    "programs": [
+      "bsk"
+    ],
+    "installTraffic": [
+      "registry.npmjs.org:443"
+    ],
+    "connections": [],
+    "fetches": [],
+    "credentialReads": [],
+    "calls": [
+      {
+        "call": "GET /bsk-observation/state",
+        "kind": "webServer",
+        "status": 200,
+        "body": "{\"sessions\":[],\"available\":true}",
+        "credentialReads": [],
+        "fetches": [],
+        "spawns": [],
+        "connections": []
+      }
+    ]
+  }
+}
