@@ -23,7 +23,8 @@ export const HINTS = {
   environment: /process\.env\b/u,
   dynamicCode: /\beval\(|\bnew Function\(|\bimport\(\s*[^'"`\s)]/u,
   selfUpdate: /\/latest\b|dist-tags|minimumReleaseAge|\bnpm\s+(?:i|install)\s|["'`]add["'`]\s*,\s*["'`]--|plugin\s+add\b/u,
-  telemetry: /\btelemetry\b|\banalytics\b|\bheartbeat\b|\bposthog\b|\bsentry\b|\bmixpanel\b|\bumami\b|\bplausible\b|\bgtag\(|google-analytics/iu,
+  // Whole words only: `insightsEntry` is not Sentry, and a server-sent-events keep-alive "heartbeat" is not telemetry.
+  telemetry: /\btelemetry\b|\banalytics\b|\bposthog\b|\bsentry\b|\bmixpanel\b|\bumami\b|\bplausible\b|\bgtag\(|google-analytics/iu,
 }
 
 /** Chinese and English labels of the hint categories, in display order. */
