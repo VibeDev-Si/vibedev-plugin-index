@@ -9,7 +9,10 @@
  * listed version below it, and the draft carries that version's reviewed capabilities forward, adding only what is new.
  *
  * Usage: npm run review -- <name>@<version> [--previous <version>] [--dsh <DSH checkout>] [--pnpm <pnpm.mjs>]
- *        [--call "METHOD /path"]... [--no-trial] [--force] [--out reviews]
+ *        [--call "METHOD /path"]... [--invoke <service>.<method>]... [--approve-builds <package>]... [--extra-start-env KEY=VALUE]...
+ *        [--extra-start-reset <path under DSH_HOME>]... [--no-trial] [--force] [--out reviews]
+ * --approve-builds answers the Plugins page's "Allow these scripts and retry" for the named packages; --extra-start-env
+ * and --extra-start-reset add a third start (for example DO_NOT_TRACK=1 after deleting a telemetry state file).
  * DSH_CHECKOUT and PNPM_MJS stand in for --dsh and --pnpm; --pnpm defaults to the pnpm bundled with VibeDev.
  * Without a DSH checkout the trial is skipped and the record says so.
  */
@@ -29,11 +32,13 @@ const { values, positionals } = parseArgs({
   allowPositionals: true,
   options: {
     previous: { type: 'string' }, dsh: { type: 'string' }, pnpm: { type: 'string' }, call: { type: 'string', multiple: true },
+    'approve-builds': { type: 'string', multiple: true }, 'extra-start-env': { type: 'string', multiple: true }, invoke: { type: 'string', multiple: true },
+    'extra-start-reset': { type: 'string', multiple: true },
     'no-trial': { type: 'boolean', default: false }, force: { type: 'boolean', default: false },
     out: { type: 'string', default: 'reviews' }, settle: { type: 'string', default: '12000' }, catalog: { type: 'string', default: 'plugins.yml' },
   },
 })
-const usage = 'usage: npm run review -- <name>@<version> [--previous <version>] [--dsh <DSH checkout>] [--pnpm <pnpm.mjs>] [--call "METHOD /path"]... [--no-trial] [--force]'
+const usage = 'usage: npm run review -- <name>@<version> [--previous <version>] [--dsh <DSH checkout>] [--pnpm <pnpm.mjs>] [--call "METHOD /path"]... [--invoke <service>.<method>]... [--approve-builds <package>]... [--extra-start-env KEY=VALUE]... [--extra-start-reset <path>]... [--no-trial] [--force]'
 if (positionals.length !== 1) {
   console.error(usage)
   process.exit(2)
@@ -42,6 +47,13 @@ const at = positionals[0].lastIndexOf('@')
 const name = at > 0 ? positionals[0].slice(0, at) : positionals[0]
 const requested = at > 0 ? positionals[0].slice(at + 1) : undefined
 const calls = values.call ?? []
+/** Trial options forwarded to install-trial.mjs, in the order the record's command shows them. */
+const trialOptions = [
+  ...(values.invoke ?? []).flatMap(text => ['--invoke', text]),
+  ...(values['approve-builds'] ?? []).flatMap(name => ['--approve-builds', name]),
+  ...(values['extra-start-env'] ?? []).flatMap(pair => ['--extra-start-env', pair]),
+  ...(values['extra-start-reset'] ?? []).flatMap(path => ['--extra-start-reset', path]),
+]
 const outDir = resolve(repo, values.out)
 const { catalog } = loadCatalog(resolve(repo, values.catalog))
 const target = catalog?.target?.dsh
@@ -76,7 +88,7 @@ async function runTrial(spec) {
   const work = mkdtempSync(join(tmpdir(), 'vibedev-review-'))
   const out = join(work, 'trial.json')
   const logFile = join(work, 'trial.log')
-  const args = [trialScript, '--dsh', resolve(dsh), '--pnpm', resolve(pnpm), '--settle', values.settle, '--out', out, ...calls.flatMap(call => ['--call', call]), spec]
+  const args = [trialScript, '--dsh', resolve(dsh), '--pnpm', resolve(pnpm), '--settle', values.settle, '--out', out, ...calls.flatMap(call => ['--call', call]), ...trialOptions, spec]
   const fd = openSync(logFile, 'w')
   const status = await new Promise((done) => {
     const child = spawn(process.execPath, args, { stdio: ['ignore', fd, fd], windowsHide: true })
@@ -86,6 +98,10 @@ async function runTrial(spec) {
   })
   closeSync(fd)
   const raw = existsSync(out) ? JSON.parse(readFileSync(out, 'utf8')) : undefined
+  // The harness cannot always remove its temporary root while Node is still writing at exit; finish that here.
+  if (typeof raw?.root === 'string' && raw.root.includes('vibedev-install-trial-') && existsSync(raw.root)) {
+    try { rmSync(raw.root, { recursive: true, force: true, maxRetries: 10, retryDelay: 500 }) } catch (error) { console.error(`could not delete ${raw.root}: ${error.message}`) }
+  }
   const tail = readFileSync(logFile, 'utf8').split(/\r?\n/u).filter(line => !/token=/u.test(line)).slice(-12).join('\n')
   rmSync(work, { recursive: true, force: true, maxRetries: 3 })
   if (raw === undefined) {
@@ -155,12 +171,12 @@ const listing = { plugin, version: plugin?.versions?.find(item => item.version =
 const draft = draftEntry({ report, trial, listing, categories: catalog.categories ?? {}, delta, previous: values.previous, previousReport, today })
 const quote = text => (/[\s"]/u.test(text) ? JSON.stringify(text) : text)
 const command = ['npm run review --', `${name}@${version}`, ...values.previous ? ['--previous', values.previous] : [],
-  ...dsh && !values['no-trial'] ? ['--dsh', quote(dsh)] : [], ...calls.flatMap(call => ['--call', quote(call)]), ...values['no-trial'] ? ['--no-trial'] : []].join(' ')
+  ...dsh && !values['no-trial'] ? ['--dsh', quote(dsh)] : [], ...calls.flatMap(call => ['--call', quote(call)]), ...trialOptions.map(quote), ...values['no-trial'] ? ['--no-trial'] : []].join(' ')
 const steps = [
   `npm run inspect -- ${name}@${version} --deps --json`,
   ...values.previous ? [`npm run inspect -- ${name}@${values.previous} --deps --json`] : [],
   ...trialBlocker === undefined
-    ? [`node test/dsh-composition/install-trial.mjs --dsh ${quote(dsh)} --pnpm <pnpm.mjs> --settle ${values.settle}${calls.map(call => ` --call ${quote(call)}`).join('')} --out trial.json ${name}@${version}`]
+    ? [`node test/dsh-composition/install-trial.mjs --dsh ${quote(dsh)} --pnpm <pnpm.mjs> --settle ${values.settle}${calls.map(call => ` --call ${quote(call)}`).join('')}${trialOptions.map(item => ` ${quote(item)}`).join('')} --out trial.json ${name}@${version}`]
     : [],
   ...previousTrialSource ? [`# 上一版本的试用结果取自 · previous trial facts from ${previousTrialSource}`] : [],
 ]

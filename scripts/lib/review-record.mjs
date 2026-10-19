@@ -35,13 +35,17 @@ function counted(items) {
 
 // ---- install trial -----------------------------------------------------------------------------------------------
 
-/** How a reviewer reads a trial phase: install (hot install and first activation), a call, or the restart. */
+/** How a reviewer reads a trial phase: install (hot install and first activation), a call, the restart, or the extra start. */
 function groupOf(phase) {
   if (phase.startsWith('install:') || phase === 'states1') return 'install'
   if (phase.startsWith('call:')) return phase.slice('call:'.length)
   if (phase === 'boot2' || phase === 'idle2' || phase === 'states2') return 'restart'
+  if (phase === 'reset3' || phase === 'boot3' || phase === 'idle3') return 'extra start'
   return null
 }
+
+const LOOPBACK = address => /^127\./u.test(address) || address === '::1' || address === '::ffff:127.0.0.1'
+const hostPort = (address, port) => `${address.includes(':') ? `[${address}]` : address}:${port}`
 
 const isPackageManagerRun = spawn => spawn.args.some(arg => /pnpm\.[cm]?js$/iu.test(arg)) || /(?:^|[\\/])pnpm(?:\.cmd|\.exe)?$/iu.test(spawn.file)
 
@@ -66,18 +70,46 @@ export function summarizeTrial(raw, { names }) {
   const states = (boot) => names.flatMap(name => (raw.states?.[`${boot}:${name}`]?.rows ?? []).map(row => `${row.row}=${row.state}${row.error ? ` (${row.error})` : ''}`))
   const afterInstall = states('boot1')
   const afterRestart = states('boot2')
+  const afterExtraStart = raw.extraStart === undefined ? undefined : states('boot3')
   const installs = (raw.installs ?? []).map(item => ({
     spec: item.spec, application: item.application, version: item.version ?? null,
     ...item.error ? { error: tidy(item.error) } : {}, ...item.kind ? { kind: item.kind } : {},
     ...item.pendingBuilds?.length ? { pendingBuilds: item.pendingBuilds } : {},
+    ...(item.attempts?.length ?? 0) > 1 ? {
+      approval: { pendingBuilds: item.attempts[0].pendingBuilds ?? [], firstAttempt: item.attempts[0].application, firstError: item.attempts[0].error === undefined ? null : tidy(item.attempts[0].error) },
+    } : {},
   }))
   const active = rows => rows.length > 0 && rows.every(row => row.includes('=ACTIVE'))
+  const network = raw.network ?? { supported: false, listeners: [], remote: [], processes: [] }
+  const ownListener = item => item.role === undefined && groupOf(item.firstPhase) !== null
+  const listeners = (network.listeners ?? []).filter(ownListener)
+    .map(item => ({ text: `${item.proto} ${hostPort(item.address, item.port)} — ${item.process}（${groupOf(item.firstPhase)}）`, loopback: LOOPBACK(item.address), proto: item.proto, address: item.address, port: item.port, process: item.process }))
+  const isPnpm = item => /pnpm\.[cm]?js|[\\/]pnpm(?:\.cmd|\.exe)?\b/iu.test(item.cmd ?? '')
   return {
     dshVersion: raw.dshVersion ?? null,
-    ok: raw.failure === undefined && installs.length > 0 && installs.every(item => item.application === 'applied') && active(afterInstall) && active(afterRestart),
+    ok: raw.failure === undefined && installs.length > 0 && installs.every(item => item.application === 'applied') && active(afterInstall) && active(afterRestart)
+      && (afterExtraStart === undefined || active(afterExtraStart)),
     ...raw.failure === undefined ? {} : { failure: tidy(String(raw.failure).split('\n')[0]) },
     installs,
-    entries: { afterInstall, afterRestart },
+    entries: { afterInstall, afterRestart, ...afterExtraStart === undefined ? {} : { afterExtraStart } },
+    ...raw.extraStart === undefined ? {} : { extraStart: raw.extraStart },
+    network: {
+      supported: network.supported === true,
+      samples: network.samples ?? 0,
+      dshWeb: (network.listeners ?? []).filter(item => item.role === 'dsh-web').map(item => hostPort(item.address, item.port)),
+      listeners: listeners.map(item => item.text),
+      loopbackOnly: listeners.every(item => item.loopback),
+      direct: (network.remote ?? []).filter(item => groupOf(item.firstPhase) !== null || item.firstPhase === 'teardown')
+        .map(item => `${groupOf(item.firstPhase) ?? item.firstPhase}: ${item.process} → ${hostPort(item.remote, item.port)}`),
+      processes: (network.processes ?? []).filter(item => groupOf(item.firstPhase) !== null && !isPnpm(item) && !/^conhost\.exe$/iu.test(item.name ?? ''))
+        .map(item => `${groupOf(item.firstPhase)}: ${item.name} ${tidy(item.cmd ?? '').replace(/^"[^"]*"\s*|^\S+\s*/u, '')}`.trim()),
+    },
+    leftoverProcesses: (raw.leftoverProcesses ?? []).map(item => `${item.name} ${tidy(item.cmd ?? '')}`.trim()),
+    files: (raw.files ?? []).filter(item => item.checkpoint !== 'baseline').map(item => ({
+      checkpoint: item.checkpoint, counts: item.counts,
+      added: item.added.map(tidy), changed: item.changed.map(tidy), removed: item.removed.map(tidy),
+    })),
+    patch: (raw.patches ?? []).map(item => ({ checkpoint: item.checkpoint, exists: item.exists, sha256: item.sha256, rows: item.rows })),
     registrations: {
       tools: unique((raw.tools ?? []).filter(item => groupOf(item.phase) === 'install').map(item => item.name)).sort(),
       skills: unique((raw.skills ?? []).filter(item => groupOf(item.phase) === 'install').map(item => `${item.name}${item.source ? ` (${item.source})` : ''}`)).sort(),
@@ -93,7 +125,7 @@ export function summarizeTrial(raw, { names }) {
     calls: (raw.calls ?? []).map(item => ({
       call: `${item.method} ${item.path}`, kind: item.kind, status: item.status ?? null, body: item.body === undefined ? null : tidy(item.body),
       ...item.error ? { error: tidy(item.error) } : {},
-      credentialReads: item.credentialReads ?? [], fetches: (item.fetches ?? []).map(tidy), spawns: (item.spawns ?? []).map(tidy), connections: item.connections ?? [],
+      credentialReads: counted(item.credentialReads ?? []), fetches: counted((item.fetches ?? []).map(tidy)), spawns: counted((item.spawns ?? []).map(tidy)), connections: counted(item.connections ?? []),
     })),
   }
 }
@@ -191,6 +223,10 @@ export function compareFacts(previous, current, files) {
     add('试用：外连 · Trial: connections', pt.connections.map(stripCount), ct.connections.map(stripCount), true)
     add('试用：进程内 fetch · Trial: fetch', pt.fetches.map(stripCount), ct.fetches.map(stripCount), true)
     add('试用：凭据读取 · Trial: credential reads', pt.credentialReads.map(stripCount), ct.credentialReads.map(stripCount), true)
+    if (pt.network !== undefined || ct.network !== undefined) {
+      const strip = items => (items ?? []).map(text => text.replace(/（[^）]*）$/u, ''))
+      add('试用：监听端口 · Trial: listening sockets', strip(pt.network?.listeners), strip(ct.network?.listeners), true)
+    }
     add('试用：安装与运行 · Trial: install and run', pt.ok ? 'OK' : 'failed', ct.ok ? 'OK' : 'failed', true)
   }
   const compareUrl = p.provenance?.repository && p.provenance.repository === c.provenance?.repository && p.provenance.commit && c.provenance.commit
@@ -313,6 +349,15 @@ export function autoNotes({ report, trial, delta, previous }) {
     const r = trial.registrations
     const registered = [...r.tools.map(name => `tool ${name}`), ...r.skills.map(name => `skill ${name}`), ...r.webRoutes.map(path => `web route ${path}`), ...r.connectionRoutes.map(route => `route ${route}`)]
     parts.push(`Trial on DSH ${trial.dshVersion} (installBundle in a temporary profile): ${trial.ok ? 'installed and ACTIVE after hot install and after restart' : `did not pass (${trial.failure ?? trial.installs.map(item => item.application).join(', ')})`}; registered ${registered.join(', ') || 'nothing visible to the trial'}; child processes ${trial.programs.join(', ') || 'none'}; outbound connections outside installation ${trial.connections.length === 0 ? 'none' : trial.connections.join(', ')}; credential reads ${trial.credentialReads.length === 0 ? 'none' : trial.credentialReads.join(', ')}.`)
+    const approval = trial.installs.find(item => item.approval)?.approval
+    if (approval) parts.push(`The first install stopped on pending dependency build scripts (${approval.pendingBuilds.join(', ')}); it succeeded after approving them.`)
+    if (trial.network?.supported) {
+      parts.push(`Listening sockets opened: ${trial.network.listeners.length === 0 ? 'none' : `${trial.network.listeners.join(', ')} (${trial.network.loopbackOnly ? 'loopback only' : 'not loopback only'})`}; direct connections not through the proxy: ${trial.network.direct.length === 0 ? 'none' : trial.network.direct.join(', ')}; processes left after stop: ${(trial.leftoverProcesses ?? []).length === 0 ? 'none' : trial.leftoverProcesses.join(', ')}.`)
+    }
+    if (trial.extraStart) {
+      const extra = [...trial.connections, ...trial.fetches].filter(line => line.startsWith('extra start:'))
+      parts.push(`Extra start with ${Object.entries(trial.extraStart.env).map(([key, value]) => `${key}=${value}`).join(', ') || 'no extra environment'}${trial.extraStart.reset.length ? ` after deleting ${trial.extraStart.reset.join(', ')}` : ''}: ${extra.length === 0 ? 'no outbound request' : extra.join(', ')}.`)
+    }
     for (const call of trial.calls) {
       parts.push(`Call ${call.call}: ${call.status ?? call.error ?? 'not found'}${call.credentialReads.length ? `, read ${call.credentialReads.join(', ')}` : ''}${call.fetches.length ? `, requested ${call.fetches.join(', ')}` : ''}.`)
     }
@@ -482,14 +527,34 @@ function hintsSection(report) {
   ].join('\n')
 }
 
+/** Rows for the process-tree sampling, files, and profile patch of a trial (absent in records made before them). */
+function networkRows(trial) {
+  if (trial.network === undefined) return []
+  const n = trial.network
+  if (!n.supported) return [['监听端口 · Listening sockets', '未采样（只在 Windows 上采样）· not sampled (Windows only)']]
+  const files = (trial.files ?? []).map(item => `${item.checkpoint}：+${item.counts.added} ~${item.counts.changed} −${item.counts.removed}${item.added.length ? `（新增 · added ${list(item.added, 8)}）` : ''}${item.changed.length ? `（修改 · changed ${list(item.changed, 6)}）` : ''}`)
+  const patch = (trial.patch ?? []).filter(item => item.checkpoint !== 'baseline').map(item => `${item.checkpoint}：${item.exists ? (item.rows.length ? item.rows.join(', ') : '无行 · no rows') : '文件不存在 · no file'}`)
+  return [
+    ['监听端口 · Listening sockets', `${list(n.listeners, 10)}；${n.listeners.length === 0 ? '插件没有新增监听 · the plugin opened no listener' : n.loopbackOnly ? '全部只绑定本机地址 · all loopback-only' : '⚠️ 有绑定到非本机地址的监听 · some listen beyond loopback'}；DSH web：${list(n.dshWeb, 2)}（进程树每几秒采样一次，共 ${n.samples} 次 · process tree sampled every few seconds, ${n.samples} samples）`],
+    ['绕过代理的直接外连 · Direct connections, not through the proxy', list(n.direct, 10)],
+    ['进程树中的进程 · Processes in the tree', list(n.processes, 10)],
+    ['停止后遗留的进程 · Left running after the last stop', list(trial.leftoverProcesses ?? [], 6)],
+    ['写入的文件 · Files written（临时 DSH_HOME/用户目录/TEMP · temporary DSH_HOME, user directory, TEMP）', files.join('；') || '—'],
+    ['profile 补丁中的行 · Rows in the profile patch', patch.join('；') || '—'],
+  ]
+}
+
 function trialSection(trial, report) {
   if (!trial || trial.skipped) return `未运行 · Not run：${trial?.skipped ?? '—'}。需要人工安装试用后再填写 testedOn · Run a hands-on trial before filling in testedOn.`
   const r = trial.registrations
   const rows = [
-    ['DSH', `${trial.dshVersion}（web profile；临时 DSH_HOME、用户目录与 pnpm 仓库 · temporary DSH_HOME, user directory, and pnpm store；代理只放行 npm registry · proxy admits only the npm registry）`],
+    ['DSH', `${trial.dshVersion}（web profile；临时 DSH_HOME、用户目录、APPDATA、TEMP 与 pnpm 仓库 · temporary DSH_HOME, user directory, APPDATA, TEMP, and pnpm store；代理只放行 npm registry · proxy admits only the npm registry）`],
     ['安装 · Install', trial.installs.map(item => `${item.spec} → ${item.application}${item.version ? ` (${item.version})` : ''}${item.error ? `：${item.error}` : ''}${item.pendingBuilds ? `；待批准脚本 · pending builds ${item.pendingBuilds.join(', ')}` : ''}`).join('；')],
-    ['条目 · Entries', `安装后 · after install：${list(trial.entries.afterInstall, 8, String)}；重启后 · after restart：${list(trial.entries.afterRestart, 8, String)}`],
-    ['结果 · Result', trial.ok ? '✅ 安装成功，安装后和重启后都是 ACTIVE · installed, ACTIVE after install and after restart' : `❌ ${trial.failure ?? '见上 · see above'}`],
+    ...trial.installs.filter(item => item.approval).map(item => ['构建脚本审批 · Build-script approval',
+      `首次安装 · first attempt：${item.approval.firstAttempt}，待批准 · pending ${list(item.approval.pendingBuilds, 6)}${item.approval.firstError ? `（${item.approval.firstError}）` : ''}；用户会看到「允许这些脚本并重试」· the user is asked to "Allow these scripts and retry"；批准后 · after approval：${item.application}`]),
+    ['条目 · Entries', `安装后 · after install：${list(trial.entries.afterInstall, 8, String)}；重启后 · after restart：${list(trial.entries.afterRestart, 8, String)}${trial.entries.afterExtraStart ? `；额外启动后 · after the extra start：${list(trial.entries.afterExtraStart, 8, String)}` : ''}`],
+    ['结果 · Result', trial.ok ? `✅ 安装成功，安装后、重启后${trial.entries.afterExtraStart ? '和额外启动后' : ''}都是 ACTIVE · installed, ACTIVE after install, after restart${trial.entries.afterExtraStart ? ', and after the extra start' : ''}` : `❌ ${trial.failure ?? '见上 · see above'}`],
+    ...trial.extraStart ? [['额外启动 · Extra start', `环境变量 · env：${list(Object.entries(trial.extraStart.env).map(([key, value]) => `${key}=${value}`), 6)}；启动前删除 · deleted first：${list(trial.extraStart.reset, 6)}`]] : [],
     ['工具 · Tools', list(r.tools, 10)],
     ['技能 · Skills', list(r.skills, 10)],
     ['Web 路由 · Web routes', list(r.webRoutes, 10)],
@@ -499,13 +564,14 @@ function trialSection(trial, report) {
     ['其他外连 · Other connections', list(trial.connections, 10)],
     ['进程内 fetch · In-process fetch', list(trial.fetches, 10)],
     ['凭据读取 · Credential reads', list(trial.credentialReads, 10)],
+    ...networkRows(trial),
   ]
   const calls = trial.calls.map(call => `- ${code(call.call)}（${call.kind}）→ ${call.status ?? call.error ?? '—'}；凭据 · credentials: ${list(call.credentialReads, 5)}；fetch: ${list(call.fetches, 5)}；外连 · connections: ${list(call.connections, 5)}；子进程 · processes: ${list(call.spawns, 5)}`)
   return [
     table(['项目 · Item', '结果 · Result'], rows),
-    ...calls.length ? ['', '调用 · Calls（`--call`）：', '', ...calls] : [],
+    ...calls.length ? ['', '调用 · Calls（`--call`、`--invoke`）：', '', ...calls] : [],
     '',
-    `说明 · Notes：分组 install = 热安装及首次启用，restart = 重启后，其他为 --call；不含安装前 DSH 自身的活动。浏览器端代码（${report.name} 的 client 包）没有在试用中运行，见第二节。 · Group install = hot install and first activation, restart = after a restart, others are --call; DSH's own activity before the install is excluded. Browser-side code did not run in the trial; see section 2.`,
+    `说明 · Notes：分组 install = 热安装及首次启用，restart = 重启后，extra start = 带额外环境变量的第三次启动，其他为 --call；不含安装前 DSH 自身的活动。浏览器端代码（${report.name} 的 client 包）没有在试用中运行，见第二节。 · Group install = hot install and first activation, restart = after a restart, extra start = a third start with extra environment variables, others are --call; DSH's own activity before the install is excluded. Browser-side code did not run in the trial; see section 2.`,
   ].join('\n')
 }
 

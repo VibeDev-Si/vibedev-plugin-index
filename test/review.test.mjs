@@ -118,6 +118,56 @@ test('an update draft carries the reviewed capabilities forward and adds only ne
   assert.match(draft.yaml, /carried over from 1\.0\.0; new: new\.example\.net/u)
 })
 
+test('summarizeTrial reports listeners, build approvals, the extra start, files, and the profile patch', () => {
+  const raw = {
+    ...rawTrial,
+    extraStart: { env: { DO_NOT_TRACK: '1' }, reset: ['telemetry/dsh-example'] },
+    states: { ...rawTrial.states, 'boot3:dsh-example': { rows: [{ row: 'example', state: 'ACTIVE' }] } },
+    installs: [{
+      spec: 'dsh-example@1.1.0', application: 'applied', version: '1.1.0',
+      attempts: [{ application: 'failed', pendingBuilds: ['native@1.0.0'] }, { application: 'applied', approvedBuilds: ['native@1.0.0'] }],
+    }],
+    connections: [...rawTrial.connections, { phase: 'idle3', kind: 'connect', target: 'telemetry.example.com:443', allowed: false }],
+    network: {
+      supported: true, samples: 4,
+      listeners: [
+        { proto: 'TCP', address: '127.0.0.1', port: 5000, pid: 1, process: 'trial process (DSH)', role: 'dsh-web', firstPhase: 'boot1' },
+        { proto: 'TCP', address: '127.0.0.1', port: 6000, pid: 3, process: 'other', firstPhase: 'boot1' },
+        { proto: 'TCP', address: '127.0.0.1', port: 9080, pid: 2, process: 'node.exe', firstPhase: 'call:invoke svc.start' },
+        { proto: 'TCP', address: '0.0.0.0', port: 7000, pid: 2, process: 'node.exe', firstPhase: 'idle2' },
+      ],
+      remote: [{ pid: 2, process: 'node.exe', remote: '203.0.113.5', port: 443, firstPhase: 'idle2' }],
+      processes: [
+        { pid: 2, name: 'node.exe', cmd: 'C:\\node.exe C:\\Temp\\vibedev-install-trial-abc\\gateway.cjs', firstPhase: 'call:invoke svc.start' },
+        { pid: 5, name: 'conhost.exe', cmd: 'conhost.exe 0x4', firstPhase: 'install:dsh-example@1.1.0' },
+      ],
+    },
+    files: [
+      { checkpoint: 'baseline', added: ['home/a (1 B)'], changed: [], removed: [], counts: { added: 1, changed: 0, removed: 0 } },
+      { checkpoint: 'install', added: ['home/telemetry/state.json (10 B)'], changed: [], removed: [], counts: { added: 1, changed: 0, removed: 0 } },
+    ],
+    patches: [{ checkpoint: 'baseline', exists: true, sha256: 'a', rows: [] }, { checkpoint: 'install', exists: true, sha256: 'b', rows: ['webserver'] }],
+  }
+  const trial = summarizeTrial(raw, { names: ['dsh-example'] })
+  assert.equal(trial.ok, true)
+  assert.deepEqual(trial.installs[0].approval, { pendingBuilds: ['native@1.0.0'], firstAttempt: 'failed', firstError: null })
+  assert.deepEqual(trial.entries.afterExtraStart, ['example=ACTIVE'])
+  assert.ok(trial.connections.includes('extra start: telemetry.example.com:443 (refused)'))
+  assert.deepEqual(trial.network.dshWeb, ['127.0.0.1:5000'])
+  assert.deepEqual(trial.network.listeners, ['TCP 127.0.0.1:9080 — node.exe（invoke svc.start）', 'TCP 0.0.0.0:7000 — node.exe（restart）'])
+  assert.equal(trial.network.loopbackOnly, false)
+  assert.deepEqual(trial.network.direct, ['restart: node.exe → 203.0.113.5:443'])
+  assert.deepEqual(trial.network.processes, ['invoke svc.start: node.exe <tmp>\\gateway.cjs'])
+  assert.deepEqual(trial.files.map(item => item.checkpoint), ['install'])
+  assert.deepEqual(trial.patch.map(item => item.rows), [[], ['webserver']])
+  const report = fakeReport()
+  const draft = draftEntry({ report, trial, listing: {}, categories, today: '2026-10-20' })
+  const markdown = renderRecord({ report, trial, listing: {}, draft, command: 'npm run review -- dsh-example@1.1.0', steps: [], tool: { index: 'abc1234' }, today: '2026-10-20' })
+  assert.match(markdown, /构建脚本审批 · Build-script approval/u)
+  assert.match(markdown, /`TCP 0\.0\.0\.0:7000 — node\.exe（restart）`；⚠️/u)
+  assert.match(markdown, /install：webserver/u)
+})
+
 test('the record puts Chinese before English and lists TODOs for an unlisted version', () => {
   const report = fakeReport()
   const trial = summarizeTrial(rawTrial, { names: ['dsh-example'] })
