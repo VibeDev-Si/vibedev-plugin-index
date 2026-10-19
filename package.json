@@ -13,6 +13,7 @@
     "validate": "node scripts/validate.mjs",
     "check-updates": "node scripts/check-updates.mjs",
     "inspect": "node scripts/inspect.mjs",
+    "mirror": "node scripts/mirror.mjs",
     "test": "node --test \"test/*.test.mjs\""
   },
   "dependencies": {

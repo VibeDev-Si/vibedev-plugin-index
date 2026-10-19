@@ -32,6 +32,10 @@ jobs:
         run: |
           node scripts/build.mjs --out dist
           node scripts/validate.mjs --index dist/index.json
+      - name: Mirror script dry run (no connection is made)
+        run: |
+          touch "$RUNNER_TEMP/dry-run-key" "$RUNNER_TEMP/dry-run-known-hosts"
+          node scripts/mirror.mjs --ssh deploy@download.example.invalid --identity "$RUNNER_TEMP/dry-run-key" --known-hosts "$RUNNER_TEMP/dry-run-known-hosts"
       - name: Full pipeline on real npm data (test fixture)
         run: node scripts/validate.mjs --catalog test/fixtures/e2e-plugins.yml
       - name: Deliberately broken lists must be rejected
