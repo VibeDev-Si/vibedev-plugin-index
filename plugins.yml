@@ -61,15 +61,18 @@ plugins:
         en: >-
           Lets the agent drive a real browser through Tencent BrowserSkill. Install first, both at version 0.3.3: the bsk
           command-line tool on PATH and the BrowserSkill extension connected in Chrome or Edge (github.com/Tencent/BrowserSkill,
-          Quick start); restart VibeDev afterwards so it finds bsk. It drives your signed-in browser, so the agent can act
-          on sites where you are logged in: use a separate browser profile for it and keep the extension's confirmation
-          settings on. The plugin launches bsk processes, and the browser visits the sites the agent chooses. Session
-          recovery records are kept in ~/.bsk.
+          Quick start); if VibeDev then reports that it cannot find bsk, restart VibeDev or set the plugin's bskPath to the
+          full path. It drives your signed-in browser, so the agent can act on sites where you are logged in: use a separate
+          browser profile for it and keep the extension's confirmation settings on. The plugin launches bsk processes, and
+          the browser visits the sites the agent chooses. Session recovery records are kept in ~/.bsk. The bsk background
+          service updates itself every 30 minutes by default; set the environment variable BSK_AUTO_UPDATE=off to keep it
+          at the version that matches this plugin.
         zh: >-
           让 Agent 通过腾讯 BrowserSkill 操作真实浏览器。安装前先装好两样，版本都要是 0.3.3：bsk 命令行工具（加入 PATH），以及
-          Chrome 或 Edge 里已连接 bsk 的 BrowserSkill 扩展（见 github.com/Tencent/BrowserSkill 的 Quick start）；装好后重启
-          VibeDev，它才能找到 bsk。它操作的是你已登录的浏览器，Agent 能在你已登录的网站里操作：建议给它单独建一个浏览器配置，并保持
-          扩展里的确认开关打开。插件会启动 bsk 进程，浏览器会访问 Agent 选择的网站。会话恢复记录保存在 ~/.bsk。
+          Chrome 或 Edge 里已连接 bsk 的 BrowserSkill 扩展（见 github.com/Tencent/BrowserSkill 的 Quick start）；如果 VibeDev
+          提示找不到 bsk，重启 VibeDev，或在插件配置的 bskPath 里填它的完整路径。它操作的是你已登录的浏览器，Agent 能在你已登录的网站里
+          操作：建议给它单独建一个浏览器配置，并保持扩展里的确认开关打开。插件会启动 bsk 进程，浏览器会访问 Agent 选择的网站。会话恢复
+          记录保存在 ~/.bsk。bsk 的后台服务默认每 30 分钟自动更新一次；设置环境变量 BSK_AUTO_UPDATE=off 可以让它停在与插件匹配的版本。
     versions:
       - version: 0.3.3
         integrity: sha512-YleWGGDN7re7arDD8PVgcIuTeMXHne4JKilLaKmvO9L1EzvOKNKVXZ3eHq7CXbgF7uooxRjnYviMH2QMRqZv+A==
@@ -94,7 +97,12 @@ plugins:
             Registers the bundled browser-skill skill and GET/POST routes under /bsk-observation; stops browser sessions of
             archived DSH sessions. No credentials, settings writes, telemetry, eval, or self-update. Trial on DSH
             0.2.1-rc.2 (installBundle in a temporary profile): installed and ACTIVE after hot install and after restart;
-            no outbound connection; bsk itself was not installed, so browser tools were not exercised.
+            no outbound connection. Browser trial in the VibeDev desktop app (DSH 0.2.1-rc.2) with bsk CLI 0.3.3 (release
+            sha256 verified, Authenticode signed by Tencent Technology (Shenzhen)) and extension 0.3.3 in Chrome 155:
+            session start, navigate, observe, screenshot, fill, click (radio, checkbox), form submit, load wait and stop all
+            worked on public pages; CLI timings: session start 0.21 s, observe about 0.09 s, screenshot 0.14 s, navigation
+            1.0 to 1.3 s. The bsk daemon listens on 127.0.0.1 only and, outside this pinned package, updates itself every
+            30 minutes unless BSK_AUTO_UPDATE=off.
   - name: dsh-context
     category: usage
     tags: []
