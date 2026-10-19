@@ -1,0 +1,395 @@
+{
+  "schema": 1,
+  "package": "@linxin666/dsh-remote-web-ui",
+  "version": "0.4.7",
+  "date": "2026-10-20",
+  "target": "0.2.1-rc.2",
+  "command": "npm run review -- @linxin666/dsh-remote-web-ui@0.4.7 --dsh C:\\vdp-wt\\vdmerge --call \"GET /api/pair/status\" --approve-builds cloudflared",
+  "tool": {
+    "index": "35e0ff5",
+    "dsh": "bbc7df9778 (DSH 0.2.1-rc.2)"
+  },
+  "static": {
+    "name": "@linxin666/dsh-remote-web-ui",
+    "version": "0.4.7",
+    "published": "2026-10-17T13:48:56.527Z",
+    "distTags": {
+      "latest": "0.4.7"
+    },
+    "versionsPublished": 59,
+    "versionsLast30Days": 9,
+    "deprecated": null,
+    "integrity": "sha512-QNA2YFYb4y6myrRVIK/gppWVv+4RGW4OpgwIz7CWnjobfDrNRPaRaVb89TXAWwdoaYNeJ8UnLatf7UcuoKvtRQ==",
+    "license": "Apache-2.0",
+    "licenseAccepted": true,
+    "licenseFiles": [
+      "LICENSE"
+    ],
+    "provenance": null,
+    "bundle": true,
+    "enginesDsh": null,
+    "dshPeers": {
+      "@deepseek-ai/dsh": ">=0.2.1-rc.2"
+    },
+    "otherPeers": {
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0"
+    },
+    "indexEnginesDsh": ">=0.2.1-rc.2",
+    "declaresDsh": true,
+    "target": "0.2.1-rc.2",
+    "compatibleInDiscover": true,
+    "compatibleAtInstall": true,
+    "unmet": {},
+    "installScripts": [],
+    "npmHasInstallScript": false,
+    "unpackedBytes": 2317494,
+    "fileCount": 209,
+    "tarballBytes": 646468,
+    "dependencies": {
+      "@deepseek-ai/schemastery": "^3.18.5",
+      "cloudflared": "^0.7.3",
+      "clsx": "^2.1.1",
+      "qrcode.react": "^4.2.0",
+      "yaml": "^2.8.2",
+      "zod": "^4.4.3"
+    },
+    "optionalDependencies": {},
+    "description": "Scan-to-pair remote access for the dsh web GUI that shares one official interface: a QR beside the settings button pairs phones and PCs into the same Web GUI (a portrait-touch adaptation layer for phones, full desktop on PCs) through one-time tokens and revocable device sessions, with a LAN bind toggle, optional Cloudflare tunnel, and one-click family self-update",
+    "keywords": [],
+    "repository": "https://github.com/zhu1090093659/dsh-web",
+    "homepage": null,
+    "bugs": null,
+    "maintainers": [
+      "linxin666"
+    ],
+    "hints": {
+      "childProcess": [
+        "lib/index.js",
+        "lib/types/firewall.js",
+        "lib/types/tunnel.js",
+        "src/firewall.ts",
+        "src/tunnel.ts"
+      ],
+      "network": [
+        "lib/client.js",
+        "lib/index.js",
+        "lib/types/client/RemoteEntry.js",
+        "lib/types/client/pair-api.js",
+        "lib/types/client/telemetry.js",
+        "lib/types/index.js",
+        "lib/types/lan-source.js",
+        "lib/types/posture.js",
+        "lib/types/remote-channel-boot.js",
+        "lib/types/routes.js",
+        "lib/types/tunnel.js",
+        "src/client/RemoteEntry.tsx",
+        "src/client/pair-api.ts",
+        "src/client/telemetry.ts",
+        "src/index.ts",
+        "src/lan-source.ts",
+        "src/posture.ts",
+        "src/remote-channel-boot.ts",
+        "src/routes.ts",
+        "src/tunnel.ts"
+      ],
+      "fileWrites": [
+        "lib/index.js",
+        "lib/types/lan-bind.js",
+        "lib/types/pairing.js",
+        "lib/types/pairing.persist.test.js",
+        "lib/types/relay-registry.js",
+        "src/lan-bind.ts",
+        "src/pairing.persist.test.ts",
+        "src/pairing.ts",
+        "src/relay-registry.ts"
+      ],
+      "configWrites": [
+        "lib/index.js",
+        "lib/types/lan-bind.js",
+        "src/lan-bind.ts"
+      ],
+      "configReads": [],
+      "credentials": [
+        "lib/index.js",
+        "lib/types/tunnel.js",
+        "src/tunnel.ts"
+      ],
+      "environment": [
+        "lib/index.js",
+        "lib/types/dsh-home.js",
+        "lib/types/index.js",
+        "lib/types/tunnel.js",
+        "src/dsh-home.ts",
+        "src/index.ts",
+        "src/tunnel.ts"
+      ],
+      "dynamicCode": [],
+      "selfUpdate": [],
+      "telemetry": [
+        "lib/client.js",
+        "lib/types/client/index.js",
+        "lib/types/client/telemetry.js",
+        "src/client/index.ts",
+        "src/client/telemetry.ts"
+      ]
+    },
+    "hosts": {
+      "127.0.0.1": [
+        "lib/client.js",
+        "lib/index.js",
+        "lib/types/client/locales.js",
+        "lib/types/index.js",
+        "lib/types/remote-api.js",
+        "lib/types/tunnel-plan.js",
+        "src/client/locales.ts",
+        "src/index.ts",
+        "src/remote-api.ts",
+        "src/tunnel-plan.ts"
+      ],
+      "dsh-market.com": [
+        "lib/client.js",
+        "lib/index.js",
+        "lib/types/client/telemetry.js",
+        "lib/types/relay-registry.js",
+        "src/client/telemetry.ts",
+        "src/relay-registry.ts"
+      ],
+      "example.trycloudflare.com": [
+        "lib/client.js",
+        "lib/types/client/RemoteSettingsCard.js",
+        "src/client/RemoteSettingsCard.tsx"
+      ],
+      "pair.invalid": [
+        "lib/index.js",
+        "lib/types/routes.js",
+        "src/routes.ts"
+      ],
+      "pairing.example.trycloudflare.com": [
+        "lib/types/pairing.persist.test.js",
+        "src/pairing.persist.test.ts"
+      ],
+      "xxx.trycloudflare.com": [
+        "lib/client.js",
+        "lib/types/client/locales.js",
+        "src/client/locales.ts"
+      ]
+    },
+    "envVars": {
+      "DSH_PROFILE": [
+        "lib/index.js",
+        "lib/types/index.js",
+        "src/index.ts"
+      ],
+      "DSH_REMOTE_PUBLIC_BASE_URL": [
+        "lib/index.js",
+        "lib/types/index.js",
+        "src/index.ts"
+      ],
+      "DSH_REMOTE_TRUSTED_HOSTS": [
+        "lib/index.js",
+        "lib/types/index.js",
+        "src/index.ts"
+      ],
+      "TUNNEL_TOKEN": [
+        "lib/index.js",
+        "lib/types/tunnel.js",
+        "src/tunnel.ts"
+      ]
+    },
+    "dependencyTree": {
+      "count": 8,
+      "truncated": false,
+      "packages": [
+        {
+          "name": "@deepseek-ai/cosmokit",
+          "version": "1.8.6",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@deepseek-ai/schemastery",
+          "version": "3.18.5",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@standard-schema/spec",
+          "version": "1.1.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "cloudflared",
+          "version": "0.7.3",
+          "license": "MIT",
+          "installScript": true
+        },
+        {
+          "name": "clsx",
+          "version": "2.1.1",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "qrcode.react",
+          "version": "4.2.0",
+          "license": "ISC",
+          "installScript": false
+        },
+        {
+          "name": "yaml",
+          "version": "2.9.1",
+          "license": "ISC",
+          "installScript": false
+        },
+        {
+          "name": "zod",
+          "version": "4.6.7",
+          "license": "MIT",
+          "installScript": false
+        }
+      ],
+      "withInstallScripts": [
+        "cloudflared@0.7.3"
+      ],
+      "licensesOutsideList": [],
+      "unresolved": []
+    }
+  },
+  "trial": {
+    "dshVersion": "0.2.1-rc.2",
+    "ok": true,
+    "installs": [
+      {
+        "spec": "@linxin666/dsh-remote-web-ui@0.4.7",
+        "application": "applied",
+        "version": "0.4.7",
+        "approval": {
+          "pendingBuilds": [
+            "cloudflared@0.7.3"
+          ],
+          "firstAttempt": "failed",
+          "firstError": null
+        }
+      }
+    ],
+    "entries": {
+      "afterInstall": [
+        "remote-web-ui=ACTIVE"
+      ],
+      "afterRestart": [
+        "remote-web-ui=ACTIVE"
+      ]
+    },
+    "network": {
+      "supported": true,
+      "samples": 14,
+      "dshWeb": [
+        "127.0.0.1:62085"
+      ],
+      "listeners": [],
+      "loopbackOnly": true,
+      "direct": [],
+      "processes": [
+        "install: node.exe"
+      ]
+    },
+    "leftoverProcesses": [],
+    "files": [
+      {
+        "checkpoint": "install",
+        "counts": {
+          "added": 3,
+          "changed": 2,
+          "removed": 0
+        },
+        "added": [
+          "home/profiles/web/.plugin-manager/logs/operation-17eKcA/pnpm.log (654 B)",
+          "home/profiles/web/.plugin-manager/logs/operation-I985Q9/pnpm.log (1043 B)",
+          "home/profiles/web/pnpm-lock.yaml (2431 B)"
+        ],
+        "changed": [
+          "home/profiles/web/package.json (364 B)",
+          "home/profiles/web/pnpm-workspace.yaml (100 B)"
+        ],
+        "removed": []
+      },
+      {
+        "checkpoint": "restart",
+        "counts": {
+          "added": 0,
+          "changed": 1,
+          "removed": 0
+        },
+        "added": [],
+        "changed": [
+          "home/profiles/web/cordis.yml (223 B)"
+        ],
+        "removed": []
+      }
+    ],
+    "patch": [
+      {
+        "checkpoint": "baseline",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      },
+      {
+        "checkpoint": "install",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      },
+      {
+        "checkpoint": "restart",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      }
+    ],
+    "registrations": {
+      "tools": [],
+      "skills": [],
+      "webRoutes": [
+        "/api/pair/accept",
+        "/api/pair/events",
+        "/api/pair/heartbeat",
+        "/api/pair/issue",
+        "/api/pair/lan-bind",
+        "/api/pair/revoke",
+        "/api/pair/status",
+        "/api/pair/stop",
+        "/pair-accept",
+        "/pair-app",
+        "/pair-app.sw.js",
+        "/pair-ping",
+        "/remote"
+      ],
+      "connectionRoutes": []
+    },
+    "processes": [],
+    "programs": [],
+    "installTraffic": [
+      "registry.npmjs.org:443 ×20"
+    ],
+    "connections": [
+      "install: github.com:443 (refused)"
+    ],
+    "fetches": [],
+    "credentialReads": [],
+    "calls": [
+      {
+        "call": "GET /api/pair/status",
+        "kind": "webServer",
+        "status": 403,
+        "body": "{\"ok\":false,\"code\":\"forbidden\"}",
+        "credentialReads": [],
+        "fetches": [],
+        "spawns": [],
+        "connections": []
+      }
+    ]
+  }
+}
