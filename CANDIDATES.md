@@ -1,59 +1,48 @@
-# 首批候选插件（待产品负责人批准）/ Proposed first candidates
+# 候选与审核结论 / Candidates and review decisions
 
-> 状态：**提议，未收录**。`plugins.yml` 目前没有任何正式条目。下面每一项只是初审（2026-10-19，依据 npm 元数据、tarball 代码扫描和 GitHub 仓库活跃度）；批准后还要在 VibeDev（DSH `0.2.1-rc.2`）里实际安装试用，按 [README](README.md#审核清单) 的审核清单补全记录，再通过 PR 写进 `plugins.yml`。
+> `plugins.yml` 是唯一的收录清单。这里记录产品负责人点名的候选、审核结论和证据；“收”的版本已写进 `plugins.yml`，其余不会出现在索引里。审核方法：解包 npm tarball 读代码（不执行），用 `npm run inspect -- <name>@<version> --deps` 检查依赖树，再用 `test/dsh-composition/install-trial.mjs` 在临时 DSH_HOME 里通过 `pluginManager.installBundle` 安装（与「发现」页的安装路径相同），记录进程、网络、凭据读取和注册项。目标 DSH：`0.2.1-rc.2`。
 >
-> Status: **proposed, not listed.** `plugins.yml` has no production entries. Each row is an initial review only; after approval it still needs a hands-on test on VibeDev (DSH `0.2.1-rc.2`) and a full review record in a PR.
+> `plugins.yml` is the only list. This file records the candidates the product owner named, the decisions, and the evidence; "include" versions are in `plugins.yml`, nothing else reaches the index.
 
-数据来源：awesome-dsh-plugin 目录（2026-10-18，5,895 条）按 star/下载量筛选，再用 `npm run inspect -- <name>@<version> --deps` 逐个检查（不安装、不执行包代码）。“兼容”同时指 Discover 列表视角（索引里的 `engines.dsh`）和 DSH 安装时的检查（`engines.dsh`，否则 `@deepseek-ai/dsh-*` peers）。
+## 第一批（2026-10-19）
 
-## 总览
+| 插件与版本 | 结论 | 关键证据 | 用户可见的风险提示 |
+|---|---|---|---|
+| `@wxg-prc-cpg/browser-skill-dsh-plugin@0.3.3`（腾讯 BrowserSkill） | **收** | MIT，含 LICENSE；peers `^0.1.5-rc.3 \|\| ^0.2.0-rc.1` 兼容；无依赖、无安装脚本、465 KiB。唯一子进程是用户自装的 `bsk` CLI（配置 `bskPath`，默认从 PATH 找；包内不附带），不经 shell 以 `bsk <cmd> --json` 启动：每次加载 `bsk --version`、调用 bsk_* 工具时、会话活跃时每 1.5 s `bsk screenshot`（`lib/index.mjs:3075-3109, 6114, 955-968`）。插件本身不联网。试用：安装 applied，重启后仍 ACTIVE，无任何外连。无 npm provenance。 | 需另装 bsk；会启动 bsk 进程；浏览器访问 Agent 选择的网站；记录写在 `~/.bsk` |
+| `dsh-context@0.73.2` | **收**（附披露） | Apache-2.0；provenance 指向 tag v0.73.2；`engines.dsh` 兼容；1 个依赖（zod）。只在面板请求 `/api/dsh-context/balance` 时读取凭据：试用中恰好 1 次读取 `DEEPSEEK_API_KEY`、1 次请求 `https://api.deepseek.com/v1/tools/user/balance`。原因：它优先找设置项 `llm-deepseek`，找不到时退回第一个带 `apiKeyEnv` 的设置项；VibeDev web 组合里只有 `web-deepseek-api` 一项，所以余额可能显示为空，但 key 只发往 api.deepseek.com。浏览器端访问 models.dev（价格）和 npm 镜像（每小时查一次自身新版本，只显示提示和 GitHub 链接）。启动时无外连。 | 用你的 DeepSeek key 查询余额；从 models.dev 取价格；会提示有新版本（新版本未经审核） |
+| `@michengai/dsh-skills-manager@1.2.7`（npm 最新；审核期间又发了 1.2.8） | **有条件**（不进 `plugins.yml`） | Apache-2.0；provenance 指向 tag v1.2.7；peers 明确列出 0.2.1-rc.2；依赖 fflate；试用 applied/ACTIVE，注册工具 `create_skill`，启动时无外连。**问题**：内置更新器无条件注册（`lib/index.js:280-284`，无配置开关）。打开「检查更新」对话框时 GET 端点，查询 `registry.npmjs.org/<pkg>/latest`（试用中返回 latest 1.2.8、updateAvailable:true）；点击「更新」后 POST，安装 npm 最新版（`plugin-updater.js:466-522`）。在 VibeDev 桌面（profile 名为 `desktop`，宿主通过 argv 传入 pnpm）走 `pnpm add --config.minimumReleaseAge=0 <pkg>@<latest> --registry=https://registry.npmjs.org/`，绕过 `pluginManager.installBundle` 的兼容检查，还会改写 profile 的 `pnpm-workspace.yaml`（`:263-456`）。此外它会从 ClawHub、skills.sh 和 GitHub 压缩包安装第三方技能，这些内容我们无法审核；并读写其他 Agent 的技能目录（~/.claude、~/.codex 等）。30 天发了 29 个版本。 | — |
+| `dsh-univer-office@0.3.7`（dream-num/Univer） | **暂缓（负责人决定）** | 解包 227 MB、tarball 49 MB；遥测发往 `https://univer.ai/api/telemetry/cli`，内容是随机安装 ID、事件、平台和版本，可用 `DO_NOT_TRACK` 或 state.json 的 `disabled` 关闭（`lib/build-info.json`，`lib/telemetry-entry.js:61,170`）；`lib/index.js` 经过混淆（`_0x` 字符串数组），无法完整审读；从 `@puppeteer/browsers` 引入 `install`（`lib/index.js:9142`），运行时可能下载浏览器到缓存目录；`@univerjs-pro/*` 原生绑定包在 npm 元数据里没有 license 字段；渲染带 “Univer free version” 水印和页数限制；依赖 puppeteer-core。 | — |
+| `@linxin666/dsh-remote-web-ui@0.4.7` | **暂缓（负责人决定）** | 遥测发往 `https://dsh-market.com/api/telemetry/event`；可选通过 `<id>.dsh-market.com` 中转访问用户主机；依赖 `cloudflared`（其安装脚本会下载二进制）建立公网隧道；用 `netsh` 修改防火墙规则；监听 0.0.0.0 对局域网开放；59 个版本。 | — |
 
-| # | 包与版本 | 分类 | 许可证 | DSH 0.2.1-rc.2 | 安装脚本 | 解包大小 / 依赖 | 网络 | 子进程 | 初审结论 |
-|---|---|---|---|---|---|---|---|---|---|
-| 1 | `dsh-context@0.73.2` | usage | Apache-2.0 ✅ | ✅ `>=0.1.7-rc.2 \|\| >=0.2.0-rc.2` | 无 | 0.57 MiB / 1（zod） | models.dev、registry.npmjs.org、registry.npmmirror.com、api.deepseek.com | 无 | **建议收录** |
-| 2 | `@wxg-prc-cpg/browser-skill-dsh-plugin@0.3.3` | browser | MIT ✅ | ✅ `^0.1.5-rc.3 \|\| ^0.2.0-rc.1` | 无 | 0.45 MiB / 0 | 浏览器自动化访问用户指定的网页 | 有（`spawn`，待确认程序） | **建议收录** |
-| 3 | `@agentscope-ai/reme-dsh-plugin@0.1.2` | memory | Apache-2.0 ⚠️ 包内无 LICENSE | ✅ `^0.1.7-rc.2 \|\| ^0.2.0-rc.2 \|\| ^0.2.1-alpha.2` | 无 | 2.91 MiB / 0 | 本机 ReMe 服务 `127.0.0.1:2333`（`REME_HOST`/`REME_PORT`） | 无 | **建议收录**（需用户自备 ReMe 服务） |
-| 4 | `@nanmicoder/dsh-agent-teams@0.1.25` | workflow | MIT ✅ | ✅ 明确列出 `0.2.1-rc.2` | 无 | 3.26 MiB / 0 | 只访问自身 Host 路由 | 无 | **建议收录**（会消耗模型额度：子代理） |
-| 5 | `@linxin666/dsh-client-ui-skill-explorer@0.4.7` | dev | BSD-3-Clause ✅ | ✅ `>=0.2.1-rc.2` | 无 | 0.28 MiB / 0 | **每天向 dsh-market.com 发一次匿名安装心跳** | 无 | 需负责人决定（第三方遥测） |
-| 6 | `@zilliz/memsearch-dsh@0.1.6` | memory | MIT ⚠️ 包内无 LICENSE | ✅（无 DSH 声明范围限制） | 无 | 0.18 MiB / 0 | memsearch CLI 自身 | **`bash -c memsearch …`** | 需负责人决定（Windows 需 bash + Python CLI） |
-| 7 | `@openviking/dsh-memory-plugin@0.5.26` | memory | ⚠️ 包写 Apache-2.0，仓库根是 AGPL-3.0，包内无 LICENSE | ✅ `>=0.1.0-rc.6 <1.0.0-0` | 无 | 0.31 MiB / 0 | OpenViking 服务（环境变量配置） | 无 | 暂缓：先向维护者确认许可证 |
-| 8 | `dsh-better-sidebar@0.28.0` | ui | MIT ✅ | ✅ `^0.2.1-rc.1` 等 13 个 peer | 无 | 18.12 MiB / 33（树 169） | 多处 | git、归档工具、打开外部程序 | 第二批（体量大，需深审） |
+### dsh-skills-manager 要收录，作者需要提供
 
-完整性（integrity，`dist.integrity`），批准后直接用于 `plugins.yml`：
+1. 配置开关（例如 `updater: false`），关闭后不注册 `/api/michengai/dsh-skills-manager/update`，也不显示「检查更新」。或者在 profile 由插件市场管理时自动关闭。
+2. 更新统一走 `pluginManager.installBundle`，不直接调用 pnpm、不设置 `minimumReleaseAge=0`、不强制 `--registry`、不改写 `pnpm-workspace.yaml`。
+3. 可选：能够禁用 ClawHub、skills.sh 和 GitHub 来源，或者在安装第三方技能前明确告知来源。
 
-| 包与版本 | integrity |
-|---|---|
-| `dsh-context@0.73.2` | `sha512-C1UQrNogShFx/uYpg/aED0Qd7x7oX8Tay2gwfhYy89VxDOg1sPIeML3yttvFDfzPLeGpP1JU9qksTNyYoY8YAA==` |
-| `@wxg-prc-cpg/browser-skill-dsh-plugin@0.3.3` | `sha512-YleWGGDN7re7arDD8PVgcIuTeMXHne4JKilLaKmvO9L1EzvOKNKVXZ3eHq7CXbgF7uooxRjnYviMH2QMRqZv+A==` |
-| `@agentscope-ai/reme-dsh-plugin@0.1.2` | `sha512-dZQSyknARE76fjYnNqK63Kai8MS6QSZ+bUNNG8fwl1syWb3BptyngweQkphxfYtE6sonzXK5MVwxbLgf0c7+qg==` |
-| `@nanmicoder/dsh-agent-teams@0.1.25` | `sha512-p8ElanLgY2Tp+/MvpmZiVCFg8feE43stctPa/FHC6fYmxou5G7oblBLQoSc5HuK1d3vxieJptwDOJwXdz47IBg==` |
-| `@linxin666/dsh-client-ui-skill-explorer@0.4.7` | `sha512-BFUfTBUywJk6N7x6P894GnxjltOhZcx3A7cU1GT95fCdVWt4dAKLc8XeQdmreSBTpreHbyPfcgm4RBqnYXs1Eg==` |
-| `@zilliz/memsearch-dsh@0.1.6` | `sha512-bbGaGVFxPLu93Jxv7ZxPZJF3h0SQiqp+5ps0B/U5InZbeMiZxBeeVX244vhukSnvIrdyv9lv6wunG02BjY2iaw==` |
-| `@openviking/dsh-memory-plugin@0.5.26` | `sha512-bNTNv7frjBexYdJR1RGL88uWaz+4FtJMPvuVwGAHuaSow4AN5AqnDYHw95oObjghmTq5lm5omLzKXBDWur0MYA==` |
-| `dsh-better-sidebar@0.28.0` | `sha512-x7+/YmH/HrSlXWOBZkhL7qQqcDgZEnDcWrhR5GlizzUZjz+w84FbQ6jo8trJC9tyaQxMaNvXVnXwDxn4I330Ew==` |
+满足后我们再审核新版本并钉住精确版本；插件发新版仍然要等我们审核。
 
-## 逐项初审
+## 其余候选（初审，未试用）
 
-1. **dsh-context**（上下文/用量面板，bowenliang123）。代码只用 `fetch`：从 models.dev 取模型价格；向 registry.npmjs.org / registry.npmmirror.com 查询自身最新版本（只提示，不自更新）；Host 端用 DSH `credentials` 服务里的 DeepSeek key 调 `api.deepseek.com/user/balance` 显示余额——这一点要在审核记录里写明。未发现子进程、写文件或改配置。维护活跃（0 个未关闭 issue，108 个已关闭，10-18 有提交），但发版很快（30 天 37 版），建议约每月复审一次，而不是逐版跟进。
-2. **BrowserSkill**（腾讯）。浏览器自动化插件，Host 端 `lib/index.mjs` 引入 `node:child_process` 的 `spawn`，需确认启动的是哪个程序（浏览器或 BrowserSkill CLI）以及是否下载浏览器。无依赖；30 天 3 版，节奏适合审核。
-3. **ReMe**（阿里 AgentScope）。记忆插件，只连接本机 ReMe 服务（默认 `http://127.0.0.1:2333`，可用环境变量改），用户要先自己装 ReMe。包内缺 LICENSE 文件（Apache-2.0 要求随附许可文本），可提 issue 请上游补上。共 2 个版本。
-4. **dsh-agent-teams**（NanmiCoder）。多代理协作；只请求自身 Host 路由，会写团队状态文件（待确认路径），通过子代理消耗模型额度。`engines.dsh` 逐个列出受支持的 DSH 版本，兼容性声明清楚。
-5. **skill-explorer**（linxin666 / dsh-web 系列）。功能低风险，但浏览器端每天向 `https://dsh-market.com/api/telemetry/event` 发送一次匿名心跳（随机 ID + 包名，README 已说明）。VibeDev 自己默认关闭产品分析，是否接受第三方遥测请负责人决定；同系列的 git-graph、task-board 也有同样的心跳。
-6. **memsearch**（Zilliz）。通过 `execFile('bash', ['-c', …])` 调用 memsearch CLI（Python）。在 Windows 上需要 Git Bash/WSL 和 Python 环境，对 VibeDev 的 Windows 用户不友好；包内缺 LICENSE。
-7. **OpenViking**（火山引擎）。npm 包写 Apache-2.0，但仓库根许可证是 AGPL-3.0，包内也没有 LICENSE 文件；在许可证说清之前不收录。另外 30 天发了 29 版，审核负担重。
-8. **dsh-better-sidebar**。很受欢迎（VibeDev 的媒体预览插件也以它为 peer），但体量接近 20 MiB 上限、169 个传递依赖（其中 `khroma@2.1.0` 的 package.json 缺 license 字段），含 git/归档/打开外部程序等子进程和配置写入路径，需要单独一轮深审。
+| 插件与版本 | 初审 | integrity |
+|---|---|---|
+| `@agentscope-ai/reme-dsh-plugin@0.1.2` | Apache-2.0（包内无 LICENSE）；只连本机 ReMe 服务 `127.0.0.1:2333` | `sha512-dZQSyknARE76fjYnNqK63Kai8MS6QSZ+bUNNG8fwl1syWb3BptyngweQkphxfYtE6sonzXK5MVwxbLgf0c7+qg==` |
+| `@nanmicoder/dsh-agent-teams@0.1.25` | MIT；只请求自身路由；会消耗子代理额度 | `sha512-p8ElanLgY2Tp+/MvpmZiVCFg8feE43stctPa/FHC6fYmxou5G7oblBLQoSc5HuK1d3vxieJptwDOJwXdz47IBg==` |
+| `@linxin666/dsh-client-ui-skill-explorer@0.4.7` | BSD-3-Clause；每天向 dsh-market.com 发匿名心跳（需负责人决定） | `sha512-BFUfTBUywJk6N7x6P894GnxjltOhZcx3A7cU1GT95fCdVWt4dAKLc8XeQdmreSBTpreHbyPfcgm4RBqnYXs1Eg==` |
+| `@zilliz/memsearch-dsh@0.1.6` | MIT；`bash -c memsearch …`，Windows 不友好 | `sha512-bbGaGVFxPLu93Jxv7ZxPZJF3h0SQiqp+5ps0B/U5InZbeMiZxBeeVX244vhukSnvIrdyv9lv6wunG02BjY2iaw==` |
+| `@openviking/dsh-memory-plugin@0.5.26` | 包写 Apache-2.0、仓库根目录是 AGPL-3.0，需澄清 | `sha512-bNTNv7frjBexYdJR1RGL88uWaz+4FtJMPvuVwGAHuaSow4AN5AqnDYHw95oObjghmTq5lm5omLzKXBDWur0MYA==` |
+| `dsh-better-sidebar@0.28.0` | MIT；18 MiB、依赖树 169 个包，需深审 | `sha512-x7+/YmH/HrSlXWOBZkhL7qQqcDgZEnDcWrhR5GlizzUZjz+w84FbQ6jo8trJC9tyaQxMaNvXVnXwDxn4I330Ew==` |
 
-## 暂不提议（原因）
+## 暂不提议
 
-- `@vectorize-io/hindsight-coding-agents@0.8.1`：package.json 没有 license 字段（不满足 OSI 许可证要求），代码含 `new Function`/`eval`，16 MiB。
-- `@smalltailqwq/dsh-client-ui-skin-maid-atelier@0.1.8`：`SEE LICENSE IN LICENSE`，自定义许可证。
-- `@struktoai/mirage-dsh@0.0.6`：`engines.dsh` 为 `0.1.1-rc.2`，与 0.2.1-rc.2 不兼容；依赖树里 `tree-sitter-bash` 有安装脚本。
-- `dsh-pet@0.3.7`：解包 62.5 MiB（超过 20 MiB），运行时还会下载 Electron（`@electron/get`）。
-- `@tt-a1i/archify-dsh@1.0.0`、`@liustack/modlens@3.27.1`、`@wxg-prc-cpg/dsh-weknora@0.1.0`、`dsh-deja@0.22.2`：没有任何 DSH 兼容声明（无 `engines.dsh`、无 dsh peer），必须先在 0.2.1-rc.2 上实测（规则：`review.testedOn` 必须包含目标版本）。
-- `dsh-ops@0.3.0`：运维类工具，子进程和写文件路径多，放到后续批次深审。
-- `dshmarket`：本方案就是用来替代它的（自更新、运行 pnpm、改 `cordis.patch.yml`、49 个 HTTP 路由）。
-- `@vibedev-si/*`（dsh-vibedev、dsh-film、dsh-media-viewer、dsh-ecosystem）：VibeDev 自家插件经生态中心/默认配置分发，放进社区索引会出现两条渠道，是否列入请负责人决定。
+- `@vectorize-io/hindsight-coding-agents@0.8.1`：package.json 没有 license 字段，代码含 `new Function`/`eval`，16 MiB。
+- `@smalltailqwq/dsh-client-ui-skin-maid-atelier@0.1.8`：自定义许可证（`SEE LICENSE IN LICENSE`）。
+- `@struktoai/mirage-dsh@0.0.6`：`engines.dsh` 为 `0.1.1-rc.2`，不兼容。
+- `dsh-pet@0.3.7`：解包 62.5 MiB，运行时会下载 Electron。
+- `@tt-a1i/archify-dsh`、`@liustack/modlens`、`@wxg-prc-cpg/dsh-weknora`、`dsh-deja`：没有任何 DSH 兼容声明，需要先实测。
+- `dsh-ops@0.3.0`：子进程和写文件路径多，留到后续批次。
+- `dshmarket`：本方案就是用来替代它的。`@vibedev-si/*`：已经通过 VibeDev 生态中心分发。
 
 ## English summary
 
-Recommended for the first batch after a hands-on test: `dsh-context@0.73.2` (Apache-2.0; network to models.dev, npm registries for its own update notice, and `api.deepseek.com/user/balance` with the user's DeepSeek key), `@wxg-prc-cpg/browser-skill-dsh-plugin@0.3.3` (MIT; spawns a process to be identified), `@agentscope-ai/reme-dsh-plugin@0.1.2` (Apache-2.0; local ReMe server only; LICENSE file missing from the package), `@nanmicoder/dsh-agent-teams@0.1.25` (MIT; own Host routes only; uses subagents). Owner decision needed: `@linxin666/dsh-client-ui-skill-explorer@0.4.7` (daily anonymous heartbeat to dsh-market.com), `@zilliz/memsearch-dsh@0.1.6` (runs `bash -c memsearch …`). Deferred: `@openviking/dsh-memory-plugin@0.5.26` (package says Apache-2.0, repository root is AGPL-3.0), `dsh-better-sidebar@0.28.0` (18 MiB, 169 packages, needs a deep review). All eight are compatible with DSH 0.2.1-rc.2, publish on npm, and have no install scripts in the package or its resolved dependency tree.
+Batch 1: include `@wxg-prc-cpg/browser-skill-dsh-plugin@0.3.3` (launches the user-installed `bsk` CLI; the browser visits sites the agent chooses) and `dsh-context@0.73.2` (uses the DeepSeek key for a balance request to api.deepseek.com, models.dev prices, update hint without self-install). `@michengai/dsh-skills-manager@1.2.7` is conditional and not listed: its always-on updater installs the npm latest on two clicks, bypassing `installBundle` on the desktop profile, and it installs third-party skills from ClawHub, skills.sh, and GitHub. `dsh-univer-office@0.3.7` and `@linxin666/dsh-remote-web-ui@0.4.7` are deferred by the product owner (size, telemetry, obfuscated code and unlicensed binaries; telemetry, relay, public tunnel, firewall changes).

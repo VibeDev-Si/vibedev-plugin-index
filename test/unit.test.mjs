@@ -7,7 +7,26 @@ import { readDisplayMetadata, repositoryUrl } from '../scripts/lib/display.mjs'
 import { dshRange, installScripts, isBundle, isOsiLicense, unmetDshRequirements } from '../scripts/lib/manifest.mjs'
 import { integrityMatches } from '../scripts/lib/npm.mjs'
 import { PackageFiles } from '../scripts/lib/package-files.mjs'
-import { readTarball } from '../scripts/lib/tar.mjs'
+import { createTar, readTarball } from '../scripts/lib/tar.mjs'
+
+test('createTar writes a ustar archive that readTarball reads back, including long paths', () => {
+  const long = `icons/${'d'.repeat(90)}/${'f'.repeat(60)}.svg`
+  const entries = [{ name: 'index.json', bytes: Buffer.from('{"format":1}') }, { name: long, bytes: Buffer.alloc(700, 7) }]
+  const files = readTarball(gzipSync(createTar(entries, 0)), { maxBytes: 1 << 20 })
+  assert.deepEqual([...files.keys()], ['index.json', long])
+  assert.equal(files.get('index.json').toString(), '{"format":1}')
+  assert.equal(files.get(long).length, 700)
+  assert.throws(() => createTar([{ name: 'x'.repeat(101), bytes: Buffer.alloc(0) }]), /too long/u)
+})
+
+test('checkCatalog accepts * as a network host for sites the agent chooses', () => {
+  const review = { reviewer: 'r', date: '2026-10-19', license: 'MIT', testedOn: ['0.2.1-rc.2'], capabilities: { network: ['*', 'api.example.com'], files: 'none', config: 'none', childProcess: ['bsk'] }, installScripts: [], notes: 'n' }
+  const list = { schema: 1, index: { title: 'T' }, target: { dsh: '0.2.1-rc.2' }, policy: { maxUnpackedBytes: 1, inlineIconBytes: 0 }, categories: { tools: { en: 'Tools' } },
+    plugins: [{ name: 'p', category: 'tools', tags: [], maintainer: 'm@x.io', versions: [{ version: '1.0.0', integrity: `sha512-${'A'.repeat(86)}==`, review }] }] }
+  assert.deepEqual(checkCatalog(list).errors, [])
+  list.plugins[0].versions[0].review.capabilities.network = ['**']
+  assert.ok(checkCatalog(list).errors.some(error => error.includes('capabilities.network[0]')))
+})
 
 function header(name, size, type = '0') {
   const block = Buffer.alloc(512)

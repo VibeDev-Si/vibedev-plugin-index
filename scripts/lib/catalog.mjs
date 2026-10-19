@@ -20,7 +20,8 @@ const LANGUAGE_ID = /^[a-z]{2,8}(?:-[a-z0-9]{1,8})*$/u
 const ID = /^[a-z0-9][a-z0-9-]*$/u
 const INTEGRITY = /^sha512-[A-Za-z0-9+/]{86}==$/u
 const DATE = /^\d{4}-\d{2}-\d{2}$/u
-const HOST = /^(?:\*\.)?[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+(?::\d{1,5})?$/u
+/** A host name, `*.domain`, or `*` alone for sites the user or the agent chooses (for example a browser it drives). */
+const HOST = /^(?:\*|(?:\*\.)?[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+(?::\d{1,5})?)$/u
 const ACCESS = ['none', 'read', 'write']
 
 class Checker {
@@ -99,7 +100,7 @@ function checkReview(c, value, path, policy) {
   tested.forEach((version, position) => { if (semver.valid(version) !== version) c.fail(`${path}.testedOn[${position}]`, 'must be an exact DSH version') })
   const capabilities = c.object(review.capabilities, `${path}.capabilities`, ['network', 'files', 'config', 'childProcess'], ['network', 'files', 'config', 'childProcess'])
   if (capabilities !== undefined) {
-    c.stringList(capabilities.network, `${path}.capabilities.network`, HOST, 'host names such as api.example.com')
+    c.stringList(capabilities.network, `${path}.capabilities.network`, HOST, 'host names such as api.example.com, or * for sites the user or agent chooses')
     if (!ACCESS.includes(capabilities.files)) c.fail(`${path}.capabilities.files`, `must be one of ${ACCESS.join(', ')}`)
     if (!ACCESS.includes(capabilities.config)) c.fail(`${path}.capabilities.config`, `must be one of ${ACCESS.join(', ')}`)
     c.stringList(capabilities.childProcess, `${path}.capabilities.childProcess`, undefined, 'program names')

@@ -48,6 +48,48 @@ function paxRecords(data) {
 }
 
 /**
+ * Build an uncompressed ustar archive of regular files and their parent directories.
+ * @param {{ name: string, bytes: Uint8Array }[]} entries - files by relative POSIX path.
+ * @param {number} [mtime] - modification time in Unix seconds for every entry.
+ * @returns {Buffer} the archive, ending with two zero blocks.
+ * @throws {Error} for a path the ustar name and prefix fields cannot hold.
+ */
+export function createTar(entries, mtime = Math.floor(Date.now() / 1000)) {
+  const header = (name, size, type, mode) => {
+    const block = Buffer.alloc(BLOCK)
+    const slash = Buffer.byteLength(name) > 100 ? name.lastIndexOf('/') : -1
+    const [prefix, base] = slash > 0 ? [name.slice(0, slash), name.slice(slash + 1)] : ['', name]
+    if (Buffer.byteLength(base) > 100 || Buffer.byteLength(prefix) > 155) throw new Error(`path too long for a ustar archive: ${name}`)
+    block.write(base, 0, 100, 'utf8')
+    block.write(`${mode}\0`, 100)
+    block.write('0000000\0', 108)
+    block.write('0000000\0', 116)
+    block.write(`${size.toString(8).padStart(11, '0')}\0`, 124)
+    block.write(`${mtime.toString(8).padStart(11, '0')}\0`, 136)
+    block.write(type, 156)
+    block.write('ustar\0', 257)
+    block.write('00', 263)
+    block.write(prefix, 345, 155, 'utf8')
+    block.fill(0x20, 148, 156)
+    let sum = 0
+    for (const byte of block) sum += byte
+    block.write(`${sum.toString(8).padStart(6, '0')}\0 `, 148)
+    return block
+  }
+  const blocks = []
+  const directories = [...new Set(entries.flatMap(({ name }) => {
+    const parts = name.split('/').slice(0, -1)
+    return parts.map((_, depth) => parts.slice(0, depth + 1).join('/'))
+  }))].sort()
+  for (const directory of directories) blocks.push(header(`${directory}/`, 0, '5', '0000755'))
+  for (const { name, bytes } of entries) {
+    blocks.push(header(name, bytes.length, '0', '0000644'), Buffer.from(bytes), Buffer.alloc((BLOCK - (bytes.length % BLOCK)) % BLOCK))
+  }
+  blocks.push(Buffer.alloc(2 * BLOCK))
+  return Buffer.concat(blocks)
+}
+
+/**
  * Unpack the regular files of a `.tgz` in memory.
  * @param {Uint8Array} compressed - the tarball bytes.
  * @param {{ maxBytes: number }} limits - largest unpacked archive accepted.

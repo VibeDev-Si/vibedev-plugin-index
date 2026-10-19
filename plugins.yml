@@ -45,7 +45,87 @@ categories:
 labels:
   vibedev: { en: Made by VibeDev, zh: VibeDev 出品 }
 
-# 尚无正式收录。候选见 CANDIDATES.md，经产品负责人批准后按 README 的审核清单逐个加入。
-# No production entries yet. Candidates are proposed in CANDIDATES.md; each is added here only after approval and a
-# completed review (README.md, review checklist).
-plugins: []
+# 收录的插件。每个版本都有审核记录；候选和暂缓的插件见 CANDIDATES.md。
+# Listed plugins. Every version carries its review record; candidates and deferred plugins are in CANDIDATES.md.
+# capabilities.network: host names the plugin contacts; "*" means sites the user or the agent chooses.
+plugins:
+  - name: "@wxg-prc-cpg/browser-skill-dsh-plugin"
+    category: browser
+    tags: []
+    maintainer: https://github.com/Tencent/BrowserSkill/issues
+    display:
+      title:
+        en: BrowserSkill
+        zh: BrowserSkill 浏览器操作
+      description:
+        en: >-
+          Lets the agent drive a real browser through Tencent BrowserSkill. Requires the separate bsk command-line tool
+          (github.com/Tencent/BrowserSkill) on PATH: the plugin launches bsk processes, and the browser visits the sites
+          the agent chooses. Session recovery records are kept in ~/.bsk.
+        zh: >-
+          让 Agent 通过腾讯 BrowserSkill 操作真实浏览器。需要另行安装 bsk 命令行工具（github.com/Tencent/BrowserSkill）并加入
+          PATH：插件会启动 bsk 进程，浏览器会访问 Agent 选择的网站。会话恢复记录保存在 ~/.bsk。
+    versions:
+      - version: 0.3.3
+        integrity: sha512-YleWGGDN7re7arDD8PVgcIuTeMXHne4JKilLaKmvO9L1EzvOKNKVXZ3eHq7CXbgF7uooxRjnYviMH2QMRqZv+A==
+        review:
+          reviewer: VibeDev
+          date: 2026-10-19
+          license: MIT
+          testedOn: [0.2.1-rc.2]
+          capabilities:
+            network: ["*"]
+            files: write
+            config: none
+            childProcess: [bsk]
+          installScripts: []
+          notes: >-
+            No dependencies, no install scripts, no npm provenance. The plugin itself opens no network connection (client
+            requests stay on its own /bsk-observation routes). Its only child process is the user-installed bsk CLI
+            (config bskPath, default "bsk" from PATH; not shipped in the package), started without a shell as
+            `bsk <command> --json`: `bsk --version` at every load, bsk_* tool calls (tools appear after the browser-skill
+            skill is invoked), and `bsk screenshot --session <id> --out <temp>/bsk-obs-*.png` every 1.5 s for active
+            sessions. Files: start journal under ~/.bsk/dsh-starts (or BSK_HOME), thumbnails in the temp directory.
+            Registers the bundled browser-skill skill and GET/POST routes under /bsk-observation; stops browser sessions of
+            archived DSH sessions. No credentials, settings writes, telemetry, eval, or self-update. Trial on DSH
+            0.2.1-rc.2 (installBundle in a temporary profile): installed and ACTIVE after hot install and after restart;
+            no outbound connection; bsk itself was not installed, so browser tools were not exercised.
+  - name: dsh-context
+    category: usage
+    tags: []
+    maintainer: https://github.com/bowenliang123/dsh-context/issues
+    display:
+      description:
+        en: >-
+          Context window, token usage, and cost panel for DSH sessions. Uses your DeepSeek API key (DEEPSEEK_API_KEY) to
+          query your balance at api.deepseek.com, loads model prices from models.dev, and asks npm for its own newer
+          version to show an update hint; it never installs updates itself.
+        zh: >-
+          DSH 会话的上下文窗口、Token 用量与费用面板。会用你的 DeepSeek API key（DEEPSEEK_API_KEY）向 api.deepseek.com
+          查询余额，从 models.dev 获取模型价格，并向 npm 查询自身新版本以显示更新提示；不会自行安装更新。
+    versions:
+      - version: 0.73.2
+        integrity: sha512-C1UQrNogShFx/uYpg/aED0Qd7x7oX8Tay2gwfhYy89VxDOg1sPIeML3yttvFDfzPLeGpP1JU9qksTNyYoY8YAA==
+        review:
+          reviewer: VibeDev
+          date: 2026-10-19
+          license: Apache-2.0
+          testedOn: [0.2.1-rc.2]
+          capabilities:
+            network: [api.deepseek.com, models.dev, registry.npmjs.org, registry.npmmirror.com]
+            files: write
+            config: read
+            childProcess: []
+          installScripts: []
+          notes: >-
+            npm provenance: built from github.com/bowenliang123/dsh-context tag v0.73.2 (commit 2ee5c96). One dependency
+            (zod), no install scripts. Host: POST routes /api/dsh-context/{balance,skills,fleet,attachment,detail,backfill}
+            on the connection bridge; no child process. Balance: only when the panel calls /api/dsh-context/balance, it
+            reads Settings to find the DeepSeek entry (falls back to the first entry with an apiKeyEnv), resolves that
+            credential, and sends it as a Bearer token to <baseURL>/user/balance. In the VibeDev web composition the only
+            such entry is web-deepseek-api, so the trial saw exactly one read of DEEPSEEK_API_KEY and one request to
+            https://api.deepseek.com/v1/tools/user/balance (the balance may show nothing there). Files: links or copies
+            image attachments inside DSH's attachment storage for display. Browser: models.dev/api.json price book; hourly
+            registry.npmjs.org and registry.npmmirror.com /dsh-context/latest for an update hint linking to GitHub
+            releases (newer versions are not reviewed here). No telemetry, eval, or self-update. Trial on DSH 0.2.1-rc.2:
+            installed and ACTIVE after hot install and after restart; no outbound connection at startup.

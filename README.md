@@ -32,7 +32,7 @@ VibeDev 使用上游 DeepSeek Harness 自带的插件市场：Host 端服务 `@d
 2. **发布在 npm**：来自 registry.npmjs.org，并声明 `dsh.bundle`（可安装的 DSH bundle）。不收录 Git、tarball 或私有源。
 3. **精确版本**：每个版本单独审核，记录版本号和 npm 的 `dist.integrity`（sha512）。不接受范围（`^1.0.0`）或标签（`latest`）。
 4. **兼容当前 VibeDev 的 DSH 版本**（`plugins.yml` 的 `target.dsh`，现在是 `0.2.1-rc.2`）：发现页的兼容判断和安装时的检查都必须通过；完全没有 DSH 声明（无 `engines.dsh`、无 dsh peer）的包，必须由审核人在目标版本上实际运行过（`testedOn`）。
-5. **行为已声明**：网络（访问哪些主机）、文件（none/read/write）、DSH 配置（none/read/write）、子进程（启动哪些程序）都写进审核记录；构建时据此给条目加上「联网」「运行外部程序」「写入文件」「修改 DSH 配置」「安装脚本」标签。遥测必须写明，默认开启的第三方遥测要产品负责人批准。
+5. **行为已声明**：网络（访问哪些主机；`*` 表示用户或 Agent 选择的网站，例如它驱动的浏览器）、文件（none/read/write）、DSH 配置（none/read/write）、子进程（启动哪些程序）都写进审核记录；构建时据此给条目加上「联网」「运行外部程序」「写入文件」「修改 DSH 配置」「安装脚本」标签。遥测必须写明，默认开启的第三方遥测要产品负责人批准。
 6. **没有未经审核的安装脚本**：包自身的 `preinstall`/`install`/`postinstall` 和 `binding.gyp` 必须逐项记录在 `installScripts`，否则校验失败；依赖树里的安装脚本用 `npm run inspect -- <name>@<version> --deps` 检查。
 7. **体量限制**：解包后不超过 20 MiB（`policy.maxUnpackedBytes`），超出时必须写 `sizeException` 说明理由；依赖越少越好。
 8. **维护者可联系且有响应**：记录 issue 地址或邮箱；仓库未归档，最近 90 天有提交或 issue 回复。安全问题报告 7 天内无回应的，可以先下架。
@@ -75,11 +75,12 @@ CANDIDATES.md               待批准的候选插件与初审
 scripts/build.mjs           生成 dist/index.json、dist/icons/、dist/index.html
 scripts/validate.mjs        校验清单、npm 事实与生成的索引
 scripts/check-updates.mjs   每周的上游新版本报告
-scripts/inspect.mjs         审核辅助：一个版本的事实与 plugins.yml 片段
+scripts/inspect.mjs         审核辅助：一个版本的事实与 plugins.yml 片段（--grep 查看代码出处）
+scripts/mirror.mjs          把 dist/ 发布到 VibeDev 下载服务器（默认只演练）
 scripts/lib/                共用模块（部分改编自 DSH 参考生成器，见 NOTICE.md）
 test/unit.test.mjs          离线单元测试
 test/fixtures/              e2e 测试清单与两个故意写错的清单
-test/dsh-composition/       用 DSH 源码检出做真实组合测试
+test/dsh-composition/       用 DSH 源码检出做真实组合测试：market-list.mjs（读索引）、install-trial.mjs（安装试用）
 .github/                    CI、Pages 发布、每周检查、issue 与 PR 模板
 ```
 
@@ -91,9 +92,31 @@ npm run build                            # 生成 dist/
 npm run inspect -- dsh-context@0.73.2 --deps
 npm run check-updates
 node test/dsh-composition/market-list.mjs --dsh <已构建的 DSH 检出> --dist .cache/e2e-dist
+node test/dsh-composition/install-trial.mjs --dsh <已构建的 DSH 检出> --pnpm <pnpm.mjs> --out report.json <name@version>...
 ```
 
+`install-trial.mjs` 在临时 DSH_HOME、临时用户目录和临时 pnpm 仓库里启动 DSH 的 `web` profile，用 `pluginManager.installBundle` 安装精确版本（与「发现」页安装相同的路径），再重启一次。它记录每个条目的状态、注册的工具/技能/路由、启动的子进程、`fetch` 调用、凭据读取，以及经本地代理的每个外连。代理只放行 npm registry，其余一律拒绝并记录。
+
 需要 Node.js 22.12 或更高版本。依赖只有 4 个，全部锁定精确版本：`@deepseek-ai/dsh-plugin-market-index`（与 DSH 自己使用的 format 1 校验器相同，版本与 `target.dsh` 一致）、`semver`、`yaml`、`resolve.exports`。
+
+### 镜像到 VibeDev 下载服务器
+
+GitHub Pages 是源站；国内访问用 `https://download.vibedev.studio/plugin-index/index.json`，由 `scripts/mirror.mjs` 把构建好的 `dist/` 发布到下载服务器（站点根目录 `/data/vibedev-download/public`）。
+
+```sh
+npm run build
+# 默认只演练：列出文件、远端路径和每一条命令，不做任何改动
+node scripts/mirror.mjs --ssh deploy@<server> --identity <私钥> --known-hosts <known_hosts 文件>
+# 确认无误后真正发布
+node scripts/mirror.mjs --ssh deploy@<server> --identity <私钥> --known-hosts <known_hosts 文件> --apply
+```
+
+- **连接**：ssh 固定使用 `BatchMode=yes`、`StrictHostKeyChecking=yes`、给定的 known_hosts 和 `IdentitiesOnly=yes`，不会自动信任新主机。
+- **上传**：发布前先确认 `dist/index.json` 是合法的 format 1。`dist/` 以 tar 流经 ssh 上传到 `plugin-index.releases/<id>.staging`，然后在服务器上逐个文件核对 sha256。
+- **切换**：把暂存目录改名为正式版本目录，再用一次原子重命名把符号链接 `plugin-index` 指向它。如果已有的 `plugin-index` 不是符号链接，脚本在改动任何东西之前就停止。
+- **验证**：通过 HTTPS 取公开地址，不跟随重定向，要求 HTTP 200、`application/json`，且字节与 `dist/index.json` 完全一致。验证失败时自动切回上一个版本。
+- **清理**：只在 `plugin-index.releases/` 里保留最近 `--keep` 个版本（默认 5），站点根目录下其他内容一概不碰。
+- **服务器要求**：POSIX shell、GNU coreutils（`mv -T`、`ln -sfn`、`sha256sum`）和 tar。Web 服务器要能跟随该符号链接，并对这个 URL 直接返回 200：DSH 读取索引时拒绝重定向。
 
 ### 索引格式
 
@@ -131,7 +154,7 @@ A version must meet all of these; `npm run validate` checks the machine-checkabl
 2. **Published on npm** (registry.npmjs.org) and declares `dsh.bundle`. No Git, tarball, or private sources.
 3. **Exact version**: each version is reviewed on its own and recorded with its npm `dist.integrity` (sha512). No ranges (`^1.0.0`) or tags (`latest`).
 4. **Compatible with the DSH version VibeDev ships** (`target.dsh`, now `0.2.1-rc.2`) in both the Discover check and the install-time check; a package with no DSH declaration at all must have been run on the target by the reviewer (`testedOn`).
-5. **Declared behavior**: network hosts, file access (none/read/write), DSH configuration access (none/read/write), and programs started are recorded; the build turns them into the labels Uses the network, Runs programs, Writes files, Changes DSH settings, and Install scripts. Telemetry must be declared; third-party telemetry that is on by default needs the product owner's approval.
+5. **Declared behavior**: network hosts (`*` for sites the user or the agent chooses, such as a browser it drives), file access (none/read/write), DSH configuration access (none/read/write), and programs started are recorded; the build turns them into the labels Uses the network, Runs programs, Writes files, Changes DSH settings, and Install scripts. Telemetry must be declared; third-party telemetry that is on by default needs the product owner's approval.
 6. **No unreviewed install scripts**: `preinstall`/`install`/`postinstall` and `binding.gyp` must each be listed in `installScripts`, or validation fails; check the dependency tree with `npm run inspect -- <name>@<version> --deps`.
 7. **Size**: at most 20 MiB unpacked (`policy.maxUnpackedBytes`) unless `sizeException` gives the reason; few dependencies.
 8. **Responsive maintainer**: an issue tracker or e-mail is recorded; the repository is not archived and shows commits or issue replies within 90 days. A security report without an answer in 7 days can lead to removal.
@@ -167,6 +190,17 @@ A version must meet all of these; `npm run validate` checks the machine-checkabl
 ### Layout and commands
 
 See the [Chinese section](#仓库结构与命令) for the file tree and commands. Node.js 22.12 or later. The four dependencies are pinned exactly: `@deepseek-ai/dsh-plugin-market-index` (the format-1 validator DSH itself uses, at the `target.dsh` version), `semver`, `yaml`, and `resolve.exports`; `.npmrc` disables install scripts.
+
+### Mirroring to the VibeDev download server
+
+GitHub Pages is the origin; users in China read `https://download.vibedev.studio/plugin-index/index.json`. `scripts/mirror.mjs` publishes the built `dist/` to the download server (site root `/data/vibedev-download/public`). It is a dry run by default: it lists the files, the remote paths, and every command, and changes nothing. Run it with `--ssh user@host --identity <key> --known-hosts <file>`, then add `--apply` to publish.
+
+- **Connection**: ssh always runs with `BatchMode=yes`, `StrictHostKeyChecking=yes`, the given known_hosts file, and `IdentitiesOnly=yes`.
+- **Upload**: the script first checks that `dist/index.json` is valid format 1. It then streams `dist/` over ssh as a tar archive into `plugin-index.releases/<id>.staging` and checks every file's sha256 on the server.
+- **Switch**: it renames the staging directory to the release, then points the `plugin-index` symbolic link at it with one atomic rename. If an existing `plugin-index` is not a symbolic link, the run stops before anything changes.
+- **Verify**: it fetches the public URL over HTTPS without following redirects and requires HTTP 200, `application/json`, and the exact bytes of `dist/index.json`. On failure it switches the link back to the previous release.
+- **Cleanup**: it keeps the newest `--keep` releases (5 by default), only inside `plugin-index.releases/`; nothing else under the site root is touched.
+- **Server requirements**: a POSIX shell, GNU coreutils (`mv -T`, `ln -sfn`, `sha256sum`), and tar. The web server must follow the link and answer this URL with 200 directly, because DSH refuses redirects when it reads an index.
 
 ### Index format
 
