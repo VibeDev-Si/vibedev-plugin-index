@@ -5,6 +5,8 @@
  * The release selection and entry assembly follow DeepSeek Harness apps/plugin-market-generator/src/generate.ts
  * (dsh-v0.2.1-rc.2), MIT License, Copyright (c) 2026 DeepSeek; see NOTICE.md.
  */
+import { existsSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import { MarketIndexError, parseMarketIndex } from '@deepseek-ai/dsh-plugin-market-index'
 import semver from 'semver'
 import { CAPABILITY_LABELS, loadCatalog } from './catalog.mjs'
@@ -183,6 +185,17 @@ export async function runPipeline(catalogFile, { registry = PUBLIC_REGISTRY, con
   for (const plugin of index.plugins) {
     const target = plugin['dist-tags'].latest
     if (!plugin.versions.some(version => version.version === target)) report.errors.push(`${plugin.name}: dist-tags.latest ${target} is not a listed version`)
+  }
+  // Lists kept beside a reviews/ directory (the production list) expect a review record for every listed version.
+  const reviews = join(dirname(catalogFile), 'reviews')
+  if (existsSync(reviews)) {
+    for (const plugin of catalog.plugins) {
+      for (const { version } of plugin.versions) {
+        if (!existsSync(join(reviews, `${plugin.name}@${version}.md`))) {
+          report.warnings.push(`${plugin.name}@${version}: no review record reviews/${plugin.name}@${version}.md; create it with npm run review -- ${plugin.name}@${version} --dsh <DSH checkout>`)
+        }
+      }
+    }
   }
   return { ...report, icons, facts: results.flatMap(result => result === undefined ? [] : [result.facts]), catalog, ...report.errors.length === 0 ? { index } : {} }
 }

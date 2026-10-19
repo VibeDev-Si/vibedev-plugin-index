@@ -173,6 +173,13 @@ export function checkCatalog(value) {
       checkReview(c, version.review, `${vpath}.review`, policy)
     }
   }
+  // A draft from `npm run review` marks judgment fields TODO; none may reach the index.
+  const todo = (value, path) => {
+    if (typeof value === 'string') { if (/\bTODO\b/u.test(value)) c.fail(path, 'still contains TODO; fill it in') }
+    else if (Array.isArray(value)) value.forEach((item, position) => todo(item, `${path}[${position}]`))
+    else if (typeof value === 'object' && value !== null) for (const [key, item] of Object.entries(value)) todo(item, `${path}.${key}`)
+  }
+  todo(root, '$')
   return { catalog: root, errors: c.errors }
 }
 

@@ -16,13 +16,9 @@ Fill this in completely when adding or updating a plugin version; a docs/scripts
 
 ## 插件审核 / Plugin review
 
-<details><summary><code>npm run inspect -- name@x.y.z --deps</code> 输出 / output</summary>
+审核记录 / Review record：`reviews/name@x.y.z.md`（由 `npm run review -- name@x.y.z --dsh <DSH 检出>` 生成，随本 PR 提交 / written by `npm run review`, committed with this PR）
 
-```text
-(paste here)
-```
-
-</details>
+更新版本时的主要变化 / For an update, changes to look at（记录「与 … 相比」一节 / the record's "Changes since" section）：
 
 - [ ] 许可证是 OSI 许可证，与仓库和包内 LICENSE 一致 / OSI license, matches repository and packaged LICENSE
 - [ ] 发布在 npm，声明 `dsh.bundle`；记录了精确版本和 `dist.integrity` / On npm, declares `dsh.bundle`; exact version and integrity recorded
@@ -36,6 +32,6 @@ Fill this in completely when adding or updating a plugin version; a docs/scripts
 
 试用记录 / Hands-on notes (VibeDev version, OS, what was exercised):
 
-## 第二位维护者 / Second maintainer
+## 合并 / Merge
 
-合并前需要另一位维护者批准。/ Another maintainer must approve before merge.
+`main` 受保护：Validate 检查通过后才能合并；有第二位维护者后再要求批准。/ `main` is protected: merge after the Validate check passes; approvals are required once there is a second maintainer.
