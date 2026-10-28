@@ -15,7 +15,8 @@
     "inspect": "node scripts/inspect.mjs",
     "review": "node scripts/review.mjs",
     "mirror": "node scripts/mirror.mjs",
-    "test": "node --test \"test/*.test.mjs\""
+    "test": "node --test \"test/*.test.mjs\"",
+    "auto-publish": "node scripts/auto-publish.mjs"
   },
   "dependencies": {
     "@deepseek-ai/dsh-plugin-market-index": "0.2.1-rc.2",

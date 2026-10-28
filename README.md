@@ -92,6 +92,16 @@ VibeDev 使用上游 DeepSeek Harness 自带的插件市场：Host 端服务 `@d
 - 审核人运行 `npm run review -- <name>@<新版本>`，它会自动与最新收录的版本对比，通常只需要看「变化」一节。然后在 PR 里加上新版本（旧版本可以保留或删除），合并后 Pages 自动重新发布。已安装旧版本的用户会在发现页看到「有更新」。
 - **紧急下架**：删除对应版本（或整个插件）并合并，Pages 几分钟内更新；客户端最多缓存 10 分钟。已经安装的副本不会被自动卸载，需要在 issue 和发布说明里通知用户。
 
+### 第一方插件的自动跟随
+
+`@vibedev-si/` 下的第一方插件可以由维护者在 `plugins.yml` 里标 `autoPublish: true`。定时任务（每 6 小时）运行
+`node scripts/auto-publish.mjs --apply`，把 npm 上的新稳定版写进 `plugins.yml` 并生成审核记录，然后开一个 PR；Validate
+通过后自动合并，Pages 重新发布，客户端 10 分钟内看到新版本。
+
+自动收录不是"免检"：新版本必须通过 `npm run validate` 的全部规则（npm integrity、bundle、OSI 许可证、安装脚本、体量、
+DSH 兼容），脚本还会比对静态线索——只要新版本会访问**新的主机**或启动**新的程序**，就拒绝收录，必须人工审核。
+代码审阅发生在插件仓库的 PR 里；行为声明沿用上一版，必要时人工更新 `capabilities`。
+
 ### 仓库结构与命令
 
 ```text
@@ -247,6 +257,18 @@ A removal needs only steps 3–6: delete the version or the whole plugin from `p
 - Every Monday (02:17 UTC) a scheduled workflow runs `scripts/check-updates.mjs`, lists versions newer than the newest reviewed one with their facts, and opens or updates one issue labelled `upstream-release`; it closes the issue when nothing is pending.
 - A reviewer runs `npm run review -- <name>@<new version>`, which compares it with the newest listed version automatically, so usually only the "Changes since" section needs reading. The reviewer then adds the version in a PR, keeping or dropping older versions. Merging redeploys Pages, and users with an older version see **Update available**.
 - **Emergency removal**: delete the version or plugin and merge; Pages updates within minutes and clients cache for at most 10 minutes. Installed copies stay installed, so announce the removal.
+
+### First-party auto-follow
+
+A first-party package under `@vibedev-si/` may set `autoPublish: true`. Every six hours the scheduled workflow runs
+`node scripts/auto-publish.mjs --apply`, records the newest stable npm release as a review record and a `plugins.yml`
+entry, and opens a pull request that merges automatically once Validate passes; Pages then republishes and clients see
+the new version within the 10-minute cache.
+
+Auto-follow is not a waiver: the new version must pass every `npm run validate` rule (npm integrity, bundle, OSI
+license, install scripts, size policy, DSH compatibility), and the script also compares static hints — a release that
+would reach a **new host** or start a **new program** is refused and needs a human review. Code review happens in the
+package's own pull request; behaviour declarations are carried over from the previous version.
 
 ### Layout and commands
 
