@@ -139,7 +139,7 @@ export function checkCatalog(value) {
   const names = new Set()
   for (const [position, entry] of (Array.isArray(root.plugins) ? root.plugins : []).entries()) {
     const path = `$.plugins[${position}]`
-    const plugin = c.object(entry, path, ['name', 'category', 'tags', 'maintainer', 'display', 'versions'], ['name', 'category', 'tags', 'maintainer', 'versions'])
+    const plugin = c.object(entry, path, ['name', 'category', 'tags', 'maintainer', 'display', 'versions', 'autoPublish'], ['name', 'category', 'tags', 'maintainer', 'versions'])
     if (plugin === undefined) continue
     if (typeof plugin.name !== 'string' || plugin.name.length > 214 || !PACKAGE_NAME.test(plugin.name)) c.fail(`${path}.name`, 'must be an npm package name')
     else if (names.has(plugin.name)) c.fail(`${path}.name`, `duplicates ${plugin.name}`)
@@ -148,6 +148,14 @@ export function checkCatalog(value) {
     c.stringList(plugin.tags, `${path}.tags`, undefined, 'label ids').forEach((tag, at) => {
       if (!Object.hasOwn(labels, tag)) c.fail(`${path}.tags[${at}]`, `references undeclared label ${JSON.stringify(tag)}`)
     })
+    // First-party packages may opt into taking their own new npm releases automatically; the scheduled
+    // workflow still runs every machine check the curated list applies. Third-party entries never may.
+    if (plugin.autoPublish !== undefined) {
+      if (typeof plugin.autoPublish !== 'boolean') c.fail(`${path}.autoPublish`, 'must be true or false')
+      else if (plugin.autoPublish && !(typeof plugin.name === 'string' && plugin.name.startsWith('@vibedev-si/'))) {
+        c.fail(`${path}.autoPublish`, 'is only allowed for VibeDev first-party packages under @vibedev-si/')
+      }
+    }
     if (typeof plugin.maintainer !== 'string' || !(/^https:\/\/\S+$/u.test(plugin.maintainer) || /^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(plugin.maintainer))) {
       c.fail(`${path}.maintainer`, 'must be an https URL (issue tracker) or an e-mail address where the maintainer answers')
     }

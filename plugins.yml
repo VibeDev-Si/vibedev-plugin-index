@@ -2,6 +2,8 @@
 # VibeDev curated plugin index — the source list (schema 1).
 #
 # 只有这里记录过审核的精确版本才会进入 dist/index.json；插件发新版不会自动收录。
+# 例外：标了 autoPublish: true 的第一方包（@vibedev-si/）由定时任务把 npm 上的新稳定版写成本清单条目，
+# 每个新版本仍要通过全部机器检查才会构建进索引。
 # Only the exact versions reviewed and recorded here reach dist/index.json; a new upstream release is never
 # included automatically. See README.md for the inclusion criteria and the review checklist.
 
@@ -142,3 +144,56 @@ plugins:
             registry.npmjs.org and registry.npmmirror.com /dsh-context/latest for an update hint linking to GitHub
             releases (newer versions are not reviewed here). No telemetry, eval, or self-update. Trial on DSH 0.2.1-rc.2:
             installed and ACTIVE after hot install and after restart; no outbound connection at startup.
+  - name: "@vibedev-si/dsh-remote"
+    category: integration
+    tags: [vibedev]
+    autoPublish: true
+    maintainer: https://github.com/VibeDev-Si/dsh-remote/issues
+    display:
+      title:
+        en: VibeDev Remote
+        zh: VibeDev 远程访问
+      description:
+        en: >-
+          Lets your phone reach this computer's VibeDev from outside: the desktop dials out to the VibeDev relay, and
+          after signing in with the same account and verifying the phone, the phone continues sessions, sends prompts,
+          reads history, answers approvals and opens files inside the workspaces you select. Remote access is off until
+          the owner enables it, and every connection can be refused or revoked on the desktop. Needs a VibeDev account
+          with remote access granted; the computer must stay online, and nothing runs in the cloud.
+        zh: >-
+          让手机在外网连到这台电脑上的 VibeDev：电脑主动出站连接 VibeDev 中继，手机用同一账号登录并完成可信验证后，可以继续会话、
+          发送消息、查看历史、处理审批，并读取你在电脑上选定工作区里的文件。远程访问默认关闭，由电脑所有者开启；每次连接都可以在电脑上
+          拒绝或随时撤销。需要 VibeDev 账号且已开通远程权限，电脑必须保持在线，不会在云端运行任何东西。
+    versions:
+      - version: 0.1.12
+        integrity: sha512-UHf97RcksLUb7CEVR2IUZCZo4JJxuVLwBe3zopndqKG3yPmgapyO8whUTI5chZ5lyo8DVDYdhbxkKlkMOSXe1Q==
+        review:
+          reviewer: VibeDev
+          date: 2026-10-29
+          license: MIT
+          testedOn: [0.2.1-rc.2]
+          capabilities:
+            network: [vibedev.studio, remote.vibedev.studio:24443, github.com, 127.0.0.1]
+            files: write
+            config: write
+            childProcess: [python3, cloudflared, nginx, certbot, systemctl]
+          installScripts: []
+          notes: >-
+            First-party connector published from github.com/VibeDev-Si/dsh-remote tag v0.1.12; dependency tree is ws,
+            qrcode and @deepseek-ai/schemastery, none with install scripts. No telemetry, no eval, no self-update.
+            Remote access starts disabled and is enabled only from the desktop owner's own page: the plugin then holds
+            one outbound WSS to remote.vibedev.studio:24443 (ticket in the Authorization header; frames are the
+            dsh-mobile-v1 payloads, 1 MiB cap) and never listens on a public port. Sign-in is browser PKCE against
+            vibedev.studio, and the short-lived ticket, JWKS refresh and lease-validated connection all come from that
+            origin; tokens, grants, the operation journal and the relay replay log live under the profile's
+            vibedev-remote directory with 0600 files. Capabilities come from the account's remote grant and the owner's
+            selection: conversation, sessions, history, tasks, approvals, files.read and files.write, intersected with a
+            workspace fence so a phone can only touch the desktop owner's selected workspaces. Writes: workspace uploads
+            staged for a Session, downloaded copies, and remote.json/operations.json; config writes: the Loader patch row
+            this bundle ships and, from the phone, only enabling or disabling other installed bundles - installing,
+            removing and settings edits are refused remotely, and this connector cannot be disabled from a phone.
+            Child processes only exist behind opt-in desktop features: a root-owned python3 helper for the legacy LAN
+            certificate flow (nginx/certbot/systemctl, Linux only) and the cloudflared binary downloaded from GitHub
+            releases for the optional tunnel; neither runs on a default install. Trial: installBundle of 0.1.12 into the
+            VibeDev desktop profile on DSH 0.2.1-rc.2 replaced a pinned 0.1.9 tarball, and the connector has since run
+            there across restarts with a real account, phone pairing, history, approvals and file reads.
