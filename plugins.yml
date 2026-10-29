@@ -197,3 +197,69 @@ plugins:
             releases for the optional tunnel; neither runs on a default install. Trial: installBundle of 0.1.12 into the
             VibeDev desktop profile on DSH 0.2.1-rc.2 replaced a pinned 0.1.9 tarball, and the connector has since run
             there across restarts with a real account, phone pairing, history, approvals and file reads.
+  - name: dsh-film
+    category: media
+    tags: [vibedev]
+    maintainer: https://github.com/VibeDev-Si/dsh-film/issues
+    display:
+      title:
+        en: VibeDev Film
+        zh: VibeDev 影视工作台
+      description:
+        en: >-
+          A canvas film workbench: script and storyboard canvas, image/video/audio generation, the Director stage and
+          final editing, plus local scene detection with keyframes, clips and the original audio, and optional AI shot
+          descriptions. Models and media go through the VibeDev account plugin, so no API key is entered here, and the
+          bundled local server listens on 127.0.0.1 only and stops when VibeDev exits. Local processing needs FFmpeg:
+          install it with your system package manager or from the workbench's own plugin market. The package ships the
+          Bun runtime for three platforms, so it is large (about 45 MiB unpacked, one runtime installed per platform).
+        zh: >-
+          画布式影视工作台：剧本与分镜画布、图片/视频/音频生成、导演台和剪辑成片，还能本地切镜并提取关键帧、片段和原音轨，
+          可选 AI 逐镜头描述与整段分析。模型与媒体统一走 VibeDev 账号插件，不需要在这里填写 API Key；随包的本地服务只监听
+          127.0.0.1，VibeDev 退出后自行关闭。本地处理需要 FFmpeg：用系统包管理器安装，或在工作台里的插件市场下载。
+          包装了三个平台的 Bun 运行时，所以体积较大（解包约 45 MiB，每个平台只装一个）。
+    versions:
+      - version: 0.8.0
+        integrity: sha512-DlmR0u0BZw2CtHHeYDDWs3yKGp5UAD9XQJvwAX4aCk5/RmN4NzA8f2xPVRZjrs9i3SzgVLAA+QNCB8eCz2fRXg==
+        review:
+          reviewer: VibeDev
+          date: 2026-10-29
+          license: MIT
+          testedOn: [0.2.1-rc.2]
+          capabilities:
+            network: [127.0.0.1]
+            files: write
+            config: none
+            childProcess: [bun, ffmpeg, ffprobe]
+          installScripts: []
+          sizeException: >-
+            解包 46,981,566 B（44.8 MiB），超过 20 MiB 上限：包内随附三个平台的 Bun 运行时（用来启动本地 Film 服务）、
+            FFmpeg 与文档解析 Worker，以及工作台 Web 产物和内置节点/工具/技能。这些是本地处理能力，不是可裁剪的依赖；
+            Bun 可选依赖按平台只安装一个。Unpacks to 44.8 MiB because it ships the three platforms' Bun runtimes that run
+            the local Film server, the FFmpeg and document-parsing workers, the workbench Web build and the built-in
+            nodes/tools/skills. These are the local processing capability rather than trimmable dependencies, and only one
+            platform's Bun package is installed per user.
+          notes: >-
+            First-party workbench published from github.com/VibeDev-Si/dsh-film tag v0.8.0; the workbench source is the
+            private dsh-film-studio repository, workbench branch at ebed97a0 (tag dsh-film-v0.8.0). Runtime dependency is zod
+            only; the optional @oven/bun-* packages are pinned 1.3.13 and carry no install scripts. No npm provenance: the
+            OIDC release job was refused by GitHub billing, so 0.8.0 was published from the machine after the tarball was
+            verified byte for byte against the tested archive. The host half spawns the bundled Bun to run the local Film
+            server on an ephemeral 127.0.0.1 port with three stdio pipes and a parent-process lifeline, and the package
+            contains no other host name; model and media traffic is handed to @vibedev-si/dsh-vibedev on the host side, so
+            Film never holds an API key. ffmpeg/ffprobe come from PATH, FFMPEG_PATH/FFPROBE_PATH, or a build the user installs
+            into the plugin data directory. The workbench executes the node, tool and skill scripts in that data directory
+            (tools.ts imports tool plugins from file paths) and re-seeds its own built-in copies when the build revision
+            changes; it writes no DSH settings or profile configuration. ToonFlow's anonymous usage reporter is still in the
+            bundle, but account-managed mode returns before it registers: no settings read, no timer, no request, and the
+            privacy panel cannot enable it. The same mode hides the bundled ToonFlow provider and plugin-store screens, so
+            the api.toonflow.net, api.apimart.ai and similar hosts found by the static scan are unreachable from the Film UI.
+            Windows evidence: installed through pluginManager.installBundle of this exact archive into the desktop profile on
+            DSH 0.2.1-rc.2 and active after restart; canvas, nodes, asset library, project ZIP import/export, read-only
+            document text extraction, image/video/audio generation, local frame analysis with report viewing and AI shot
+            descriptions were all used there, and a save during analysis no longer cancels it. Host-style launch returned
+            FFmpeg status and a real ffprobe in hundreds of milliseconds and the server exited by itself after its parent was
+            killed. Repository checks: 167 automated checks pass and verify-package.mjs installs the archive into a fresh
+            directory, starts it, and sees 401 without a session and 303 for the session link. Limits: Windows only; the
+            1 GB/10,000-entry archive and 100 MB document boundaries were not exercised; there is no read-only open button
+            and no document-to-node import in this version.
