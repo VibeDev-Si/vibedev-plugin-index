@@ -6,12 +6,14 @@ name: Auto-publish first-party plugins
 # new program, outgrow its size exception, or come from another publisher. This job then lands the change and
 # publishes the index without a person:
 #   1. push the `auto/publish` branch and open (or reuse) its pull request;
-#   2. run Validate on that branch: a pull request opened with GITHUB_TOKEN starts no pull_request workflow, but a
-#      workflow_dispatch run reports the same required `validate` check on the branch's commit;
+#   2. wait for the pull request's Validate run, which reports the required `validate` check, approving it when GitHub
+#      holds it for approval (the bot counts as a first-time contributor); when GitHub starts no run, dispatch
+#      Validate on the branch, which reports the same check on the same commit;
 #   3. merge exactly that commit once Validate passed;
 #   4. deploy Pages: a merge made with GITHUB_TOKEN starts no push workflow, so pages.yml is dispatched explicitly.
-# The download server copies the published index on its own timer (see "Download server mirror" in README.md).
-# Opening the pull request needs the repository setting "Allow GitHub Actions to create and approve pull requests".
+# The download server copies the published index on its own timer (see "Mirroring to the VibeDev download server" in
+# README.md). Opening the pull request needs "Allow GitHub Actions to create and approve pull requests" enabled for the
+# organization and the repository.
 
 on:
   schedule:
@@ -69,6 +71,7 @@ jobs:
           git add plugins.yml reviews
           git commit -m "chore(index): record newer first-party releases"
           sha=$(git rev-parse HEAD)
+          since=$(date -u -d '-2 minutes' +%Y-%m-%dT%H:%M:%SZ)
           # Only this step holds a token; the steps before it ran repository and dependency code without one.
           auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
           git -c "http.https://github.com/.extraheader=$auth" push --force origin "HEAD:refs/heads/$branch"
@@ -78,23 +81,32 @@ jobs:
               --body "Opened by the scheduled auto-publish job. Each added version is a first-party release that passed every curated-list check; its review record carries over the declarations of the previous reviewed version. The job runs Validate on this branch and merges the validated commit."
           fi
 
-          # wait_for_run <workflow> <branch> <event> <head sha> <created after>: print the run id once it exists.
-          wait_for_run() {
+          # find_run <workflow> <branch> <event> <head sha> <created after> <tries>: print the newest matching run id.
+          find_run() {
             local id=""
-            for _ in $(seq 1 30); do
+            for _ in $(seq 1 "$6"); do
               id=$(gh run list --repo "$REPO" --workflow "$1" --branch "$2" --event "$3" --limit 20 \
                 --json databaseId,headSha,createdAt \
                 --jq "[.[] | select(.headSha == \"$4\" and .createdAt >= \"$5\")][0].databaseId // empty")
               if [ -n "$id" ]; then echo "$id"; return 0; fi
               sleep 10
             done
-            echo "::error::$1 did not start on $2 at $4" >&2
             return 1
           }
 
-          since=$(date -u -d '-2 minutes' +%Y-%m-%dT%H:%M:%SZ)
-          gh workflow run validate.yml --repo "$REPO" --ref "$branch"
-          validate=$(wait_for_run validate.yml "$branch" workflow_dispatch "$sha" "$since")
+          # The pull request's own Validate run is the check the branch protection counts. GitHub may hold it for
+          # approval (the bot counts as a first-time contributor); approving it lets it run. Only when GitHub starts
+          # no such run is Validate dispatched on the branch, which reports the same check on the same commit.
+          if validate=$(find_run validate.yml "$branch" pull_request "$sha" "$since" 9); then
+            if [ "$(gh run view "$validate" --repo "$REPO" --json conclusion --jq .conclusion)" = "action_required" ]; then
+              gh api -X POST "repos/$REPO/actions/runs/$validate/approve" >/dev/null \
+                || { echo "::error::Validate on the auto/publish pull request awaits approval; approve run $validate by hand"; exit 1; }
+            fi
+          else
+            gh workflow run validate.yml --repo "$REPO" --ref "$branch"
+            validate=$(find_run validate.yml "$branch" workflow_dispatch "$sha" "$since" 30) \
+              || { echo "::error::Validate did not start on $branch at $sha"; exit 1; }
+          fi
           gh run watch "$validate" --repo "$REPO" --exit-status --interval 20
           gh pr merge "$branch" --repo "$REPO" --squash --match-head-commit "$sha" \
             --subject "chore(index): record newer first-party releases"
@@ -103,7 +115,8 @@ jobs:
           main=$(gh api "repos/$REPO/commits/main" --jq .sha)
           since=$(date -u -d '-2 minutes' +%Y-%m-%dT%H:%M:%SZ)
           gh workflow run pages.yml --repo "$REPO" --ref main
-          pages=$(wait_for_run pages.yml main workflow_dispatch "$main" "$since")
+          pages=$(find_run pages.yml main workflow_dispatch "$main" "$since" 30) \
+            || { echo "::error::Pages did not start at $main"; exit 1; }
           gh run watch "$pages" --repo "$REPO" --exit-status --interval 20
           echo "published=$main" >> "$GITHUB_OUTPUT"
       - name: Report refused releases
