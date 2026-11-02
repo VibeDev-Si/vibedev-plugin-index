@@ -87,7 +87,7 @@ VibeDev 使用上游 DeepSeek Harness 自带的插件市场：Host 端服务 `@d
 
 ### 上游发布新版本时
 
-- **第三方插件从不自动收录。** 索引只包含 `plugins.yml` 里的版本，发现页安装的永远是记录过的 `name@version`。第一方插件见下一节。
+- **第三方插件默认不自动收录。** 索引只包含 `plugins.yml` 里的版本，发现页安装的永远是记录过的 `name@version`。例外是第一方插件和显式开启 `autoFollow` 的第三方插件，见下面两节。
 - 每天（02:17 UTC）定时任务运行 `scripts/check-updates.mjs`，把收录插件比已审核版本更新的版本列成表（发布时间、`engines.dsh`、与目标 DSH 是否兼容、安装脚本、体量、许可证），新建或更新一个带 `upstream-release` 标签的 issue；没有待审版本时关闭它。
 - 审核人运行 `npm run review -- <name>@<新版本>`，它会自动与最新收录的版本对比，通常只需要看「变化」一节。然后在 PR 里加上新版本（旧版本可以保留或删除），合并后 Pages 自动重新发布。已安装旧版本的用户会在发现页看到「有更新」。
 - **紧急下架**：删除对应版本（或整个插件）并合并，Pages 几分钟内更新；客户端最多缓存 10 分钟。已经安装的副本不会被自动卸载，需要在 issue 和发布说明里通知用户。
@@ -99,7 +99,7 @@ VibeDev 自己的插件可以在 `plugins.yml` 里标 `autoPublish: true`（目�
 
 Auto-publish 有两个触发来源：下载服务器每 10 分钟对比 npm 与已发布的索引，发现新稳定版就立即触发一次（见「镜像到 VibeDev 下载服务器」），
 新版本通常半小时内出现在发现页；GitHub 上的每小时定时运行作为兜底（GitHub 的定时触发常常晚几个小时，有时直接跳过）。
-它运行 `node scripts/auto-publish.mjs --apply`，把 npm 上 `latest` 指向的新稳定版写进 `plugins.yml`（只插入新条目，
+它运行 `node scripts/auto-publish.mjs --apply`，把通过自动收录规则的新稳定版写进 `plugins.yml`（只插入新条目，
 文件其余部分逐字节不变）并生成审核记录，然后不需要人工就把它发布出去：
 
 1. 推送 `auto/publish` 分支，开（或复用）它的 PR；
@@ -111,17 +111,41 @@ Auto-publish 有两个触发来源：下载服务器每 10 分钟对比 npm 与�
 开 PR 需要组织和仓库两级 Settings → Actions → General 里的 **Allow GitHub Actions to create and approve pull requests** 都已开启。
 
 自动收录不是"免检"：新版本必须通过 `npm run validate` 的全部规则（npm integrity、bundle、OSI 许可证、安装脚本、体量、
-DSH 兼容），并且：
+DSH 兼容）。第一方插件取 npm 上 `latest` 指向的版本，并且：
 
 - 必须由 `firstParty.npmPublishers` 里的账号发布，npm 上的全部维护者都在其中，`repository` 属于 `firstParty.repositoryOwner`；
 - 会访问**新的主机**或启动**新的程序**时拒绝收录；
 - 超过体量上限的包只能沿用最近一个人工审核版本的 `sizeException`，且解包体量不超过该版本的 125%。
 
-被拒绝的版本不会挡住其他插件的新版本：任务照常发布通过的部分，最后以失败结束并在日志里写明原因，需要人工审核。
+被拒绝的版本不会挡住其他插件的新版本：任务照常发布通过的部分，把被拒的版本和原因写进唯一一个带 `auto-publish-refused`
+标签的 issue（每次运行都更新，没有被拒版本时自动关闭），这些版本等人工审核。只有读不到 npm 或 tarball、或者清单本身校验失败时，任务才以失败结束。
 代码审阅发生在插件仓库的 PR 里；行为声明沿用上一版，必要时人工更新 `capabilities`。
 
 注意：公开仓库 60 天没有新提交时，GitHub 会停用定时工作流。下载服务器的触发器在触发前会把因此停用的 Auto-publish 重新启用；
 被人手动停用的不会自动启用。
+
+### 第三方插件的受控自动跟随
+
+第三方插件可以在 `plugins.yml` 里写一个 `autoFollow` 块，让新版本在满足下面全部条件时自动收录，其余版本照常等人工审核：
+
+- **更新范围**：与最近一次人工审核的版本相比，`updates: patch` 只收同一主、次版本号的补丁版本；`updates: minor` 收同一主版本号的版本。主版本号变化总要人工审核。
+- **等待期**：在 npm 上发布满 `policy.autoFollowWaitHours` 小时（现在是 72，与 npm 允许作者撤回版本的时限相同）且没有弃用。等待期内的版本由之后的运行再看；如果作者发版比等待期还勤，取已满等待期的最高版本。
+- **发布身份**：npm 上全部维护者都在 `autoFollow.npmMaintainers` 里；写了 `npmPublishers` 时，发布账号必须在其中；写了 `provenance` 时，版本必须带 npm provenance，并且来自声明的仓库和发布工作流。
+- **行为不扩大**：与最近一次人工审核的版本相比，代码中没有新的主机、新的环境变量名、新的代码线索类别（子进程、凭据、动态代码、遥测等），没有新的直接依赖或依赖树中的新包，没有安装脚本，许可证不变。
+- **全部机器检查**：与人工收录相同；体量规则与第一方相同。
+
+自动收录的条目沿用人工审核版本的 `capabilities`、`installScripts`、`testedOn` 和风险提示，审核记录写明发布身份、等待期和对比的基线，并注明没有做安装试用。
+人工审核并收录一个新版本后，之后的新版本就以它为对比基线。
+
+静态检查看不出所有新能力：例如 BrowserSkill 0.4.0 新增了在网页中运行脚本、上传和下载文件，扫描结果却没有变化。所以开启前，
+风险提示要写清插件在这些限制内可能做的事；新能力常随次版本出现的插件用 `updates: patch`。目前开启的：
+
+| 插件 | 规则 | 理由 |
+|---|---|---|
+| `@wxg-prc-cpg/browser-skill-dsh-plugin` | `updates: patch`；维护者与发布账号 `wxg-prc-cpg` | 新能力随次版本出现（0.3 → 0.4）；没有 npm provenance |
+| `dsh-context` | `updates: minor`；维护者 `bowenliang123`；provenance 来自 `github.com/bowenliang123/dsh-context` 的 `.github/workflows/release.yml` | 几乎每天发一个次版本；每个版本都由作者仓库的发布工作流构建 |
+
+不再自动跟随时删除 `autoFollow` 块即可。
 
 ### 仓库结构与命令
 
@@ -133,7 +157,7 @@ scripts/review.mjs          一条命令完成审核：静态检查、安装试�
 scripts/build.mjs           生成 dist/index.json、dist/icons/、dist/index.html
 scripts/validate.mjs        校验清单、npm 事实与生成的索引
 scripts/check-updates.mjs   每天的上游新版本报告
-scripts/auto-publish.mjs    第一方插件的自动收录（每小时）
+scripts/auto-publish.mjs    第一方插件与开启 autoFollow 的第三方插件的自动收录（每小时）
 scripts/inspect.mjs         审核辅助：一个版本的事实与 plugins.yml 片段（--grep 查看代码出处）
 scripts/mirror.mjs          把 dist/ 发布到 VibeDev 下载服务器（默认只演练）
 scripts/lib/                共用模块（部分改编自 DSH 参考生成器，见 NOTICE.md）
@@ -304,7 +328,7 @@ A removal needs only steps 3–6: delete the version or the whole plugin from `p
 
 ### When a listed plugin releases a new version
 
-- **Third-party plugins are never automatic.** The index holds only the versions in `plugins.yml`; Discover installs exactly that `name@version`. First-party plugins are covered in the next section.
+- **Third-party plugins are not taken automatically by default.** The index holds only the versions in `plugins.yml`; Discover installs exactly that `name@version`. First-party plugins and third-party plugins with an `autoFollow` block are covered in the next two sections.
 - Every day (02:17 UTC) a scheduled workflow runs `scripts/check-updates.mjs`, lists versions newer than the newest reviewed one with their facts, and opens or updates one issue labelled `upstream-release`; it closes the issue when nothing is pending.
 - A reviewer runs `npm run review -- <name>@<new version>`, which compares it with the newest listed version automatically, so usually only the "Changes since" section needs reading. The reviewer then adds the version in a PR, keeping or dropping older versions. Merging redeploys Pages, and users with an older version see **Update available**.
 - **Emergency removal**: delete the version or plugin and merge; Pages updates within minutes and clients cache for at most 10 minutes. Installed copies stay installed, so announce the removal.
@@ -318,9 +342,9 @@ GitHub owner of its source repositories (`repositoryOwner`).
 Auto-publish has two triggers: every 10 minutes the download server compares npm with the published index and dispatches
 it as soon as a newer stable release appears (see Mirroring to the VibeDev download server), so a new version usually
 reaches Discover within half an hour; the hourly schedule on GitHub is the fallback (GitHub often starts scheduled runs
-hours late, and sometimes skips them). It runs `node scripts/auto-publish.mjs --apply`, which records the stable release
-npm's `latest` points to as a review record and a `plugins.yml` entry (only the new entry is inserted; every other byte of
-the file stays), and then publishes it without a person:
+hours late, and sometimes skips them). It runs `node scripts/auto-publish.mjs --apply`, which records each stable release
+that passes the automatic rules as a review record and a `plugins.yml` entry (only the new entry is inserted; every other
+byte of the file stays), and then publishes it without a person:
 
 1. push the `auto/publish` branch and open (or reuse) its pull request;
 2. wait for the pull request's own Validate run, which reports the required `validate` check; GitHub holds it for
@@ -335,7 +359,8 @@ Opening the pull request needs **Allow GitHub Actions to create and approve pull
 General) enabled for both the organization and the repository.
 
 Auto-follow is not a waiver: the new version must pass every `npm run validate` rule (npm integrity, bundle, OSI
-license, install scripts, size policy, DSH compatibility), and:
+license, install scripts, size policy, DSH compatibility). For a first-party plugin the job takes the version npm's
+`latest` points to, and:
 
 - it must be published by an account in `firstParty.npmPublishers`, every npm maintainer must be one of those accounts,
   and its `repository` must be owned by `firstParty.repositoryOwner`;
@@ -343,12 +368,49 @@ license, install scripts, size policy, DSH compatibility), and:
 - a package over the size limit may keep only the `sizeException` of the last human-reviewed version, and only while
   it unpacks to at most 125% of that version.
 
-A refused release does not hold back the other plugins: the job publishes what passed, then fails with the reason in
-its log, and the refused release needs a human review. Code review happens in the package's own pull request;
-behaviour declarations are carried over from the previous version.
+A refused release does not hold back the other plugins: the job publishes what passed and lists each refused release
+with its reason in the one issue labelled `auto-publish-refused` (updated on every run and closed when nothing is
+refused); refused releases wait for a human review. The run fails only when the registry or a tarball cannot be read or
+the list itself fails its checks. Code review happens in the package's own pull request; behaviour declarations are
+carried over from the previous version.
 
 GitHub disables scheduled workflows in a public repository after 60 days without a commit. The download server's trigger
 enables Auto-publish again before dispatching it; a workflow a person disabled stays disabled.
+
+### Controlled auto-follow of third-party plugins
+
+A third-party plugin may carry an `autoFollow` block in `plugins.yml`. A new release is then taken when every condition
+below holds; every other release still waits for a review:
+
+- **Update range**: compared with the last version reviewed by hand, `updates: patch` takes releases with the same major
+  and minor version, `updates: minor` releases with the same major version. A new major version always needs a review.
+- **Waiting period**: the release has been on npm for `policy.autoFollowWaitHours` hours (72 now, the time in which npm
+  lets an author unpublish) and is not deprecated. A release still waiting is checked again by a later run; when an
+  author publishes faster than the waiting period, the highest release past it is taken.
+- **Identity**: every npm maintainer is in `autoFollow.npmMaintainers`; with `npmPublishers`, the publishing account
+  must be one of them; with `provenance`, the release must carry npm provenance from the declared repository and
+  release workflow.
+- **No wider behavior**: compared with the last version reviewed by hand, the code names no new host, no new
+  environment variable, and no new code-hint category (child processes, credentials, dynamic code, telemetry, and so
+  on); there is no new direct dependency and no new package in the dependency tree, no install script, and the same
+  license.
+- **Every machine check**: the same as for a reviewed version; the size rule is the first-party one.
+
+An automated entry carries over the capabilities, install scripts, testedOn and risk notes of the version reviewed by
+hand; its record states the identity, the waiting period and the version it was compared with, and that it was not
+trial-installed. Once a person reviews and lists a newer version, later releases are compared with that one.
+
+Static checks cannot show every new capability: BrowserSkill 0.4.0 added running scripts in pages and uploading and
+downloading files while its scan stayed the same. So before enabling `autoFollow`, the risk notes must cover what the
+plugin may do within these limits, and a plugin whose new capabilities arrive with minor versions uses
+`updates: patch`. Enabled now:
+
+| Plugin | Rules | Why |
+|---|---|---|
+| `@wxg-prc-cpg/browser-skill-dsh-plugin` | `updates: patch`; maintainer and publisher `wxg-prc-cpg` | New capabilities arrive with minor versions (0.3 → 0.4); no npm provenance |
+| `dsh-context` | `updates: minor`; maintainer `bowenliang123`; provenance from `github.com/bowenliang123/dsh-context`, `.github/workflows/release.yml` | Ships a minor version almost every day; every release is built by the author's release workflow |
+
+To stop following a plugin, remove its `autoFollow` block.
 
 ### Layout and commands
 

@@ -64,8 +64,8 @@ const lines = [
   `## Upstream releases awaiting review · 待审核的上游新版本`,
   '',
   `Daily check of \`${values.catalog}\` against npm, target DSH \`${target}\`, run ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC.`,
-  'Nothing below reaches the index until a reviewer completes the checklist and a pull request records the exact version and integrity in `plugins.yml`.',
-  '以下版本不会自动收录：需要审核人按清单复审，并通过 PR 把精确版本和 integrity 写进 `plugins.yml`。',
+  'Nothing below reaches the index until a reviewer completes the checklist and a pull request records the exact version and integrity in `plugins.yml`, except a release that later passes the automatic rules of a plugin marked `autoPublish` or `autoFollow` (see the issue labelled auto-publish-refused for the ones those rules refused).',
+  '以下版本不会自动收录：需要审核人按清单复审，并通过 PR 把精确版本和 integrity 写进 `plugins.yml`；例外是标了 `autoPublish` 或 `autoFollow` 的插件之后通过自动收录规则的版本（被规则拒绝的版本见标签为 auto-publish-refused 的 issue）。',
   '',
 ]
 if (rows.length === 0) lines.push(catalog.plugins.length === 0 ? 'No plugins are listed yet. 尚未收录插件。' : 'Every listed plugin is at its newest published version. 所有收录插件都已是最新版本。')

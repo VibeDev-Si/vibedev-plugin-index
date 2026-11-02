@@ -1,13 +1,17 @@
 # VibeDev 精选插件索引 — 收录清单（schema 1）
 # VibeDev curated plugin index — the source list (schema 1).
 #
-# 只有这里记录过审核的精确版本才会进入 dist/index.json；第三方插件发新版不会自动收录。
-# 例外：标了 autoPublish: true 的第一方包由定时任务把 npm 上的新稳定版写成本清单条目。新版本必须由 firstParty 列出的
+# 只有这里记录过审核的精确版本才会进入 dist/index.json。
+# 例外一：标了 autoPublish: true 的第一方包由定时任务把 npm 上的新稳定版写成本清单条目。新版本必须由 firstParty 列出的
 # npm 账号发布、全部维护者都是这些账号、源码仓库属于 firstParty.repositoryOwner，并通过全部机器检查。
-# Only the exact versions reviewed and recorded here reach dist/index.json; a new third-party release is never
-# included automatically. First-party packages marked autoPublish: true take their new stable npm releases through
-# the scheduled job, which requires the release to come from the accounts under firstParty and to pass every machine
-# check. See README.md for the inclusion criteria and the review checklist.
+# 例外二：写了 autoFollow 的第三方包，新版本在声明的更新范围内、发布满 policy.autoFollowWaitHours 小时、来自声明的
+# npm 账号或构建来源、与最近一次人工审核的版本相比没有新的主机、环境变量、代码线索类别和依赖时自动收录；其余新版本都等人工审核。
+# Only the exact versions recorded here reach dist/index.json. First-party packages marked autoPublish: true take their
+# new stable npm releases through the scheduled job, which requires the release to come from the accounts under
+# firstParty and to pass every machine check. Third-party packages with an autoFollow block take a release within the
+# declared update range once it is policy.autoFollowWaitHours old, comes from the declared npm accounts or provenance,
+# and adds no host, environment variable, code-hint category or dependency to the last version reviewed by hand; every
+# other third-party release waits for a review. See README.md for the inclusion criteria and the review checklist.
 
 schema: 1
 
@@ -29,6 +33,10 @@ policy:
   maxUnpackedBytes: 20971520
   # Icons up to this size are embedded in index.json as data: URLs; larger icons are published under icons/.
   inlineIconBytes: 16384
+  # autoFollow takes a third-party release only after it has been on npm this many hours: 72 is the time in which npm
+  # lets an author unpublish a version, and in which a bad release is usually noticed.
+  # autoFollow 只收录在 npm 上已发布满这么多小时的第三方版本：72 小时内作者可以撤回版本，问题版本通常也会在这段时间被发现。
+  autoFollowWaitHours: 72
 
 firstParty:
   # The npm accounts VibeDev publishes from and the GitHub owner of its source repositories. autoPublish takes a release
@@ -65,6 +73,13 @@ plugins:
   - name: "@wxg-prc-cpg/browser-skill-dsh-plugin"
     category: browser
     tags: []
+    # Patch releases of the reviewed minor line only: 0.4.0 added running scripts in pages and file upload and
+    # download, which the static checks do not show, so a new minor line waits for a review.
+    # 只自动收录人工审核过的次版本线上的补丁版本：0.4.0 新增的在网页中运行脚本、上传和下载文件，静态检查看不出来，新的次版本要人工审核。
+    autoFollow:
+      updates: patch
+      npmMaintainers: [wxg-prc-cpg]
+      npmPublishers: [wxg-prc-cpg]
     maintainer: https://github.com/Tencent/BrowserSkill/issues
     display:
       title:
@@ -152,6 +167,14 @@ plugins:
   - name: dsh-context
     category: usage
     tags: []
+    # Minor releases too (the author ships one almost every day), but only builds of the author's release workflow.
+    # 也收录次版本（作者几乎每天发一个），但只收录作者仓库发布工作流构建的版本。
+    autoFollow:
+      updates: minor
+      npmMaintainers: [bowenliang123]
+      provenance:
+        repository: https://github.com/bowenliang123/dsh-context
+        workflow: .github/workflows/release.yml
     maintainer: https://github.com/bowenliang123/dsh-context/issues
     display:
       description:
