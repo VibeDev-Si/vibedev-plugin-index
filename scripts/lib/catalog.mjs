@@ -111,6 +111,38 @@ function checkReview(c, value, path, policy) {
   void policy
 }
 
+/** An npm account name. */
+const NPM_ACCOUNT = /^[a-z0-9][a-z0-9._-]{0,213}$/u
+
+/** Check a plugin's `autoFollow` block: the update range and the identity third-party releases must come from. */
+function checkAutoFollow(c, plugin, path, policy) {
+  const at = `${path}.autoFollow`
+  if (plugin.autoPublish === true) c.fail(at, 'cannot be combined with autoPublish')
+  if (policy?.autoFollowWaitHours === undefined) c.fail(at, 'requires $.policy.autoFollowWaitHours')
+  const follow = c.object(plugin.autoFollow, at, ['updates', 'npmMaintainers', 'npmPublishers', 'provenance'], ['updates', 'npmMaintainers'])
+  if (follow === undefined) return
+  if (follow.updates !== 'patch' && follow.updates !== 'minor') {
+    c.fail(`${at}.updates`, 'must be patch (same major and minor as the last version reviewed by hand) or minor (same major)')
+  }
+  for (const key of ['npmMaintainers', 'npmPublishers']) {
+    if (follow[key] === undefined) continue
+    const accounts = c.stringList(follow[key], `${at}.${key}`, NPM_ACCOUNT, 'npm account names')
+    if (Array.isArray(follow[key]) && accounts.length === 0) c.fail(`${at}.${key}`, 'must name at least one npm account')
+  }
+  if (follow.provenance !== undefined) {
+    const provenance = c.object(follow.provenance, `${at}.provenance`, ['repository', 'workflow'], ['repository', 'workflow'])
+    if (provenance !== undefined) {
+      if (typeof provenance.repository !== 'string' || !/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/u.test(provenance.repository)) {
+        c.fail(`${at}.provenance.repository`, 'must be the https://github.com/<owner>/<repository> URL npm provenance names')
+      }
+      if (typeof provenance.workflow !== 'string' || !/^\.github\/workflows\/[\w.-]+\.ya?ml$/u.test(provenance.workflow)) {
+        c.fail(`${at}.provenance.workflow`, 'must be the workflow path npm provenance names, such as .github/workflows/release.yml')
+      }
+    }
+  }
+  if (follow.npmPublishers === undefined && follow.provenance === undefined) c.fail(at, 'needs npmPublishers or provenance to identify releases')
+}
+
 /**
  * Validate a parsed source list.
  * @param {unknown} value - the parsed YAML document.
@@ -128,16 +160,19 @@ export function checkCatalog(value) {
   }
   const target = c.object(root.target, '$.target', ['dsh'], ['dsh'])
   if (target !== undefined && (typeof target.dsh !== 'string' || semver.valid(target.dsh) !== target.dsh)) c.fail('$.target.dsh', 'must be the exact DSH version VibeDev ships, such as 0.2.1-rc.2')
-  const policy = c.object(root.policy, '$.policy', ['maxUnpackedBytes', 'inlineIconBytes'], ['maxUnpackedBytes', 'inlineIconBytes'])
+  const policy = c.object(root.policy, '$.policy', ['maxUnpackedBytes', 'inlineIconBytes', 'autoFollowWaitHours'], ['maxUnpackedBytes', 'inlineIconBytes'])
   if (policy !== undefined) {
     if (!Number.isSafeInteger(policy.maxUnpackedBytes) || policy.maxUnpackedBytes < 1) c.fail('$.policy.maxUnpackedBytes', 'must be a positive integer')
     if (!Number.isSafeInteger(policy.inlineIconBytes) || policy.inlineIconBytes < 0 || policy.inlineIconBytes > 32768) c.fail('$.policy.inlineIconBytes', 'must be an integer from 0 to 32768')
+    if (policy.autoFollowWaitHours !== undefined && (!Number.isSafeInteger(policy.autoFollowWaitHours) || policy.autoFollowWaitHours < 1 || policy.autoFollowWaitHours > 720)) {
+      c.fail('$.policy.autoFollowWaitHours', 'must be a whole number of hours from 1 to 720')
+    }
   }
   // Who first party is: the npm accounts VibeDev publishes from and the GitHub owner of its source repositories.
   if (root.firstParty !== undefined) {
     const firstParty = c.object(root.firstParty, '$.firstParty', ['npmPublishers', 'repositoryOwner'], ['npmPublishers', 'repositoryOwner'])
     if (firstParty !== undefined) {
-      const publishers = c.stringList(firstParty.npmPublishers, '$.firstParty.npmPublishers', /^[a-z0-9][a-z0-9._-]{0,213}$/u, 'npm account names')
+      const publishers = c.stringList(firstParty.npmPublishers, '$.firstParty.npmPublishers', NPM_ACCOUNT, 'npm account names')
       if (Array.isArray(firstParty.npmPublishers) && publishers.length === 0) c.fail('$.firstParty.npmPublishers', 'must name at least one npm account')
       if (typeof firstParty.repositoryOwner !== 'string' || !/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/u.test(firstParty.repositoryOwner)) {
         c.fail('$.firstParty.repositoryOwner', 'must be a GitHub user or organization name')
@@ -150,7 +185,7 @@ export function checkCatalog(value) {
   const names = new Set()
   for (const [position, entry] of (Array.isArray(root.plugins) ? root.plugins : []).entries()) {
     const path = `$.plugins[${position}]`
-    const plugin = c.object(entry, path, ['name', 'category', 'tags', 'maintainer', 'display', 'versions', 'autoPublish'], ['name', 'category', 'tags', 'maintainer', 'versions'])
+    const plugin = c.object(entry, path, ['name', 'category', 'tags', 'maintainer', 'display', 'versions', 'autoPublish', 'autoFollow'], ['name', 'category', 'tags', 'maintainer', 'versions'])
     if (plugin === undefined) continue
     if (typeof plugin.name !== 'string' || plugin.name.length > 214 || !PACKAGE_NAME.test(plugin.name)) c.fail(`${path}.name`, 'must be an npm package name')
     else if (names.has(plugin.name)) c.fail(`${path}.name`, `duplicates ${plugin.name}`)
@@ -161,13 +196,16 @@ export function checkCatalog(value) {
     })
     // First-party packages may opt into taking their own new npm releases automatically; the scheduled workflow
     // still runs every machine check the curated list applies, and only takes releases published by the accounts
-    // declared under firstParty. Third-party entries never may.
+    // declared under firstParty.
     if (plugin.autoPublish !== undefined) {
       if (typeof plugin.autoPublish !== 'boolean') c.fail(`${path}.autoPublish`, 'must be true or false')
       else if (plugin.autoPublish && root.firstParty === undefined) {
         c.fail(`${path}.autoPublish`, 'requires $.firstParty, which declares the npm accounts and GitHub owner of VibeDev first-party packages')
       }
     }
+    // Third-party packages may opt into taking new releases from a declared identity within limits
+    // (scripts/lib/auto-follow.mjs); every other third-party release waits for a human review.
+    if (plugin.autoFollow !== undefined) checkAutoFollow(c, plugin, path, root.policy)
     if (typeof plugin.maintainer !== 'string' || !(/^https:\/\/\S+$/u.test(plugin.maintainer) || /^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(plugin.maintainer))) {
       c.fail(`${path}.maintainer`, 'must be an https URL (issue tracker) or an e-mail address where the maintainer answers')
     }

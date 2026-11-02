@@ -6,8 +6,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        第三方插件的新版本不会自动上架：审核人按清单复审后，通过 PR 写进 `plugins.yml`。每天的定时检查也会列出新版本。VibeDev 第一方插件由定时任务自动收录，无需申请。
-        New versions of third-party plugins are never listed automatically; a reviewer re-runs the checklist and records the version in a PR. The daily check also lists new versions. VibeDev's first-party plugins are recorded by the scheduled job without a request.
+        第三方插件的新版本默认不会自动上架：审核人按清单复审后，通过 PR 写进 `plugins.yml`。每天的定时检查也会列出新版本。VibeDev 第一方插件，以及在 `plugins.yml` 里开启了 `autoFollow` 的第三方插件，新版本通过自动收录规则后由定时任务收录，无需申请；被规则拒绝的版本列在标签为 auto-publish-refused 的 issue 里。
+        New versions of third-party plugins are not listed automatically by default; a reviewer re-runs the checklist and records the version in a PR. The daily check also lists new versions. VibeDev's first-party plugins, and third-party plugins with an `autoFollow` block in `plugins.yml`, are recorded by the scheduled job without a request when a release passes the automatic rules; releases the rules refused are listed in the issue labelled auto-publish-refused.
   - type: input
     id: package
     attributes:
