@@ -101,12 +101,12 @@ VibeDev 自己的插件可以在 `plugins.yml` 里标 `autoPublish: true`（目�
 文件其余部分逐字节不变）并生成审核记录，然后不需要人工就把它发布出去：
 
 1. 推送 `auto/publish` 分支，开（或复用）它的 PR；
-2. 在该分支上运行 Validate：用 `GITHUB_TOKEN` 开的 PR 不会触发 `pull_request` 工作流，手动触发的 Validate 会在同一提交上报告分支保护要求的 `validate` 检查；
+2. 等待这个 PR 自己的 Validate 运行，它报告分支保护要求的 `validate` 检查；机器人算首次贡献者，GitHub 会先暂停这次运行等待批准，任务会批准它；如果 GitHub 没有启动运行，就在该分支上手动触发 Validate，它在同一提交上报告同一个检查；
 3. Validate 通过后合并这个提交；
 4. 部署 Pages：用 `GITHUB_TOKEN` 合并不会触发 `push` 工作流，所以显式触发 `pages.yml`；
 5. 下载服务器上的定时同步在 10 分钟内把新索引复制到 `download.vibedev.studio`（见「镜像到 VibeDev 下载服务器」），客户端最多再缓存 10 分钟。
 
-开 PR 需要仓库设置 Settings → Actions → General 里的 **Allow GitHub Actions to create and approve pull requests**。
+开 PR 需要组织和仓库两级 Settings → Actions → General 里的 **Allow GitHub Actions to create and approve pull requests** 都已开启。
 
 自动收录不是"免检"：新版本必须通过 `npm run validate` 的全部规则（npm integrity、bundle、OSI 许可证、安装脚本、体量、
 DSH 兼容），并且：
@@ -303,15 +303,16 @@ Every hour the scheduled workflow runs `node scripts/auto-publish.mjs --apply`, 
 file stays), and then publishes it without a person:
 
 1. push the `auto/publish` branch and open (or reuse) its pull request;
-2. run Validate on that branch: a pull request opened with `GITHUB_TOKEN` starts no `pull_request` workflow, but a
-   dispatched Validate run reports the required `validate` check on the same commit;
+2. wait for the pull request's own Validate run, which reports the required `validate` check; GitHub holds it for
+   approval because the bot counts as a first-time contributor, and the job approves it. When GitHub starts no run,
+   the job dispatches Validate on the branch, which reports the same check on the same commit;
 3. merge that commit once Validate passed;
 4. deploy Pages: a merge made with `GITHUB_TOKEN` starts no `push` workflow, so `pages.yml` is dispatched explicitly;
 5. the download server's timer copies the new index to `download.vibedev.studio` within 10 minutes (see Mirroring to
    the VibeDev download server); clients cache it for at most 10 more minutes.
 
-Opening the pull request needs the repository setting **Allow GitHub Actions to create and approve pull requests**
-(Settings → Actions → General).
+Opening the pull request needs **Allow GitHub Actions to create and approve pull requests** (Settings → Actions →
+General) enabled for both the organization and the repository.
 
 Auto-follow is not a waiver: the new version must pass every `npm run validate` rule (npm integrity, bundle, OSI
 license, install scripts, size policy, DSH compatibility), and:
