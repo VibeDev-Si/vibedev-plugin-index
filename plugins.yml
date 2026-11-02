@@ -372,3 +372,18 @@ plugins:
             directory, starts it, and sees 401 without a session and 303 for the session link. Limits: Windows only; the
             1 GB/10,000-entry archive and 100 MB document boundaries were not exercised; there is no read-only open button
             and no document-to-node import in this version.
+      - version: 0.8.1
+        integrity: sha512-D3juhRcKVrE58cPpI7+LyywBy+loT9v3WHikxLsrbla66tqxzhQQpR71H83Fs8MdZk6uE7y4HpSStw4ot6gfgA==
+        review:
+          reviewer: VibeDev (automated)
+          date: 2026-11-02
+          license: MIT
+          testedOn: [0.2.1-rc.2]
+          capabilities:
+            network: [127.0.0.1]
+            files: write
+            config: none
+            childProcess: [bun, ffmpeg, ffprobe]
+          installScripts: []
+          sizeException: "自动收录：解包 44.8 MiB，未超过 0.8.0 人工审核时 44.8 MiB 的 125%，沿用其体量说明。Recorded automatically: unpacks to 44.8 MiB, within 125% of the 44.8 MiB reviewed by hand for 0.8.0, whose size reasoning carries over. 解包 46,981,566 B（44.8 MiB），超过 20 MiB 上限：包内随附三个平台的 Bun 运行时（用来启动本地 Film 服务）、 FFmpeg 与文档解析 Worker，以及工作台 Web 产物和内置节点/工具/技能。这些是本地处理能力，不是可裁剪的依赖； Bun 可选依赖按平台只安装一个。Unpacks to 44.8 MiB because it ships the three platforms' Bun runtimes that run the local Film server, the FFmpeg and document-parsing workers, the workbench Web build and the built-in nodes/tools/skills. These are the local processing capability rather than trimmable dependencies, and only one platform's Bun package is installed per user."
+          notes: Automated first-party release 0.8.1 from dsh-film; capabilities, install scripts and risk notes are unchanged from 0.8.0.
