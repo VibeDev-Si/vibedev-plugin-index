@@ -63,7 +63,7 @@ const yes = flag => (flag ? 'yes' : '**no**')
 const lines = [
   `## Upstream releases awaiting review · 待审核的上游新版本`,
   '',
-  `Weekly check of \`${values.catalog}\` against npm, target DSH \`${target}\`, run ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC.`,
+  `Daily check of \`${values.catalog}\` against npm, target DSH \`${target}\`, run ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC.`,
   'Nothing below reaches the index until a reviewer completes the checklist and a pull request records the exact version and integrity in `plugins.yml`.',
   '以下版本不会自动收录：需要审核人按清单复审，并通过 PR 把精确版本和 integrity 写进 `plugins.yml`。',
   '',

@@ -1,18 +1,27 @@
 name: Auto-publish first-party plugins
 
-# Third-party plugins are only listed after a human review. First-party packages under @vibedev-si/ may opt in with
-# `autoPublish: true`: this job then records their newest stable npm release as a pull request, which lands once the
-# Validate check passes. scripts/auto-publish.mjs still runs every curated-list check and refuses a release that would
-# reach a new host or start a new program.
+# Third-party plugins are only listed after a human review. Plugins marked `autoPublish: true` take the newest stable
+# npm release of a first-party package, published by the accounts under `firstParty` in plugins.yml:
+# scripts/auto-publish.mjs runs every curated-list check and refuses a release that would reach a new host, start a
+# new program, outgrow its size exception, or come from another publisher. This job then lands the change and
+# publishes the index without a person:
+#   1. push the `auto/publish` branch and open (or reuse) its pull request;
+#   2. run Validate on that branch: a pull request opened with GITHUB_TOKEN starts no pull_request workflow, but a
+#      workflow_dispatch run reports the same required `validate` check on the branch's commit;
+#   3. merge exactly that commit once Validate passed;
+#   4. deploy Pages: a merge made with GITHUB_TOKEN starts no push workflow, so pages.yml is dispatched explicitly.
+# The download server copies the published index on its own timer (see "Download server mirror" in README.md).
+# Opening the pull request needs the repository setting "Allow GitHub Actions to create and approve pull requests".
 
 on:
   schedule:
-    - cron: '17 */6 * * *'
+    - cron: '17 * * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 concurrency:
   group: auto-publish
@@ -21,7 +30,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -34,23 +43,71 @@ jobs:
       - name: Unit tests
         run: npm test
       - name: Record newer first-party releases
-        run: node scripts/auto-publish.mjs --apply
-      - name: Open a pull request when the list changed
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: record
+        # A refused release must not hold back the others: land what passed, then fail the run at the end.
         run: |
+          if node scripts/auto-publish.mjs --apply; then
+            echo "refused=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "refused=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Land the change through the auto/publish pull request
+        id: land
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
           if [ -z "$(git status --porcelain)" ]; then
             echo "no first-party release to record"
             exit 0
           fi
-          branch="auto/publish-$(date -u +%Y%m%d-%H%M%S)"
+          branch=auto/publish
           git config user.name "VibeDev index bot"
           git config user.email "bot@vibedev.studio"
           git switch -c "$branch"
           git add plugins.yml reviews
           git commit -m "chore(index): record newer first-party releases"
-          git push origin "$branch"
-          gh pr create --base main --head "$branch" \
-            --title "chore(index): record newer first-party releases" \
-            --body "Opened by the scheduled first-party auto-publish job. Every added version passed the curated-list checks; the review record is generated from the previous reviewed version. Merges automatically once Validate passes."
-          gh pr merge "$branch" --squash --auto
+          sha=$(git rev-parse HEAD)
+          # Only this step holds a token; the steps before it ran repository and dependency code without one.
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.https://github.com/.extraheader=$auth" push --force origin "HEAD:refs/heads/$branch"
+          if [ -z "$(gh pr list --repo "$REPO" --head "$branch" --state open --json number --jq '.[0].number // empty')" ]; then
+            gh pr create --repo "$REPO" --base main --head "$branch" \
+              --title "chore(index): record newer first-party releases" \
+              --body "Opened by the scheduled auto-publish job. Each added version is a first-party release that passed every curated-list check; its review record carries over the declarations of the previous reviewed version. The job runs Validate on this branch and merges the validated commit."
+          fi
+
+          # wait_for_run <workflow> <branch> <event> <head sha> <created after>: print the run id once it exists.
+          wait_for_run() {
+            local id=""
+            for _ in $(seq 1 30); do
+              id=$(gh run list --repo "$REPO" --workflow "$1" --branch "$2" --event "$3" --limit 20 \
+                --json databaseId,headSha,createdAt \
+                --jq "[.[] | select(.headSha == \"$4\" and .createdAt >= \"$5\")][0].databaseId // empty")
+              if [ -n "$id" ]; then echo "$id"; return 0; fi
+              sleep 10
+            done
+            echo "::error::$1 did not start on $2 at $4" >&2
+            return 1
+          }
+
+          since=$(date -u -d '-2 minutes' +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run validate.yml --repo "$REPO" --ref "$branch"
+          validate=$(wait_for_run validate.yml "$branch" workflow_dispatch "$sha" "$since")
+          gh run watch "$validate" --repo "$REPO" --exit-status --interval 20
+          gh pr merge "$branch" --repo "$REPO" --squash --match-head-commit "$sha" \
+            --subject "chore(index): record newer first-party releases"
+          gh api -X DELETE "repos/$REPO/git/refs/heads/$branch" >/dev/null || echo "branch $branch was already removed"
+
+          main=$(gh api "repos/$REPO/commits/main" --jq .sha)
+          since=$(date -u -d '-2 minutes' +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run pages.yml --repo "$REPO" --ref main
+          pages=$(wait_for_run pages.yml main workflow_dispatch "$main" "$since")
+          gh run watch "$pages" --repo "$REPO" --exit-status --interval 20
+          echo "published=$main" >> "$GITHUB_OUTPUT"
+      - name: Report refused releases
+        if: steps.record.outputs.refused == 'true'
+        run: |
+          echo "::error::A first-party release was refused, or the registry could not be read; see the step 'Record newer first-party releases' and review that release by hand."
+          exit 1
