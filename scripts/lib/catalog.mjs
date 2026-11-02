@@ -118,7 +118,7 @@ function checkReview(c, value, path, policy) {
  */
 export function checkCatalog(value) {
   const c = new Checker()
-  const root = c.object(value, '$', ['schema', 'index', 'target', 'policy', 'categories', 'labels', 'plugins'], ['schema', 'index', 'target', 'policy', 'categories', 'plugins'])
+  const root = c.object(value, '$', ['schema', 'index', 'target', 'policy', 'firstParty', 'categories', 'labels', 'plugins'], ['schema', 'index', 'target', 'policy', 'categories', 'plugins'])
   if (root === undefined) return { catalog: value, errors: c.errors }
   if (root.schema !== 1) c.fail('$.schema', 'must be 1')
   const index = c.object(root.index, '$.index', ['title', 'description'], ['title'])
@@ -132,6 +132,17 @@ export function checkCatalog(value) {
   if (policy !== undefined) {
     if (!Number.isSafeInteger(policy.maxUnpackedBytes) || policy.maxUnpackedBytes < 1) c.fail('$.policy.maxUnpackedBytes', 'must be a positive integer')
     if (!Number.isSafeInteger(policy.inlineIconBytes) || policy.inlineIconBytes < 0 || policy.inlineIconBytes > 32768) c.fail('$.policy.inlineIconBytes', 'must be an integer from 0 to 32768')
+  }
+  // Who first party is: the npm accounts VibeDev publishes from and the GitHub owner of its source repositories.
+  if (root.firstParty !== undefined) {
+    const firstParty = c.object(root.firstParty, '$.firstParty', ['npmPublishers', 'repositoryOwner'], ['npmPublishers', 'repositoryOwner'])
+    if (firstParty !== undefined) {
+      const publishers = c.stringList(firstParty.npmPublishers, '$.firstParty.npmPublishers', /^[a-z0-9][a-z0-9._-]{0,213}$/u, 'npm account names')
+      if (Array.isArray(firstParty.npmPublishers) && publishers.length === 0) c.fail('$.firstParty.npmPublishers', 'must name at least one npm account')
+      if (typeof firstParty.repositoryOwner !== 'string' || !/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/u.test(firstParty.repositoryOwner)) {
+        c.fail('$.firstParty.repositoryOwner', 'must be a GitHub user or organization name')
+      }
+    }
   }
   const categories = c.declarations(root.categories, '$.categories')
   const labels = c.declarations(root.labels, '$.labels', CAPABILITY_LABELS)
@@ -148,12 +159,13 @@ export function checkCatalog(value) {
     c.stringList(plugin.tags, `${path}.tags`, undefined, 'label ids').forEach((tag, at) => {
       if (!Object.hasOwn(labels, tag)) c.fail(`${path}.tags[${at}]`, `references undeclared label ${JSON.stringify(tag)}`)
     })
-    // First-party packages may opt into taking their own new npm releases automatically; the scheduled
-    // workflow still runs every machine check the curated list applies. Third-party entries never may.
+    // First-party packages may opt into taking their own new npm releases automatically; the scheduled workflow
+    // still runs every machine check the curated list applies, and only takes releases published by the accounts
+    // declared under firstParty. Third-party entries never may.
     if (plugin.autoPublish !== undefined) {
       if (typeof plugin.autoPublish !== 'boolean') c.fail(`${path}.autoPublish`, 'must be true or false')
-      else if (plugin.autoPublish && !(typeof plugin.name === 'string' && plugin.name.startsWith('@vibedev-si/'))) {
-        c.fail(`${path}.autoPublish`, 'is only allowed for VibeDev first-party packages under @vibedev-si/')
+      else if (plugin.autoPublish && root.firstParty === undefined) {
+        c.fail(`${path}.autoPublish`, 'requires $.firstParty, which declares the npm accounts and GitHub owner of VibeDev first-party packages')
       }
     }
     if (typeof plugin.maintainer !== 'string' || !(/^https:\/\/\S+$/u.test(plugin.maintainer) || /^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(plugin.maintainer))) {

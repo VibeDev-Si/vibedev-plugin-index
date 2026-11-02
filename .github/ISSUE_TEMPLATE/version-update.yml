@@ -6,8 +6,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        新版本不会自动上架：审核人按清单复审后，通过 PR 写进 `plugins.yml`。每周的定时检查也会列出新版本。
-        New versions are never listed automatically; a reviewer re-runs the checklist and records the version in a PR. The weekly check also lists new versions.
+        第三方插件的新版本不会自动上架：审核人按清单复审后，通过 PR 写进 `plugins.yml`。每天的定时检查也会列出新版本。VibeDev 第一方插件由定时任务自动收录，无需申请。
+        New versions of third-party plugins are never listed automatically; a reviewer re-runs the checklist and records the version in a PR. The daily check also lists new versions. VibeDev's first-party plugins are recorded by the scheduled job without a request.
   - type: input
     id: package
     attributes:

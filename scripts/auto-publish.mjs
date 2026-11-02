@@ -1,24 +1,31 @@
 #!/usr/bin/env node
 /**
- * Take newer releases of first-party plugins (`autoPublish: true`, `@vibedev-si/` only).
+ * Take newer releases of first-party plugins (`autoPublish: true`).
  *
  * The curated list never gains a version on its own for third-party plugins. First-party packages are published from
  * this organisation's own repositories, so a new release may be recorded automatically once it passes every machine
  * check the curated list applies: npm integrity, an installable `dsh.bundle`, an OSI license matching the review,
- * no install scripts, the size policy, and DSH compatibility. Two extra guards keep behaviour changes human-supervised:
- * a release that would reach a new host or start a new program is refused, and the whole list is run through the same
- * pipeline before anything is written. Code review happens in the package's own pull request before it is published.
+ * no install scripts, the size policy, and DSH compatibility. A release is first party only when the npm account that
+ * published it and every npm maintainer are listed in `firstParty.npmPublishers` and its repository is owned by
+ * `firstParty.repositoryOwner`. Further guards keep behaviour changes human-supervised: a release that would reach a
+ * new host or start a new program is refused, a package over the size limit may keep only the size exception of the
+ * last human-reviewed version and only while within SIZE_GROWTH_LIMIT of its size, and the whole list is run through
+ * the same pipeline before anything is written. Code review happens in the package's own pull request before it is
+ * published. New entries are inserted as text, so plugins.yml keeps every other byte.
  *
  * Usage: node scripts/auto-publish.mjs [--catalog plugins.yml] [--apply] [--json]
- * Exit status: 0 when nothing needed to change or the change was written; 1 when a guard refused a release.
+ * Exit status: 0 when nothing needed to change or every new release was written; 1 when a guard refused a release or
+ * the registry could not be read (releases that passed are still written with --apply).
  */
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import semver from 'semver'
-import { parseDocument, stringify } from 'yaml'
+import { stringify } from 'yaml'
 import { loadCatalog } from './lib/catalog.mjs'
+import { appendVersionText } from './lib/catalog-edit.mjs'
+import { AUTOMATED_REVIEWER, automatedSizeException, firstPartyRefusal, humanReviewedBaseline } from './lib/first-party.mjs'
 import { inspectVersion } from './lib/inspection.mjs'
 import { fetchPackument } from './lib/npm.mjs'
 import { runPipeline } from './lib/pipeline.mjs'
@@ -89,7 +96,8 @@ for (const plugin of catalog.plugins.filter(entry => entry.autoPublish === true)
     packument = await fetchPackument(plugin.name, { timeoutMs: 60_000 })
   } catch (failure) {
     console.error(`${plugin.name}: registry read failed: ${failure.message}`)
-    process.exit(1)
+    process.exitCode = 1
+    continue
   }
   const latest = packument?.['dist-tags']?.latest
   if (typeof latest !== 'string' || semver.valid(latest) !== latest || semver.prerelease(latest) !== null) {
@@ -98,6 +106,12 @@ for (const plugin of catalog.plugins.filter(entry => entry.autoPublish === true)
   }
   if (!semver.gt(latest, previous.version)) {
     log(`${plugin.name}: up to date at ${previous.version}`)
+    continue
+  }
+  const notFirstParty = firstPartyRefusal(packument, latest, catalog.firstParty)
+  if (notFirstParty !== undefined) {
+    console.error(`${plugin.name}@${latest}: refused, ${notFirstParty}; review it by hand`)
+    process.exitCode = 1
     continue
   }
   const facts = (await inspectVersion(plugin.name, latest, { target: catalog.target.dsh })).report
@@ -111,7 +125,30 @@ for (const plugin of catalog.plugins.filter(entry => entry.autoPublish === true)
     process.exitCode = 1
     continue
   }
-  pending.push({ plugin, previous, version: latest, facts })
+  const baseline = humanReviewedBaseline(plugin.versions)
+  let baselineBytes
+  if (facts.unpackedBytes > catalog.policy.maxUnpackedBytes && baseline !== undefined) {
+    baselineBytes = baseline.version === previous.version ? before.unpackedBytes
+      : (await inspectVersion(plugin.name, baseline.version, { target: catalog.target.dsh, deps: false })).report.unpackedBytes
+  }
+  const size = automatedSizeException({ bytes: facts.unpackedBytes, maxUnpackedBytes: catalog.policy.maxUnpackedBytes, baseline, baselineBytes })
+  if (size.refusal !== undefined) {
+    console.error(`${plugin.name}@${latest}: refused, it ${size.refusal}; review it by hand`)
+    process.exitCode = 1
+    continue
+  }
+  const { license, testedOn, capabilities, installScripts } = previous.review
+  const review = {
+    reviewer: AUTOMATED_REVIEWER,
+    date: today,
+    license,
+    testedOn,
+    capabilities,
+    installScripts,
+    ...size.sizeException === undefined ? {} : { sizeException: size.sizeException },
+    notes: `Automated first-party release ${latest} from ${plugin.name}; capabilities, install scripts and risk notes are unchanged from ${previous.version}.`,
+  }
+  pending.push({ plugin, previous, version: latest, facts, entry: { version: latest, integrity: facts.integrity, review } })
 }
 
 if (pending.length === 0) { log('nothing to publish'); process.exit(process.exitCode ?? 0) }
@@ -123,15 +160,7 @@ try {
     ...catalog,
     plugins: catalog.plugins.map(plugin => {
       const addition = pending.find(entry => entry.plugin.name === plugin.name)
-      if (addition === undefined) return plugin
-      return {
-        ...plugin,
-        versions: [...plugin.versions, {
-          version: addition.version,
-          integrity: addition.facts.integrity,
-          review: { ...addition.previous.review, reviewer: 'VibeDev (automated)', date: today },
-        }],
-      }
+      return addition === undefined ? plugin : { ...plugin, versions: [...plugin.versions, addition.entry] }
     }),
   }
   const draftPath = join(staging, 'plugins.yml')
@@ -149,26 +178,13 @@ if (!values.apply) {
   process.exit(process.exitCode ?? 0)
 }
 
-const document = parseDocument(readFileSync(catalogPath, 'utf8'), { uniqueKeys: true })
-const plugins = document.get('plugins')
+let text = readFileSync(catalogPath, 'utf8')
 for (const entry of pending) {
-  const index = plugins.items.findIndex(item => item.get('name') === entry.plugin.name)
-  if (index < 0) throw new Error(`${entry.plugin.name}: missing from ${values.catalog}`)
-  const versions = plugins.items[index].get('versions')
-  versions.items.push(document.createNode({
-    version: entry.version,
-    integrity: entry.facts.integrity,
-    review: {
-      ...entry.previous.review,
-      reviewer: 'VibeDev (automated)',
-      date: today,
-      notes: `Automated first-party release ${entry.version} from ${entry.plugin.name}; capabilities, install scripts and risk notes are unchanged from ${entry.previous.version}.`,
-    },
-  }))
+  text = appendVersionText(text, entry.plugin.name, entry.entry)
   const file = reviewPath(entry.plugin.name, entry.version)
   mkdirSync(join('reviews', entry.plugin.name.startsWith('@') ? entry.plugin.name.split('/')[0] : '.'), { recursive: true })
   writeFileSync(file, reviewDocument(entry.plugin, entry.previous, entry.version, entry.facts))
   log(`added ${entry.plugin.name}@${entry.version} and ${file}`)
 }
-writeFileSync(catalogPath, document.toString())
+writeFileSync(catalogPath, text)
 process.exit(process.exitCode ?? 0)

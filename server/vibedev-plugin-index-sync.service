@@ -1,0 +1,16 @@
+[Unit]
+Description=Copy the VibeDev plugin index from GitHub Pages to the download server
+Documentation=https://github.com/VibeDev-Si/vibedev-plugin-index#download-server-mirror
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/vibedev-plugin-index-sync
+Environment=ROOT=/data/vibedev-download/public
+Nice=10
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/data/vibedev-download/public /run/lock
