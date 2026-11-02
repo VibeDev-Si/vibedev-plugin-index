@@ -1,0 +1,19 @@
+[Unit]
+Description=Start the plugin index's Auto-publish workflow when npm has a release the index lacks
+Documentation=https://github.com/VibeDev-Si/vibedev-plugin-index#download-server-mirror
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/vibedev-plugin-index-trigger
+# A transient user that can read only its own state directory and the token systemd hands it.
+DynamicUser=yes
+StateDirectory=vibedev-plugin-index-trigger
+LoadCredential=token:/etc/vibedev/plugin-index-token
+Nice=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6

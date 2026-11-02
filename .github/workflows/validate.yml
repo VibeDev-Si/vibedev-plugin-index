@@ -36,11 +36,12 @@ jobs:
         run: |
           touch "$RUNNER_TEMP/dry-run-key" "$RUNNER_TEMP/dry-run-known-hosts"
           node scripts/mirror.mjs --ssh deploy@download.example.invalid --identity "$RUNNER_TEMP/dry-run-key" --known-hosts "$RUNNER_TEMP/dry-run-known-hosts"
-      - name: Download-server sync script and units
+      - name: Download-server scripts and units
         run: |
           bash -n server/plugin-index-sync.sh
           shellcheck server/plugin-index-sync.sh
-          systemd-analyze verify --man=no server/vibedev-plugin-index-sync.timer server/vibedev-plugin-index-sync.service 2>&1 | grep -v "Command /usr/local/sbin/vibedev-plugin-index-sync is not executable" | tee "$RUNNER_TEMP/units.txt"
+          python3 -m unittest discover -s server -p 'test_*.py'
+          systemd-analyze verify --man=no server/*.timer server/*.service 2>&1 | grep -v -E "Command /usr/local/sbin/vibedev-plugin-index-(sync|trigger) is not executable" | tee "$RUNNER_TEMP/units.txt"
           test ! -s "$RUNNER_TEMP/units.txt"
       - name: Full pipeline on real npm data (test fixture)
         run: node scripts/validate.mjs --catalog test/fixtures/e2e-plugins.yml

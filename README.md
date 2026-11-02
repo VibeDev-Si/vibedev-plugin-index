@@ -97,7 +97,9 @@ VibeDev 使用上游 DeepSeek Harness 自带的插件市场：Host 端服务 `@d
 VibeDev 自己的插件可以在 `plugins.yml` 里标 `autoPublish: true`（目前是 `@vibedev-si/dsh-remote` 和 `dsh-film`）。清单顶部的
 `firstParty` 写明谁是第一方：VibeDev 发布用的 npm 账号（`npmPublishers`）和源码仓库所属的 GitHub 组织（`repositoryOwner`）。
 
-定时任务（每小时）运行 `node scripts/auto-publish.mjs --apply`，把 npm 上 `latest` 指向的新稳定版写进 `plugins.yml`（只插入新条目，
+Auto-publish 有两个触发来源：下载服务器每 10 分钟对比 npm 与已发布的索引，发现新稳定版就立即触发一次（见「镜像到 VibeDev 下载服务器」），
+新版本通常半小时内出现在发现页；GitHub 上的每小时定时运行作为兜底（GitHub 的定时触发常常晚几个小时，有时直接跳过）。
+它运行 `node scripts/auto-publish.mjs --apply`，把 npm 上 `latest` 指向的新稳定版写进 `plugins.yml`（只插入新条目，
 文件其余部分逐字节不变）并生成审核记录，然后不需要人工就把它发布出去：
 
 1. 推送 `auto/publish` 分支，开（或复用）它的 PR；
@@ -118,7 +120,8 @@ DSH 兼容），并且：
 被拒绝的版本不会挡住其他插件的新版本：任务照常发布通过的部分，最后以失败结束并在日志里写明原因，需要人工审核。
 代码审阅发生在插件仓库的 PR 里；行为声明沿用上一版，必要时人工更新 `capabilities`。
 
-注意：公开仓库 60 天没有新提交时，GitHub 会停用定时工作流。长时间没有新版本后，请在 Actions 页面确认 Auto-publish 仍处于启用状态。
+注意：公开仓库 60 天没有新提交时，GitHub 会停用定时工作流。下载服务器的触发器在触发前会把因此停用的 Auto-publish 重新启用；
+被人手动停用的不会自动启用。
 
 ### 仓库结构与命令
 
@@ -134,7 +137,7 @@ scripts/auto-publish.mjs    第一方插件的自动收录（每小时）
 scripts/inspect.mjs         审核辅助：一个版本的事实与 plugins.yml 片段（--grep 查看代码出处）
 scripts/mirror.mjs          把 dist/ 发布到 VibeDev 下载服务器（默认只演练）
 scripts/lib/                共用模块（部分改编自 DSH 参考生成器，见 NOTICE.md）
-server/                     下载服务器上的定时同步：脚本与 systemd 单元
+server/                     下载服务器上的定时任务：镜像同步、新版本触发器及其 systemd 单元与测试
 test/*.test.mjs             离线单元测试
 test/fixtures/              e2e 测试清单与两个故意写错的清单
 test/dsh-composition/       用 DSH 源码检出做真实组合测试：market-list.mjs（读索引）、install-trial.mjs（安装试用）
@@ -176,7 +179,7 @@ node test/dsh-composition/install-trial.mjs --dsh <已构建的 DSH 检出> --pn
 
 GitHub Pages 是源站；VibeDev 桌面端的「发现」页读取 `https://download.vibedev.studio/plugin-index/index.json`（站点根目录 `/data/vibedev-download/public`）。
 
-**定时同步（日常使用）**：下载服务器上的 systemd 定时器每 10 分钟运行一次 `server/plugin-index-sync.sh`。它从 GitHub Pages 取 `index.json` 与 `index.html`，确认 `index.json` 是至少列出一个插件、版本都是精确版本的 format 1 索引；与当前版本相同就结束，否则写入新的版本目录，按下文与 `mirror.mjs` 相同的方式切换、经本机 Web 服务器回读验证（失败即切回）、清理。服务器不保存任何 GitHub 凭据，GitHub 也不保存服务器凭据。安装或更新：
+**定时同步（日常使用）**：下载服务器上的 systemd 定时器每 10 分钟运行一次 `server/plugin-index-sync.sh`。它从 GitHub Pages 取 `index.json` 与 `index.html`，确认 `index.json` 是至少列出一个插件、版本都是精确版本的 format 1 索引；与当前版本相同就结束，否则写入新的版本目录，按下文与 `mirror.mjs` 相同的方式切换、经本机 Web 服务器回读验证（失败即切回）、清理。同步不使用任何凭据，GitHub 也不保存服务器凭据。安装或更新：
 
 ```sh
 install -m 755 server/plugin-index-sync.sh /usr/local/sbin/vibedev-plugin-index-sync
@@ -186,6 +189,20 @@ systemctl enable --now vibedev-plugin-index-sync.timer
 DRY_RUN=1 /usr/local/sbin/vibedev-plugin-index-sync     # 只下载和检查，不改动
 systemctl start vibedev-plugin-index-sync.service        # 立即同步一次
 journalctl -u vibedev-plugin-index-sync.service -n 20    # 查看结果
+```
+
+**新版本触发**：GitHub 的定时触发不可靠，所以下载服务器上还有一个 systemd 定时器，每 10 分钟运行一次 `server/plugin_index_trigger.py`。它读取 GitHub Pages 上的索引和每个已收录包在 npm 上的 `latest`；`latest` 是比索引所列版本都新的稳定版时，触发一次 Auto-publish（已有 Auto-publish 在排队或运行时下一轮再看）。同一个版本 6 小时内只触发一次，6 小时后仍未收录（例如被规则暂时拒绝）就再触发一次。哪些版本能收录仍由 `scripts/auto-publish.mjs` 决定。触发器以 systemd 临时用户运行，令牌由 systemd 交给它，它只能写自己的状态目录。
+
+它需要一个 fine-grained 令牌：资源所有者 VibeDev-Si，只选本仓库，只给 Actions 读写权限（Metadata 只读由 GitHub 自动附带）。令牌存在服务器的 `/etc/vibedev/plugin-index-token`，仅 root 可读。每次运行都会用令牌读一次 GitHub，所以令牌过期或被撤销时，服务会在 10 分钟内显示失败（`systemctl --failed`），这期间新版本仍由每小时的定时运行收录，只是更慢。距离到期不足 30 天时日志里会出现提醒；换令牌只需改写这个文件，不用重启服务。安装或更新：
+
+```sh
+install -m 755 server/plugin_index_trigger.py /usr/local/sbin/vibedev-plugin-index-trigger
+install -m 644 server/vibedev-plugin-index-trigger.service server/vibedev-plugin-index-trigger.timer /etc/systemd/system/
+install -d -m 700 /etc/vibedev
+(umask 077; cat > /etc/vibedev/plugin-index-token)       # 粘贴令牌，按 Ctrl-D 结束
+systemctl daemon-reload
+systemctl enable --now vibedev-plugin-index-trigger.timer
+journalctl -u vibedev-plugin-index-trigger.service -n 20 # 查看结果
 ```
 
 **手动发布**：`scripts/mirror.mjs` 把本地构建的 `dist/` 直接发布到下载服务器。定时同步以 GitHub Pages 为准，下一次运行会把镜像改回 Pages 上的内容；紧急下架时请同时把改动合并到 main（Pages 随之重新发布），或者先运行 `systemctl stop vibedev-plugin-index-sync.timer` 暂停定时同步。
@@ -298,9 +315,12 @@ VibeDev's own plugins may set `autoPublish: true` in `plugins.yml` (currently `@
 The list's `firstParty` block says who first party is: the npm accounts VibeDev publishes from (`npmPublishers`) and the
 GitHub owner of its source repositories (`repositoryOwner`).
 
-Every hour the scheduled workflow runs `node scripts/auto-publish.mjs --apply`, which records the stable release npm's
-`latest` points to as a review record and a `plugins.yml` entry (only the new entry is inserted; every other byte of the
-file stays), and then publishes it without a person:
+Auto-publish has two triggers: every 10 minutes the download server compares npm with the published index and dispatches
+it as soon as a newer stable release appears (see Mirroring to the VibeDev download server), so a new version usually
+reaches Discover within half an hour; the hourly schedule on GitHub is the fallback (GitHub often starts scheduled runs
+hours late, and sometimes skips them). It runs `node scripts/auto-publish.mjs --apply`, which records the stable release
+npm's `latest` points to as a review record and a `plugins.yml` entry (only the new entry is inserted; every other byte of
+the file stays), and then publishes it without a person:
 
 1. push the `auto/publish` branch and open (or reuse) its pull request;
 2. wait for the pull request's own Validate run, which reports the required `validate` check; GitHub holds it for
@@ -327,8 +347,8 @@ A refused release does not hold back the other plugins: the job publishes what p
 its log, and the refused release needs a human review. Code review happens in the package's own pull request;
 behaviour declarations are carried over from the previous version.
 
-GitHub disables scheduled workflows in a public repository after 60 days without a commit. After a long quiet period,
-check on the Actions page that Auto-publish is still enabled.
+GitHub disables scheduled workflows in a public repository after 60 days without a commit. The download server's trigger
+enables Auto-publish again before dispatching it; a workflow a person disabled stays disabled.
 
 ### Layout and commands
 
@@ -347,7 +367,11 @@ The trial (`test/dsh-composition/install-trial.mjs`) runs in temporary DSH_HOME,
 
 GitHub Pages is the origin; the VibeDev desktop's Discover page reads `https://download.vibedev.studio/plugin-index/index.json` (site root `/data/vibedev-download/public`).
 
-**Timer (normal operation)**: a systemd timer on the download server runs `server/plugin-index-sync.sh` every 10 minutes. It fetches `index.json` and `index.html` from GitHub Pages and checks that `index.json` is a format-1 index listing at least one plugin, with exact versions only. When both files equal the current release it stops; otherwise it writes a new release directory, then switches, verifies through the local web server (switching back on failure) and cleans up as `mirror.mjs` does below. The server stores no GitHub credential and GitHub stores no server credential. Install or update it with the commands in the [Chinese section](#镜像到-vibedev-下载服务器); `DRY_RUN=1` downloads and checks without changing anything.
+**Timer (normal operation)**: a systemd timer on the download server runs `server/plugin-index-sync.sh` every 10 minutes. It fetches `index.json` and `index.html` from GitHub Pages and checks that `index.json` is a format-1 index listing at least one plugin, with exact versions only. When both files equal the current release it stops; otherwise it writes a new release directory, then switches, verifies through the local web server (switching back on failure) and cleans up as `mirror.mjs` does below. The sync uses no credential, and GitHub stores no server credential. Install or update it with the commands in the [Chinese section](#镜像到-vibedev-下载服务器); `DRY_RUN=1` downloads and checks without changing anything.
+
+**Release trigger**: GitHub's schedule is unreliable, so a second systemd timer on the download server runs `server/plugin_index_trigger.py` every 10 minutes. It reads the index on GitHub Pages and the npm `latest` of every listed package; when `latest` is a stable version newer than every listed version, it dispatches Auto-publish once (or checks again next time when an Auto-publish run is already queued or running). It dispatches the same version at most once per 6 hours, so a release still unlisted after that, for example one a rule refused for a while, is dispatched again. `scripts/auto-publish.mjs` still decides what is listed. The trigger runs as a systemd transient user, receives the token from systemd, and can write only its own state directory.
+
+It needs a fine-grained token with resource owner VibeDev-Si, this repository only, and Actions read and write only (GitHub adds Metadata read-only). The token lives in `/etc/vibedev/plugin-index-token` on the server, readable by root only. Every run reads GitHub with it, so an expired or revoked token fails the service within 10 minutes (`systemctl --failed`); meanwhile the hourly schedule still lists new releases, more slowly. The log warns from 30 days before expiry; to rotate, rewrite that file, with no restart. Install or update it with the commands in the [Chinese section](#镜像到-vibedev-下载服务器).
 
 **Manual publishing**: `scripts/mirror.mjs` publishes a locally built `dist/` directly. The timer treats GitHub Pages as the source, so its next run restores the Pages content; for an emergency removal, also merge the change to main (Pages then redeploys) or pause the timer with `systemctl stop vibedev-plugin-index-sync.timer`. `mirror.mjs` is a dry run by default: it lists the files, the remote paths, and every command, and changes nothing. Run it with `--ssh user@host --identity <key> --known-hosts <file>`, then add `--apply` to publish.
 

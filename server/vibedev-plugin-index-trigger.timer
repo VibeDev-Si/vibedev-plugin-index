@@ -1,0 +1,10 @@
+[Unit]
+Description=Check npm every 10 minutes for releases the plugin index lacks
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=10min
+RandomizedDelaySec=1min
+
+[Install]
+WantedBy=timers.target
