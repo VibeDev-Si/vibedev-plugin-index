@@ -208,6 +208,20 @@ plugins:
             releases for the optional tunnel; neither runs on a default install. Trial: installBundle of 0.1.12 into the
             VibeDev desktop profile on DSH 0.2.1-rc.2 replaced a pinned 0.1.9 tarball, and the connector has since run
             there across restarts with a real account, phone pairing, history, approvals and file reads.
+      - version: 0.1.15
+        integrity: sha512-GEjwcVAwJV9Bc/eCqDvwVtYZrPkPwGzrV4BXjzWAy7bPObM8JKynZ+xXUcdahzwag9K5ALDXlAoHNA4zZwP8jg==
+        review:
+          reviewer: VibeDev (automated)
+          date: 2026-11-02
+          license: MIT
+          testedOn: [0.2.1-rc.2]
+          capabilities:
+            network: [vibedev.studio, remote.vibedev.studio:24443, github.com, 127.0.0.1]
+            files: write
+            config: write
+            childProcess: [python3, cloudflared, nginx, certbot, systemctl]
+          installScripts: []
+          notes: Automated first-party release 0.1.15 from @vibedev-si/dsh-remote; capabilities, install scripts and risk notes are unchanged from 0.1.12.
   - name: dsh-film
     category: media
     tags: [vibedev]
