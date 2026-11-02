@@ -91,6 +91,16 @@
 
 满足后我们再审核新版本并钉住精确版本；插件发新版仍然要等我们审核。
 
+## 版本更新（2026-11-02）
+
+都用 `npm run review` 与已收录版本对比，并在 DSH 0.2.2-alpha.2 和 0.2.1-rc.2 上各做一次隔离安装试用；另外解包读了新增的代码。
+
+| 插件与版本 | 结论 | 关键证据 | 用户可见的风险提示 |
+|---|---|---|---|
+| `@wxg-prc-cpg/browser-skill-dsh-plugin@0.4.1`，审核记录见 [reviews/@wxg-prc-cpg/browser-skill-dsh-plugin@0.4.1.md](reviews/@wxg-prc-cpg/browser-skill-dsh-plugin@0.4.1.md) | **收** | 发布者与维护者同 0.3.3（npm `wxg-prc-cpg`），无依赖、无安装脚本、525 KiB。静态扫描的主机、线索类别、环境变量、子进程（只有 `bsk`）都没有变化，但 0.4.0 新增 6 个工具操作：`interact.evaluate`（在任务标签页里运行 JavaScript）、`interact.upload`（把 1–20 个本机文件路径交给 `bsk upload --file`，插件不限制路径）、`interact.download`（把下载保存到本机路径）、`interact.drag`、`interact.step`、`inspect.view`；saveFull 把完整页面观察结果以 JSON 文件留在本机。需要 bsk CLI、守护进程和扩展同为 0.4.1（协议 1.8）。两次试用：安装后与重启后 ACTIVE，只启动 `bsk --version --json`，无外连、无凭据读取。0.3.3 时做过的真实浏览器试用这次没有重做。 | Agent 能在已登录的网站里运行脚本、上传本机文件、把下载保存到本机；先升级 bsk 和扩展，再升级插件。 |
+| `dsh-context@0.78.1`，审核记录见 [reviews/dsh-context@0.78.1.md](reviews/dsh-context@0.78.1.md) | **收**（附披露，同 0.73.2） | provenance 指向 tag v0.78.1，仓库与发布工作流同 0.73.2；依赖只有 zod；代码中的主机与 0.73.2 相同。新增连接路由 `/api/dsh-context/commands`，通过 DSH 的 sessionQuery 只读会话里的命令执行记录；新面板（Context 标签、命令执行、多智能体 Fleet 与通信、偏好）读的都是 DSH 自己的会话数据。余额查询规则不变（试用中读 1 次 `DEEPSEEK_API_KEY`，请求 1 次 `https://api.deepseek.com/user/balance`）。`promptPrefix`/`promptSuffix` 设置（默认空，0.73.2 已有）会在每个会话的系统提示词前后加一段。 | 同 0.73.2 的说明。 |
+| `dsh-context@0.78.2`–`0.79.0`，审核记录见 [reviews/dsh-context@0.79.0.md](reviews/dsh-context@0.79.0.md) | **暂缓（负责人决定）** | 0.78.2 起面板里多了一张“推荐”卡片：内容来自作者仓库 main 分支的 `data/recoms.json`，不随插件版本发布，作者随时可改；0.79.0 起 GitHub 连不上时经第三方代理 gh-proxy.org 获取；卡片图片从文件指定的网址加载，点击打开推荐的网站，没有关闭开关。目前推荐的是“DeepSeek Harness 桌面端现已发布!”。作者提供关闭开关（或默认关闭）后再审。 | — |
+
 ## 其余候选（初审，未试用）
 
 | 插件与版本 | 初审 | integrity |
@@ -115,3 +125,5 @@
 ## English summary
 
 Batch 1: include `@wxg-prc-cpg/browser-skill-dsh-plugin@0.3.3` (launches the user-installed `bsk` CLI; the browser visits sites the agent chooses) and `dsh-context@0.73.2` (uses the DeepSeek key for a balance request to api.deepseek.com, models.dev prices, update hint without self-install). `@michengai/dsh-skills-manager@1.2.7` is conditional and not listed: its always-on updater installs the npm latest on two clicks, bypassing `installBundle` on the desktop profile, and it installs third-party skills from ClawHub, skills.sh, and GitHub. `dsh-univer-office@0.3.7` and `@linxin666/dsh-remote-web-ui@0.4.7` are deferred by the product owner (size, telemetry, obfuscated code and unlicensed binaries; telemetry, relay, public tunnel, firewall changes).
+
+Updates of 2026-11-02: include BrowserSkill 0.4.1 (its new tool operations let the agent run JavaScript in task tabs, upload local files and save downloads; it needs the bsk CLI and extension at the same version) and dsh-context 0.78.1 (same hosts and balance rule as 0.73.2; new panels read DSH's own session data). dsh-context 0.78.2 to 0.79.0 are on hold by the product owner's decision: they show a promotion card from a JSON file on the author's main branch, fetched through the gh-proxy.org proxy when GitHub is unreachable, with no switch to turn it off.

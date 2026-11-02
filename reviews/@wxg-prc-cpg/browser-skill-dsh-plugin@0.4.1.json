@@ -1,0 +1,233 @@
+{
+  "schema": 1,
+  "package": "@wxg-prc-cpg/browser-skill-dsh-plugin",
+  "version": "0.4.1",
+  "date": "2026-11-02",
+  "target": "0.2.1-rc.2",
+  "command": "npm run review -- @wxg-prc-cpg/browser-skill-dsh-plugin@0.4.1 --previous 0.3.3 --dsh C:\\vdp-wt\\port-fetch-022 --call \"GET /bsk-observation/state\"",
+  "tool": {
+    "index": "e133979+changes",
+    "dsh": "9514287e49 (DSH 0.2.2-alpha.2)"
+  },
+  "static": {
+    "name": "@wxg-prc-cpg/browser-skill-dsh-plugin",
+    "version": "0.4.1",
+    "published": "2026-11-01T16:57:26.199Z",
+    "distTags": {
+      "latest": "0.4.1"
+    },
+    "versionsPublished": 11,
+    "versionsLast30Days": 3,
+    "deprecated": null,
+    "integrity": "sha512-uQ5XIoPKlM99oy7NqBv97DiIJe9zBfjSetvKup0BOexHQMsKe62OuY3HVAkPWVsBP1Em/srp7+lrBkyiCDvmyw==",
+    "license": "MIT",
+    "licenseAccepted": true,
+    "licenseFiles": [
+      "LICENSE"
+    ],
+    "provenance": null,
+    "bundle": true,
+    "enginesDsh": null,
+    "dshPeers": {
+      "@deepseek-ai/dsh-attachment": "^0.1.5-rc.3 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-client-ui-primitives": "^0.1.5-rc.3 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-client-ui-tool": "^0.1.5-rc.3 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-llm": "^0.1.5-rc.3 || ^0.2.0-rc.1",
+      "@deepseek-ai/dsh-tools": "^0.1.5-rc.3 || ^0.2.0-rc.1"
+    },
+    "otherPeers": {
+      "react": "^18.2.0"
+    },
+    "indexEnginesDsh": "^0.1.5-rc.3 || ^0.2.0-rc.1",
+    "declaresDsh": true,
+    "target": "0.2.1-rc.2",
+    "compatibleInDiscover": true,
+    "compatibleAtInstall": true,
+    "unmet": {},
+    "installScripts": [],
+    "npmHasInstallScript": false,
+    "unpackedBytes": 537520,
+    "fileCount": 16,
+    "tarballBytes": 134616,
+    "dependencies": {},
+    "optionalDependencies": {},
+    "description": "DeepSeek Harness tool plugin that exposes BrowserSkill browser automation (bsk_* tools) to the model",
+    "keywords": [
+      "dsh-plugin",
+      "deepseek-harness",
+      "browserskill",
+      "browser-automation"
+    ],
+    "repository": "https://github.com/Tencent/BrowserSkill",
+    "homepage": "https://github.com/Tencent/BrowserSkill/tree/main/packages/dsh-plugin-browserskill#readme",
+    "bugs": "https://github.com/Tencent/BrowserSkill/issues",
+    "maintainers": [
+      "wxg-prc-cpg"
+    ],
+    "hints": {
+      "childProcess": [
+        "lib/index.mjs"
+      ],
+      "network": [
+        "lib/client.cjs"
+      ],
+      "fileWrites": [
+        "lib/index.mjs"
+      ],
+      "configWrites": [],
+      "configReads": [],
+      "credentials": [],
+      "environment": [
+        "lib/index.mjs"
+      ],
+      "dynamicCode": [],
+      "selfUpdate": [],
+      "telemetry": []
+    },
+    "hosts": {},
+    "envVars": {
+      "BSK_HOME": [
+        "lib/index.mjs"
+      ]
+    },
+    "dependencyTree": {
+      "count": 0,
+      "truncated": false,
+      "packages": [],
+      "withInstallScripts": [],
+      "licensesOutsideList": [],
+      "unresolved": []
+    }
+  },
+  "trial": {
+    "dshVersion": "0.2.2-alpha.2",
+    "ok": true,
+    "installs": [
+      {
+        "spec": "@wxg-prc-cpg/browser-skill-dsh-plugin@0.4.1",
+        "application": "applied",
+        "version": "0.4.1"
+      }
+    ],
+    "entries": {
+      "afterInstall": [
+        "browserskill=ACTIVE"
+      ],
+      "afterRestart": [
+        "browserskill=ACTIVE"
+      ]
+    },
+    "network": {
+      "supported": true,
+      "samples": 13,
+      "dshWeb": [
+        "127.0.0.1:62909"
+      ],
+      "listeners": [],
+      "loopbackOnly": true,
+      "direct": [],
+      "processes": []
+    },
+    "leftoverProcesses": [],
+    "files": [
+      {
+        "checkpoint": "install",
+        "counts": {
+          "added": 2,
+          "changed": 2,
+          "removed": 0
+        },
+        "added": [
+          "home/profiles/web/.plugin-manager/logs/operation-tWxgqG/pnpm.log (946 B)",
+          "home/profiles/web/pnpm-lock.yaml (1175 B)"
+        ],
+        "changed": [
+          "home/profiles/web/package.json (382 B)",
+          "home/profiles/web/pnpm-workspace.yaml (137 B)"
+        ],
+        "removed": []
+      },
+      {
+        "checkpoint": "restart",
+        "counts": {
+          "added": 0,
+          "changed": 1,
+          "removed": 0
+        },
+        "added": [],
+        "changed": [
+          "home/profiles/web/cordis.yml (223 B)"
+        ],
+        "removed": []
+      }
+    ],
+    "patch": [
+      {
+        "checkpoint": "baseline",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      },
+      {
+        "checkpoint": "install",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      },
+      {
+        "checkpoint": "restart",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      }
+    ],
+    "registrations": {
+      "tools": [],
+      "skills": [
+        "browser-skill (bundled)"
+      ],
+      "webRoutes": [
+        "/bsk-observation/events",
+        "/bsk-observation/interrupt",
+        "/bsk-observation/state",
+        "/bsk-observation/stop",
+        "/bsk-observation/thumbnail"
+      ],
+      "connectionRoutes": []
+    },
+    "processes": [
+      "install: bsk --version --json",
+      "restart: bsk --version --json"
+    ],
+    "programs": [
+      "bsk"
+    ],
+    "installTraffic": [
+      "registry.npmjs.org:443 ×3"
+    ],
+    "connections": [],
+    "fetches": [],
+    "credentialReads": [],
+    "calls": [
+      {
+        "call": "GET /bsk-observation/state",
+        "kind": "webServer",
+        "status": 200,
+        "body": "{\"sessions\":[],\"available\":true}",
+        "credentialReads": [],
+        "fetches": [],
+        "spawns": [],
+        "connections": []
+      }
+    ]
+  },
+  "previous": {
+    "version": "0.3.3",
+    "highlights": [],
+    "files": {
+      "added": 2,
+      "removed": 0,
+      "changed": 10
+    }
+  }
+}

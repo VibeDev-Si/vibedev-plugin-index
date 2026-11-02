@@ -1,0 +1,293 @@
+{
+  "schema": 1,
+  "package": "dsh-context",
+  "version": "0.79.0",
+  "date": "2026-11-02",
+  "target": "0.2.1-rc.2",
+  "command": "npm run review -- dsh-context@0.79.0 --previous 0.73.2 --dsh C:\\vdp-wt\\port-fetch-022 --call \"POST /api/dsh-context/balance\"",
+  "tool": {
+    "index": "e133979",
+    "dsh": "9514287e49 (DSH 0.2.2-alpha.2)"
+  },
+  "static": {
+    "name": "dsh-context",
+    "version": "0.79.0",
+    "published": "2026-11-01T06:42:08.598Z",
+    "distTags": {
+      "latest": "0.79.0"
+    },
+    "versionsPublished": 150,
+    "versionsLast30Days": 26,
+    "deprecated": null,
+    "integrity": "sha512-5zmmng1bHjrAsvW6oFWvP8lLHZdjF6C0mt7UHKLEkkIRV0NM/eU8TA2QfZv7H3f5VcGHrGq9x2+RuWgG9iwgsA==",
+    "license": "Apache-2.0",
+    "licenseAccepted": true,
+    "licenseFiles": [
+      "LICENSE"
+    ],
+    "provenance": {
+      "repository": "https://github.com/bowenliang123/dsh-context",
+      "ref": "refs/tags/v0.79.0",
+      "workflow": ".github/workflows/release.yml",
+      "commit": "12ebb8696ffc5276d312ebb06f784af1638f6737"
+    },
+    "bundle": true,
+    "enginesDsh": ">=0.2.0-rc.2 || >=0.2.1-rc.2",
+    "dshPeers": {
+      "@deepseek-ai/dsh-client-ui-primitives": ">=0.2.0-rc.2 || >=0.2.1-rc.2",
+      "@deepseek-ai/dsh-session": ">=0.2.0-rc.2 || >=0.2.1-rc.2"
+    },
+    "otherPeers": {
+      "react": "^18.3.1",
+      "react-dom": "^18.3.1"
+    },
+    "indexEnginesDsh": ">=0.2.0-rc.2 || >=0.2.1-rc.2",
+    "declaresDsh": true,
+    "target": "0.2.1-rc.2",
+    "compatibleInDiscover": true,
+    "compatibleAtInstall": true,
+    "unmet": {},
+    "installScripts": [],
+    "npmHasInstallScript": false,
+    "unpackedBytes": 784587,
+    "fileCount": 10,
+    "tarballBytes": 213736,
+    "dependencies": {
+      "zod": "^4.6.7"
+    },
+    "optionalDependencies": {},
+    "description": "A DeepSeek Harness plugin for context insight and management, with context dashboard and context command, for understanding how the context is made of, and how it evolves.",
+    "keywords": [
+      "deepseek-harness",
+      "dsh",
+      "cordis",
+      "plugin",
+      "context",
+      "token",
+      "ui"
+    ],
+    "repository": "https://github.com/bowenliang123/dsh-context",
+    "homepage": "https://github.com/bowenliang123/dsh-context",
+    "bugs": "https://github.com/bowenliang123/dsh-context/issues",
+    "maintainers": [
+      "bowenliang123"
+    ],
+    "hints": {
+      "childProcess": [],
+      "network": [
+        "lib/client.js",
+        "lib/index.js"
+      ],
+      "fileWrites": [
+        "lib/client.js",
+        "lib/index.js"
+      ],
+      "configWrites": [],
+      "configReads": [
+        "lib/index.js"
+      ],
+      "credentials": [
+        "lib/index.js"
+      ],
+      "environment": [],
+      "dynamicCode": [],
+      "selfUpdate": [
+        "lib/client.js"
+      ],
+      "telemetry": []
+    },
+    "hosts": {
+      "api.deepseek.com": [
+        "lib/index.js"
+      ],
+      "cdn.simpleicons.org": [
+        "lib/client.js",
+        "lib/index.js"
+      ],
+      "gh-proxy.org": [
+        "lib/index.js"
+      ],
+      "models.dev": [
+        "lib/client.js"
+      ],
+      "platform.deepseek.com": [
+        "lib/client.js",
+        "lib/index.js"
+      ],
+      "raw.githubusercontent.com": [
+        "lib/client.js",
+        "lib/index.js"
+      ],
+      "registry.npmjs.org": [
+        "lib/client.js"
+      ],
+      "registry.npmmirror.com": [
+        "lib/client.js"
+      ],
+      "www.deepseek.com": [
+        "lib/client.js"
+      ]
+    },
+    "envVars": {},
+    "dependencyTree": {
+      "count": 1,
+      "truncated": false,
+      "packages": [
+        {
+          "name": "zod",
+          "version": "4.6.7",
+          "license": "MIT",
+          "installScript": false
+        }
+      ],
+      "withInstallScripts": [],
+      "licensesOutsideList": [],
+      "unresolved": []
+    }
+  },
+  "trial": {
+    "dshVersion": "0.2.2-alpha.2",
+    "ok": true,
+    "installs": [
+      {
+        "spec": "dsh-context@0.79.0",
+        "application": "applied",
+        "version": "0.79.0"
+      }
+    ],
+    "entries": {
+      "afterInstall": [
+        "dsh-context=ACTIVE"
+      ],
+      "afterRestart": [
+        "dsh-context=ACTIVE"
+      ]
+    },
+    "network": {
+      "supported": true,
+      "samples": 14,
+      "dshWeb": [
+        "127.0.0.1:60117"
+      ],
+      "listeners": [],
+      "loopbackOnly": true,
+      "direct": [],
+      "processes": []
+    },
+    "leftoverProcesses": [],
+    "files": [
+      {
+        "checkpoint": "install",
+        "counts": {
+          "added": 2,
+          "changed": 1,
+          "removed": 0
+        },
+        "added": [
+          "home/profiles/web/.plugin-manager/logs/operation-pVOvSs/pnpm.log (898 B)",
+          "home/profiles/web/pnpm-lock.yaml (1124 B)"
+        ],
+        "changed": [
+          "home/profiles/web/package.json (331 B)"
+        ],
+        "removed": []
+      },
+      {
+        "checkpoint": "restart",
+        "counts": {
+          "added": 0,
+          "changed": 1,
+          "removed": 0
+        },
+        "added": [],
+        "changed": [
+          "home/profiles/web/cordis.yml (223 B)"
+        ],
+        "removed": []
+      }
+    ],
+    "patch": [
+      {
+        "checkpoint": "baseline",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      },
+      {
+        "checkpoint": "install",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      },
+      {
+        "checkpoint": "restart",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      }
+    ],
+    "registrations": {
+      "tools": [],
+      "skills": [],
+      "webRoutes": [],
+      "connectionRoutes": [
+        "POST /api/dsh-context/attachment",
+        "POST /api/dsh-context/backfill",
+        "POST /api/dsh-context/balance",
+        "POST /api/dsh-context/commands",
+        "POST /api/dsh-context/detail",
+        "POST /api/dsh-context/fleet",
+        "POST /api/dsh-context/recom",
+        "POST /api/dsh-context/skills"
+      ]
+    },
+    "processes": [],
+    "programs": [],
+    "installTraffic": [
+      "registry.npmjs.org:443 ×4"
+    ],
+    "connections": [
+      "POST /api/dsh-context/balance: api.deepseek.com:443 (refused)"
+    ],
+    "fetches": [
+      "POST /api/dsh-context/balance: GET https://api.deepseek.com/user/balance (Authorization)"
+    ],
+    "credentialReads": [
+      "POST /api/dsh-context/balance: DEEPSEEK_API_KEY"
+    ],
+    "calls": [
+      {
+        "call": "POST /api/dsh-context/balance",
+        "kind": "connection",
+        "status": 200,
+        "body": "{\"ok\":true,\"value\":null}",
+        "credentialReads": [
+          "DEEPSEEK_API_KEY"
+        ],
+        "fetches": [
+          "GET https://api.deepseek.com/user/balance (Authorization)"
+        ],
+        "spawns": [],
+        "connections": [
+          "api.deepseek.com:443 (refused)"
+        ]
+      }
+    ]
+  },
+  "previous": {
+    "version": "0.73.2",
+    "highlights": [
+      "DSH 声明 · engines / peers",
+      "直接依赖 · Dependencies",
+      "解包大小 · Unpacked size",
+      "代码中的主机 · Hosts in code",
+      "试用：注册项 · Trial: registrations",
+      "试用：进程内 fetch · Trial: fetch"
+    ],
+    "files": {
+      "added": 0,
+      "removed": 0,
+      "changed": 5
+    }
+  }
+}
