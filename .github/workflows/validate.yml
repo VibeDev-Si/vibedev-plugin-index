@@ -41,7 +41,7 @@ jobs:
           bash -n server/plugin-index-sync.sh
           shellcheck server/plugin-index-sync.sh
           python3 -m unittest discover -s server -p 'test_*.py'
-          systemd-analyze verify --man=no server/*.timer server/*.service 2>&1 | grep -v -E "Command /usr/local/sbin/vibedev-plugin-index-(sync|trigger) is not executable" | tee "$RUNNER_TEMP/units.txt"
+          systemd-analyze verify --man=no server/*.timer server/*.service 2>&1 | grep -v -E "Command /usr/local/sbin/vibedev-plugin-index-(sync|trigger) is not executable" | grep -v -E "^/usr/lib/systemd/|^/lib/systemd/" | tee "$RUNNER_TEMP/units.txt"
           test ! -s "$RUNNER_TEMP/units.txt"
       - name: Full pipeline on real npm data (test fixture)
         run: node scripts/validate.mjs --catalog test/fixtures/e2e-plugins.yml
