@@ -318,15 +318,18 @@ plugins:
         en: >-
           A canvas film workbench: script and storyboard canvas, image/video/audio generation, the Director stage and
           final editing, plus local scene detection with keyframes, clips and the original audio, and optional AI shot
-          descriptions. Models and media go through the VibeDev account plugin, so no API key is entered here, and the
+          descriptions. The canvas toolbar's creative library browses about 16,000 entries with sample pictures, inserts
+          prompt snippets into nodes and turns styles into cards; its content is downloaded on demand from the VibeDev
+          gateway through the account plugin. Models and media go through the VibeDev account plugin, so no API key is entered here, and the
           bundled local server listens on 127.0.0.1 only and stops when VibeDev exits. Local processing needs FFmpeg:
           install it with your system package manager or from the workbench's own plugin market. The package ships the
-          Bun runtime for three platforms, so it is large (about 45 MiB unpacked, one runtime installed per platform).
+          Bun runtime for three platforms, so it is large (about 46 MiB unpacked, one runtime installed per platform).
         zh: >-
           画布式影视工作台：剧本与分镜画布、图片/视频/音频生成、导演台和剪辑成片，还能本地切镜并提取关键帧、片段和原音轨，
-          可选 AI 逐镜头描述与整段分析。模型与媒体统一走 VibeDev 账号插件，不需要在这里填写 API Key；随包的本地服务只监听
+          可选 AI 逐镜头描述与整段分析。画布工具栏的创作库可以浏览约 1.6 万个带示例图的条目，把提示词插进节点、把风格做成卡片，
+          内容经账号插件从 VibeDev 网关按需下载。模型与媒体统一走 VibeDev 账号插件，不需要在这里填写 API Key；随包的本地服务只监听
           127.0.0.1，VibeDev 退出后自行关闭。本地处理需要 FFmpeg：用系统包管理器安装，或在工作台里的插件市场下载。
-          包装了三个平台的 Bun 运行时，所以体积较大（解包约 45 MiB，每个平台只装一个）。
+          包装了三个平台的 Bun 运行时，所以体积较大（解包约 46 MiB，每个平台只装一个）。
     versions:
       - version: 0.8.0
         integrity: sha512-DlmR0u0BZw2CtHHeYDDWs3yKGp5UAD9XQJvwAX4aCk5/RmN4NzA8f2xPVRZjrs9i3SzgVLAA+QNCB8eCz2fRXg==
@@ -387,3 +390,39 @@ plugins:
           installScripts: []
           sizeException: "自动收录：解包 44.8 MiB，未超过 0.8.0 人工审核时 44.8 MiB 的 125%，沿用其体量说明。Recorded automatically: unpacks to 44.8 MiB, within 125% of the 44.8 MiB reviewed by hand for 0.8.0, whose size reasoning carries over. 解包 46,981,566 B（44.8 MiB），超过 20 MiB 上限：包内随附三个平台的 Bun 运行时（用来启动本地 Film 服务）、 FFmpeg 与文档解析 Worker，以及工作台 Web 产物和内置节点/工具/技能。这些是本地处理能力，不是可裁剪的依赖； Bun 可选依赖按平台只安装一个。Unpacks to 44.8 MiB because it ships the three platforms' Bun runtimes that run the local Film server, the FFmpeg and document-parsing workers, the workbench Web build and the built-in nodes/tools/skills. These are the local processing capability rather than trimmable dependencies, and only one platform's Bun package is installed per user."
           notes: Automated first-party release 0.8.1 from dsh-film; capabilities, install scripts and risk notes are unchanged from 0.8.0.
+      - version: 0.9.0
+        integrity: sha512-24Gzec/h0PIajXcmv6JF1D7/AcTSwsvhvkDYkOPo3Ft8E4EDURMbI4O9I9JfJByXIDZFh1bCvihvHomHSsti7A==
+        review:
+          reviewer: VibeDev
+          date: 2026-11-07
+          license: MIT
+          testedOn: [0.2.1-rc.3]
+          capabilities:
+            network: [127.0.0.1]
+            files: write
+            config: none
+            childProcess: [bun, ffmpeg, ffprobe]
+          installScripts: []
+          sizeException: >-
+            解包 47,694,848 B（45.5 MiB，46,577 KiB），超过 20 MiB 上限：包内随附三个平台的 Bun 运行时（用来启动本地 Film 服务）、
+            FFmpeg 与文档解析 Worker，以及工作台 Web 产物和内置节点/工具/技能。这些是本地处理能力，不是可裁剪的依赖；
+            Bun 可选依赖按平台只安装一个。0.9.0 是 0.8.0 人工审核时 44.8 MiB 的 101.5%，未超过 125%。
+            Unpacks to 45.5 MiB for the three platforms' Bun runtimes that run the local Film server, the FFmpeg and
+            document-parsing workers, the workbench Web build and the built-in nodes/tools/skills - the local processing
+            capability rather than trimmable dependencies, with one platform's Bun package installed per user. 101.5% of the
+            44.8 MiB reviewed by hand for 0.8.0, within 125%.
+          notes: >-
+            First-party workbench published from github.com/VibeDev-Si/dsh-film tag v0.9.0; the workbench source is the
+            private dsh-film-studio repository, workbench branch at 9b5c2f7 (tag dsh-film-v0.9.0). New in 0.9.0: the creative
+            library - the host's searchLibrary/getLibraryEntry/applyLibraryEntry operations, the bridge's /library/* routes,
+            and the workbench's library panel and style-card node. Content is read through @vibedev-si/dsh-vibedev's
+            vibedevContent service from the VibeDev gateway, so Film's own package still contains no other host name; the
+            cache is written under library/ in the plugin data directory with a 2 GB cap. Also brings the multi-line skill
+            description fix, built-in skills following new builds, and score/voice planning for the whole film. No npm
+            provenance: the source repository is private and npm refuses a provenance attestation from a private repository,
+            so the OIDC release job publishes the tested archive without one and verifies the registry tarball byte for byte
+            afterwards (the same way @vibedev-si/dsh-vibedev has published since 0.6.0). Dependencies, install scripts,
+            capabilities and child processes are otherwise unchanged from 0.8.0. Trial on DSH 0.2.1-rc.3 (installBundle into
+            a temporary profile): installed and active after hot install and after restart; tool film_call, film_studio_open
+            and film_tools registered; no child processes, no outbound connections outside installation, no credential reads.
+            Limits: Windows only; the library panel and style cards have not been exercised on macOS or Linux.
