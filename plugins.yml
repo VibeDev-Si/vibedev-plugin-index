@@ -164,6 +164,20 @@ plugins:
             0.2.1-rc.2: ACTIVE after hot install and after restart; the only child process was `bsk --version --json`; no
             outbound connection, credential read or listener; GET /bsk-observation/state answered 200. The live browser
             trial done for 0.3.3 was not repeated for this version.
+      - version: 0.4.2
+        integrity: sha512-pdhE6JpIxvuK/Ok5BA8LAG3DFw0Oeuw+i358Ar8eO9O3bvu7PdPN+zUgpvWSvYBauEATRS1VjIVGZv+PNWyWFw==
+        review:
+          reviewer: VibeDev (automated)
+          date: 2026-11-08
+          license: MIT
+          testedOn: [0.2.1-rc.2, 0.2.2-alpha.2]
+          capabilities:
+            network: ["*"]
+            files: write
+            config: none
+            childProcess: [bsk]
+          installScripts: []
+          notes: "Automated third-party release under autoFollow (updates: patch): npm maintainers wxg-prc-cpg; published by wxg-prc-cpg; no npm provenance; published 2026-11-05T12:25:43.950Z, at least 72 hours before it was listed. Hosts, environment variables, code-hint categories, dependencies and dependency tree stay within 0.4.1, reviewed by hand on 2026-11-02; capabilities, install scripts and testedOn are carried over from it. Not trial-installed."
   - name: dsh-context
     category: usage
     tags: []
