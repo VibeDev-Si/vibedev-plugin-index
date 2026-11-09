@@ -101,6 +101,15 @@
 | `dsh-context@0.78.1`，审核记录见 [reviews/dsh-context@0.78.1.md](reviews/dsh-context@0.78.1.md) | **收**（附披露，同 0.73.2） | provenance 指向 tag v0.78.1，仓库与发布工作流同 0.73.2；依赖只有 zod；代码中的主机与 0.73.2 相同。新增连接路由 `/api/dsh-context/commands`，通过 DSH 的 sessionQuery 只读会话里的命令执行记录；新面板（Context 标签、命令执行、多智能体 Fleet 与通信、偏好）读的都是 DSH 自己的会话数据。余额查询规则不变（试用中读 1 次 `DEEPSEEK_API_KEY`，请求 1 次 `https://api.deepseek.com/user/balance`）。`promptPrefix`/`promptSuffix` 设置（默认空，0.73.2 已有）会在每个会话的系统提示词前后加一段。 | 同 0.73.2 的说明。 |
 | `dsh-context@0.78.2`–`0.79.0`，审核记录见 [reviews/dsh-context@0.79.0.md](reviews/dsh-context@0.79.0.md) | **暂缓（负责人决定）** | 0.78.2 起面板里多了一张“推荐”卡片：内容来自作者仓库 main 分支的 `data/recoms.json`，不随插件版本发布，作者随时可改；0.79.0 起 GitHub 连不上时经第三方代理 gh-proxy.org 获取；卡片图片从文件指定的网址加载，点击打开推荐的网站，没有关闭开关。目前推荐的是“DeepSeek Harness 桌面端现已发布!”。作者提供关闭开关（或默认关闭）后再审。 | — |
 
+## 第一方插件（2026-11-09）
+
+产品负责人决定：VibeDev 自己的插件都通过发现页分发，影视工作台和媒体预览不内置进安装包（社交插件暂不上）。两项都用 `npm run review` 检查；媒体预览在 DSH 0.2.2-rc.1（vibedev-app `release/desktop-0.2.2-rc.1` 的已构建检出）上做了隔离安装试用。同一天起，第一方自动收录也接受 GitHub 可信发布（OIDC）的版本，影视工作台之后的版本都自动收录。
+
+| 插件与版本 | 结论 | 关键证据 | 用户可见的风险提示 |
+|---|---|---|---|
+| `@vibedev-si/dsh-media-viewer@0.2.2`，审核记录见 [reviews/@vibedev-si/dsh-media-viewer@0.2.2.md](reviews/@vibedev-si/dsh-media-viewer@0.2.2.md) | **收**（`autoPublish`） | 维护者 crider，仓库 VibeDev-Si；无依赖、无安装脚本、133 KiB。宿主侧只注册 `/mp` 路由，按需列出并流式读取（Range）工作区里的媒体文件；浏览器侧只请求同源的 `/mp`；`dsh.internal` 只是解析请求路径的基准 URL。试用：安装后与重启后 ACTIVE，无子进程、无安装以外的外连、无凭据读取、无遗留进程。 | 只读取你打开或浏览的工作区文件，插件本身不联网、不写文件；HTML 预览默认允许脚本，在隔离的沙箱框架里运行，可以关掉。 |
+| `@vibedev-si/dsh-vibedev@0.7.2`（账号与模型），审核记录见 [reviews/@vibedev-si/dsh-vibedev@0.7.2.md](reviews/@vibedev-si/dsh-vibedev@0.7.2.md) | **暂缓（负责人决定）** | 代码没有问题：只连网关源 `api.vibedev.studio`，全部 `redirect: "error"`，拒绝跨源请求；只在登录期间于 `127.0.0.1` 随机端口监听回调；唯一的子进程是在系统浏览器打开登录页；无遥测。暂缓的原因是收录标准第 9 条：本包依赖 `@vibedev-si/dsh-ecosystem@0.2.0`，并通过 companion 行自动启用它，而生态会更新自己，也会安装和更新其他插件及 VibeDev 内置插件。VibeDev 桌面版内置这个插件，不收录不影响 VibeDev 用户。等账号插件去掉 companion（退役生态）后再收录。 | — |
+
 ## 其余候选（初审，未试用）
 
 | 插件与版本 | 初审 | integrity |
@@ -120,10 +129,12 @@
 - `dsh-pet@0.3.7`：解包 62.5 MiB，运行时会下载 Electron。
 - `@tt-a1i/archify-dsh`、`@liustack/modlens`、`@wxg-prc-cpg/dsh-weknora`、`dsh-deja`：没有任何 DSH 兼容声明，需要先实测。
 - `dsh-ops@0.3.0`：子进程和写文件路径多，留到后续批次。
-- `dshmarket`：本方案就是用来替代它的。`@vibedev-si/*`：已经通过 VibeDev 生态中心分发。
+- `dshmarket`：本方案就是用来替代它的。
 
 ## English summary
 
 Batch 1: include `@wxg-prc-cpg/browser-skill-dsh-plugin@0.3.3` (launches the user-installed `bsk` CLI; the browser visits sites the agent chooses) and `dsh-context@0.73.2` (uses the DeepSeek key for a balance request to api.deepseek.com, models.dev prices, update hint without self-install). `@michengai/dsh-skills-manager@1.2.7` is conditional and not listed: its always-on updater installs the npm latest on two clicks, bypassing `installBundle` on the desktop profile, and it installs third-party skills from ClawHub, skills.sh, and GitHub. `dsh-univer-office@0.3.7` and `@linxin666/dsh-remote-web-ui@0.4.7` are deferred by the product owner (size, telemetry, obfuscated code and unlicensed binaries; telemetry, relay, public tunnel, firewall changes).
 
 Updates of 2026-11-02: include BrowserSkill 0.4.1 (its new tool operations let the agent run JavaScript in task tabs, upload local files and save downloads; it needs the bsk CLI and extension at the same version) and dsh-context 0.78.1 (same hosts and balance rule as 0.73.2; new panels read DSH's own session data). dsh-context 0.78.2 to 0.79.0 are on hold by the product owner's decision: they show a promotion card from a JSON file on the author's main branch, fetched through the gh-proxy.org proxy when GitHub is unreachable, with no switch to turn it off.
+
+First-party plugins, 2026-11-09: the product owner distributes VibeDev's own plugins through Discover rather than the installer (the social plugin waits). `@vibedev-si/dsh-media-viewer@0.2.2` is listed with `autoPublish` (no dependencies, only the same-origin `/mp` route, no network of its own; the install trial on DSH 0.2.2-rc.1 passed). `@vibedev-si/dsh-vibedev@0.7.2` waits by the product owner's decision: its code is clean, but it enables its VibeDev Ecosystem companion, which updates itself and other plugins (criterion 9); it is listed once the account plugin drops the companion. From the same day, first-party auto-publish also takes releases npm records under a GitHub trusted publisher (OIDC).

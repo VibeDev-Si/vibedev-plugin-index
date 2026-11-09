@@ -3,12 +3,13 @@
 #
 # 只有这里记录过审核的精确版本才会进入 dist/index.json。
 # 例外一：标了 autoPublish: true 的第一方包由定时任务把 npm 上的新稳定版写成本清单条目。新版本必须由 firstParty 列出的
-# npm 账号发布、全部维护者都是这些账号、源码仓库属于 firstParty.repositoryOwner，并通过全部机器检查。
+# npm 账号发布或经 GitHub 可信发布（OIDC）发布、全部维护者都是这些账号、源码仓库属于 firstParty.repositoryOwner，并通过全部机器检查。
 # 例外二：写了 autoFollow 的第三方包，新版本在声明的更新范围内、发布满 policy.autoFollowWaitHours 小时、来自声明的
 # npm 账号或构建来源、与最近一次人工审核的版本相比没有新的主机、环境变量、代码线索类别和依赖时自动收录；其余新版本都等人工审核。
 # Only the exact versions recorded here reach dist/index.json. First-party packages marked autoPublish: true take their
 # new stable npm releases through the scheduled job, which requires the release to come from the accounts under
-# firstParty and to pass every machine check. Third-party packages with an autoFollow block take a release within the
+# firstParty or from GitHub trusted publishing (OIDC), every maintainer to be one of those accounts, and every machine
+# check to pass. Third-party packages with an autoFollow block take a release within the
 # declared update range once it is policy.autoFollowWaitHours old, comes from the declared npm accounts or provenance,
 # and adds no host, environment variable, code-hint category or dependency to the last version reviewed by hand; every
 # other third-party release waits for a review. See README.md for the inclusion criteria and the review checklist.
@@ -26,7 +27,7 @@ index:
 target:
   # The DSH runtime version VibeDev ships (@deepseek-ai/dsh-app-boot). Every listed version must be compatible with it.
   # 当前 VibeDev 内置的 DSH 版本。每个收录版本都必须与之兼容。
-  dsh: 0.2.1-rc.2
+  dsh: 0.2.2-rc.1
 
 policy:
   # Largest unpacked package accepted without review.sizeException (20 MiB).
@@ -40,10 +41,11 @@ policy:
 
 firstParty:
   # The npm accounts VibeDev publishes from and the GitHub owner of its source repositories. autoPublish takes a release
-  # only when it was published by one of these accounts, every npm maintainer is one of them, and the repository is
-  # owned by repositoryOwner.
-  # VibeDev 发布用的 npm 账号与源码仓库所属的 GitHub 组织。autoPublish 只收录由这些账号发布、全部维护者都在其中、
-  # 仓库属于 repositoryOwner 的新版本。
+  # only when it was published by one of these accounts or through GitHub trusted publishing (OIDC, which only the
+  # package's maintainers can configure), every npm maintainer is one of these accounts, and the repository is owned by
+  # repositoryOwner.
+  # VibeDev 发布用的 npm 账号与源码仓库所属的 GitHub 组织。autoPublish 只收录由这些账号发布或经 GitHub 可信发布（OIDC，
+  # 只有包维护者能配置）发布、全部维护者都在其中、仓库属于 repositoryOwner 的新版本。
   npmPublishers: [crider]
   repositoryOwner: VibeDev-Si
 
@@ -279,7 +281,7 @@ plugins:
           reviewer: VibeDev
           date: 2026-10-29
           license: MIT
-          testedOn: [0.2.1-rc.2]
+          testedOn: [0.2.1-rc.2, 0.2.2-rc.1]
           capabilities:
             network: [vibedev.studio, remote.vibedev.studio:24443, github.com, 127.0.0.1]
             files: write
@@ -304,21 +306,29 @@ plugins:
             certificate flow (nginx/certbot/systemctl, Linux only) and the cloudflared binary downloaded from GitHub
             releases for the optional tunnel; neither runs on a default install. Trial: installBundle of 0.1.12 into the
             VibeDev desktop profile on DSH 0.2.1-rc.2 replaced a pinned 0.1.9 tarball, and the connector has since run
-            there across restarts with a real account, phone pairing, history, approvals and file reads.
+            there across restarts with a real account, phone pairing, history, approvals and file reads. Retested
+            2026-11-09 on DSH 0.2.2-rc.1 (install trial of the vibedev-app release/desktop-0.2.2-rc.1 checkout):
+            installBundle applied and enabled, row mobile-gateway active on both starts, no outbound connection beyond
+            the npm registry, no child process, no credential read, no process left running.
       - version: 0.1.15
         integrity: sha512-GEjwcVAwJV9Bc/eCqDvwVtYZrPkPwGzrV4BXjzWAy7bPObM8JKynZ+xXUcdahzwag9K5ALDXlAoHNA4zZwP8jg==
         review:
           reviewer: VibeDev (automated)
           date: 2026-11-02
           license: MIT
-          testedOn: [0.2.1-rc.2]
+          testedOn: [0.2.1-rc.2, 0.2.2-rc.1]
           capabilities:
             network: [vibedev.studio, remote.vibedev.studio:24443, github.com, 127.0.0.1]
             files: write
             config: write
             childProcess: [python3, cloudflared, nginx, certbot, systemctl]
           installScripts: []
-          notes: Automated first-party release 0.1.15 from @vibedev-si/dsh-remote; capabilities, install scripts and risk notes are unchanged from 0.1.12.
+          notes: >-
+            Automated first-party release 0.1.15 from @vibedev-si/dsh-remote; capabilities, install scripts and risk
+            notes are unchanged from 0.1.12. Retested 2026-11-09 on DSH 0.2.2-rc.1 (install trial of the vibedev-app
+            release/desktop-0.2.2-rc.1 checkout): installBundle applied and enabled, row mobile-gateway active on both
+            starts, no outbound connection beyond the npm registry, no child process, no credential read, no process left
+            running.
   - name: dsh-film
     category: media
     tags: [vibedev]
@@ -440,3 +450,46 @@ plugins:
             a temporary profile): installed and active after hot install and after restart; tool film_call, film_studio_open
             and film_tools registered; no child processes, no outbound connections outside installation, no credential reads.
             Limits: Windows only; the library panel and style cards have not been exercised on macOS or Linux.
+  - name: "@vibedev-si/dsh-media-viewer"
+    category: media
+    tags: [vibedev]
+    autoPublish: true
+    maintainer: https://github.com/VibeDev-Si/dsh-media-viewer/issues
+    display:
+      title:
+        en: Media Preview & Gallery
+        zh: 媒体预览与画廊
+      description:
+        en: >-
+          A media preview for the right sidebar: images, video and audio opened from the file tree first appear in a
+          floating preview; video, audio and HTML play and render inline, with large files streamed on demand; and a
+          folder gallery can send a multi-selection to the VibeDev Film canvas. It reads only the workspace files you open
+          or browse, and the plugin itself makes no network requests, uploads nothing and writes no files. HTML previews
+          run scripts by default inside an isolated sandboxed frame; the preview has a switch to turn them off.
+        zh: >-
+          右侧栏媒体预览：从文件树点开图片、视频、音频先浮动预览；视频、音频和 HTML 直接在侧栏播放和渲染，大文件按需流式读取；
+          文件夹媒体画廊多选后可以加入影视工作台画布。只读取你打开或浏览的工作区文件，插件本身不联网、不上传、不写文件。
+          HTML 预览默认允许脚本，页面在隔离的沙箱框架里运行，预览里可以关掉脚本。
+    versions:
+      - version: 0.2.2
+        integrity: sha512-vUkmPFuMGDm3IVC/Ezg6xCs4ECy+h5MbETrefqa+39yFl5FQYcoZCJQdmCYmewyR+6aUwcDxFtaOoeG+LnBujw==
+        review:
+          reviewer: VibeDev
+          date: 2026-11-09
+          license: MIT
+          testedOn: [0.2.2-rc.1]
+          capabilities:
+            network: []
+            files: read
+            config: none
+            childProcess: []
+          installScripts: []
+          notes: >-
+            First-party preview published from github.com/VibeDev-Si/dsh-media-viewer; no dependencies, no install scripts,
+            no npm provenance. The host side registers the /mp web route, which lists media of the workspace and streams
+            files with Range requests (createReadStream, stat); the browser side fetches only that same-origin route.
+            dsh.internal in index.js is the base URL for parsing request paths and is never contacted. Peers
+            dsh-better-sidebar and @deepseek-ai/schemastery are optional. Trial on DSH 0.2.2-rc.1 (installBundle into a
+            temporary profile of the vibedev-app release/desktop-0.2.2-rc.1 checkout): installed and active after hot
+            install and after restart; web route /mp registered; no child processes, no outbound connections outside
+            installation, no credential reads, no listener of its own, nothing left running.

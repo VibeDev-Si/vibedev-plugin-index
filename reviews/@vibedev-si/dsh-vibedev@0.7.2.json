@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "package": "@vibedev-si/dsh-vibedev",
+  "version": "0.7.2",
+  "date": "2026-11-09",
+  "target": "0.2.2-rc.1",
+  "command": "npm run review -- @vibedev-si/dsh-vibedev@0.7.2 --no-trial",
+  "tool": {
+    "index": "eaf0794"
+  },
+  "static": {
+    "name": "@vibedev-si/dsh-vibedev",
+    "version": "0.7.2",
+    "published": "2026-11-09T05:36:20.986Z",
+    "distTags": {
+      "latest": "0.7.2"
+    },
+    "versionsPublished": 25,
+    "versionsLast30Days": 19,
+    "deprecated": null,
+    "integrity": "sha512-hHsmmuQnFK1Z9eKFk97B+VtS4gbtWdKi8t0viAu4A/Fv9uk6sYGDuoMTxJx8ahIxw2h7My1a38lSGoR1XTsVhg==",
+    "license": "MIT",
+    "licenseAccepted": true,
+    "licenseFiles": [
+      "LICENSE"
+    ],
+    "provenance": null,
+    "bundle": true,
+    "enginesDsh": null,
+    "dshPeers": {
+      "@deepseek-ai/dsh-attachment": ">=0.2.0-rc.2 <0.3.0",
+      "@deepseek-ai/dsh-brand": ">=0.2.0-rc.2 <0.3.0",
+      "@deepseek-ai/dsh-credentials": ">=0.2.0-rc.2 <0.3.0",
+      "@deepseek-ai/dsh-llm": ">=0.2.0-rc.2 <0.3.0",
+      "@deepseek-ai/dsh-timeout": ">=0.2.0-rc.2 <0.3.0",
+      "@deepseek-ai/dsh-tools": ">=0.2.0-rc.2 <0.3.0",
+      "@deepseek-ai/dsh-web": ">=0.2.0-rc.2 <0.3.0",
+      "@deepseek-ai/dsh-web-fetch-http": ">=0.2.0-rc.2 <0.3.0"
+    },
+    "otherPeers": {},
+    "indexEnginesDsh": ">=0.2.0-rc.2 <0.3.0",
+    "declaresDsh": true,
+    "target": "0.2.2-rc.1",
+    "compatibleInDiscover": true,
+    "compatibleAtInstall": true,
+    "unmet": {},
+    "installScripts": [],
+    "npmHasInstallScript": false,
+    "unpackedBytes": 3108515,
+    "fileCount": 87,
+    "tarballBytes": 854341,
+    "dependencies": {
+      "@vibedev-si/dsh-ecosystem": "0.2.0"
+    },
+    "optionalDependencies": {},
+    "description": "VibeDev 账号与模型：在 DeepSeek Harness 里登录 VibeDev，与 DeepSeek 账号并存，使用 VibeDev 网关的模型（Claude、GPT 等），并生成图片、视频、音乐和播客 · VibeDev account and models for DeepSeek Harness: sign in to VibeDev next to the DeepSeek account and use the VibeDev gateway's models (Claude, GPT and more), plus image, video, music and podcast generation",
+    "keywords": [
+      "dsh",
+      "dsh-plugin",
+      "deepseek-harness",
+      "vibedev",
+      "vibedev-account",
+      "llm",
+      "claude",
+      "gpt",
+      "image-generation",
+      "video-generation",
+      "music-generation",
+      "speech-to-text"
+    ],
+    "repository": "https://github.com/VibeDev-Si/dsh-vibedev",
+    "homepage": "https://github.com/VibeDev-Si/dsh-vibedev#readme",
+    "bugs": "https://github.com/VibeDev-Si/dsh-vibedev/issues",
+    "maintainers": [
+      "crider"
+    ],
+    "hints": {
+      "childProcess": [
+        "lib/index.js",
+        "lib/node-CcLPV4RA.js",
+        "lib/node-vkDR3GtK.js"
+      ],
+      "network": [
+        "client/client.account-center.js",
+        "client/client.js",
+        "lib/anthropic-messages-QcnVMGaA.js",
+        "lib/index.js",
+        "lib/openai-prompt-cache-kzRZVokq.js",
+        "scripts/verify-fetch-joint.mjs"
+      ],
+      "fileWrites": [
+        "lib/anthropic-messages-QcnVMGaA.js",
+        "lib/index.js",
+        "lib/node-CcLPV4RA.js"
+      ],
+      "configWrites": [],
+      "configReads": [],
+      "credentials": [
+        "lib/anthropic-messages-QcnVMGaA.js",
+        "lib/index.js",
+        "lib/models-CAcLevEN.js",
+        "lib/openai-completions-DqTCiqpS.js",
+        "lib/openai-prompt-cache-kzRZVokq.js",
+        "lib/openai-responses-DygWnsye.js",
+        "lib/transform-messages-Csvf2ItW.js",
+        "scripts/verify-fetch-joint.mjs"
+      ],
+      "environment": [
+        "lib/anthropic-messages-QcnVMGaA.js",
+        "lib/index.js",
+        "lib/node-CcLPV4RA.js",
+        "lib/openai-prompt-cache-kzRZVokq.js",
+        "lib/transform-messages-Csvf2ItW.js",
+        "scripts/verify-fetch-joint.mjs"
+      ],
+      "dynamicCode": [
+        "lib/models-CAcLevEN.js"
+      ],
+      "selfUpdate": [
+        "lib/anthropic-messages-QcnVMGaA.js",
+        "lib/openai-prompt-cache-kzRZVokq.js"
+      ],
+      "telemetry": [
+        "client/client.account-center.js",
+        "client/client.js"
+      ]
+    },
+    "hosts": {
+      "127.0.0.1": [
+        "lib/index.js"
+      ],
+      "api.anthropic.com": [
+        "lib/anthropic-messages-QcnVMGaA.js"
+      ],
+      "api.openai.com": [
+        "lib/openai-prompt-cache-kzRZVokq.js"
+      ],
+      "api.vibedev.studio": [
+        "lib/index.js",
+        "scripts/verify-fetch-joint.mjs"
+      ],
+      "auth.openai.com": [
+        "lib/openai-prompt-cache-kzRZVokq.js"
+      ],
+      "docs.anthropic.com": [
+        "lib/anthropic-messages-QcnVMGaA.js"
+      ],
+      "docs.expo.dev": [
+        "lib/anthropic-messages-QcnVMGaA.js",
+        "lib/openai-prompt-cache-kzRZVokq.js"
+      ],
+      "platform.claude.com": [
+        "lib/anthropic-messages-QcnVMGaA.js"
+      ]
+    },
+    "envVars": {
+      "ANTHROPIC_LOG": [
+        "lib/anthropic-messages-QcnVMGaA.js"
+      ],
+      "OPENAI_LOG": [
+        "lib/openai-prompt-cache-kzRZVokq.js"
+      ],
+      "PATH": [
+        "lib/node-CcLPV4RA.js"
+      ],
+      "VIBEDEV_FETCH_TEST_APP_TOKEN": [
+        "scripts/verify-fetch-joint.mjs"
+      ]
+    },
+    "dependencyTree": {
+      "count": 1,
+      "truncated": false,
+      "packages": [
+        {
+          "name": "@vibedev-si/dsh-ecosystem",
+          "version": "0.2.0",
+          "license": "MIT",
+          "installScript": false
+        }
+      ],
+      "withInstallScripts": [],
+      "licensesOutsideList": [],
+      "unresolved": []
+    }
+  },
+  "trial": {
+    "skipped": "disabled with --no-trial"
+  }
+}
