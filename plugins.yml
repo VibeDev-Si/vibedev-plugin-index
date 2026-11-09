@@ -450,3 +450,46 @@ plugins:
             a temporary profile): installed and active after hot install and after restart; tool film_call, film_studio_open
             and film_tools registered; no child processes, no outbound connections outside installation, no credential reads.
             Limits: Windows only; the library panel and style cards have not been exercised on macOS or Linux.
+  - name: "@vibedev-si/dsh-media-viewer"
+    category: media
+    tags: [vibedev]
+    autoPublish: true
+    maintainer: https://github.com/VibeDev-Si/dsh-media-viewer/issues
+    display:
+      title:
+        en: Media Preview & Gallery
+        zh: 媒体预览与画廊
+      description:
+        en: >-
+          A media preview for the right sidebar: images, video and audio opened from the file tree first appear in a
+          floating preview; video, audio and HTML play and render inline, with large files streamed on demand; and a
+          folder gallery can send a multi-selection to the VibeDev Film canvas. It reads only the workspace files you open
+          or browse, and the plugin itself makes no network requests, uploads nothing and writes no files. HTML previews
+          run scripts by default inside an isolated sandboxed frame; the preview has a switch to turn them off.
+        zh: >-
+          右侧栏媒体预览：从文件树点开图片、视频、音频先浮动预览；视频、音频和 HTML 直接在侧栏播放和渲染，大文件按需流式读取；
+          文件夹媒体画廊多选后可以加入影视工作台画布。只读取你打开或浏览的工作区文件，插件本身不联网、不上传、不写文件。
+          HTML 预览默认允许脚本，页面在隔离的沙箱框架里运行，预览里可以关掉脚本。
+    versions:
+      - version: 0.2.2
+        integrity: sha512-vUkmPFuMGDm3IVC/Ezg6xCs4ECy+h5MbETrefqa+39yFl5FQYcoZCJQdmCYmewyR+6aUwcDxFtaOoeG+LnBujw==
+        review:
+          reviewer: VibeDev
+          date: 2026-11-09
+          license: MIT
+          testedOn: [0.2.2-rc.1]
+          capabilities:
+            network: []
+            files: read
+            config: none
+            childProcess: []
+          installScripts: []
+          notes: >-
+            First-party preview published from github.com/VibeDev-Si/dsh-media-viewer; no dependencies, no install scripts,
+            no npm provenance. The host side registers the /mp web route, which lists media of the workspace and streams
+            files with Range requests (createReadStream, stat); the browser side fetches only that same-origin route.
+            dsh.internal in index.js is the base URL for parsing request paths and is never contacted. Peers
+            dsh-better-sidebar and @deepseek-ai/schemastery are optional. Trial on DSH 0.2.2-rc.1 (installBundle into a
+            temporary profile of the vibedev-app release/desktop-0.2.2-rc.1 checkout): installed and active after hot
+            install and after restart; web route /mp registered; no child processes, no outbound connections outside
+            installation, no credential reads, no listener of its own, nothing left running.

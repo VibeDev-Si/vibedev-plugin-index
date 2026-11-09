@@ -1,0 +1,199 @@
+{
+  "schema": 1,
+  "package": "@vibedev-si/dsh-media-viewer",
+  "version": "0.2.2",
+  "date": "2026-11-09",
+  "target": "0.2.2-rc.1",
+  "command": "npm run review -- @vibedev-si/dsh-media-viewer@0.2.2 --dsh C:\\vdp-wt\\vdmerge-rc1",
+  "tool": {
+    "index": "1181fd3",
+    "dsh": "4b08dfcb44 (DSH 0.2.2-rc.1)"
+  },
+  "static": {
+    "name": "@vibedev-si/dsh-media-viewer",
+    "version": "0.2.2",
+    "published": "2026-10-22T08:47:23.564Z",
+    "distTags": {
+      "latest": "0.2.2"
+    },
+    "versionsPublished": 7,
+    "versionsLast30Days": 3,
+    "deprecated": null,
+    "integrity": "sha512-vUkmPFuMGDm3IVC/Ezg6xCs4ECy+h5MbETrefqa+39yFl5FQYcoZCJQdmCYmewyR+6aUwcDxFtaOoeG+LnBujw==",
+    "license": "MIT",
+    "licenseAccepted": true,
+    "licenseFiles": [
+      "LICENSE"
+    ],
+    "provenance": null,
+    "bundle": true,
+    "enginesDsh": null,
+    "dshPeers": {},
+    "otherPeers": {
+      "dsh-better-sidebar": ">=0.24.0"
+    },
+    "indexEnginesDsh": null,
+    "declaresDsh": false,
+    "target": "0.2.2-rc.1",
+    "compatibleInDiscover": true,
+    "compatibleAtInstall": true,
+    "unmet": {},
+    "installScripts": [],
+    "npmHasInstallScript": false,
+    "unpackedBytes": 135870,
+    "fileCount": 7,
+    "tarballBytes": 43824,
+    "dependencies": {},
+    "optionalDependencies": {},
+    "description": "右侧栏媒体预览：从文件树点开图片、视频、音频先浮动预览（可一键在新标签页打开），直接预览视频、音频和 HTML（大文件可拖进度条，HTML 默认允许脚本），文件夹媒体画廊（多选后加入影视工作台画布）；用 DSH 自带的右侧栏，装了 dsh-better-sidebar 时也在其中可用 · A floating quick preview for images, video and audio opened from the file tree, inline video, audio and HTML preview plus a folder media gallery in the host's own right sidebar (and inside dsh-better-sidebar when installed) — range-streamed large files, sandboxed HTML with working relative assets",
+    "keywords": [
+      "dsh",
+      "dsh-plugin",
+      "deepseek-harness",
+      "vibedev",
+      "right-sidebar",
+      "video",
+      "audio",
+      "html",
+      "preview",
+      "quick-look",
+      "lightbox",
+      "gallery",
+      "file-viewer",
+      "dsh-better-sidebar"
+    ],
+    "repository": "https://github.com/VibeDev-Si/dsh-media-viewer",
+    "homepage": "https://github.com/VibeDev-Si/dsh-media-viewer#readme",
+    "bugs": "https://github.com/VibeDev-Si/dsh-media-viewer/issues",
+    "maintainers": [
+      "crider"
+    ],
+    "hints": {
+      "childProcess": [],
+      "network": [
+        "client.js"
+      ],
+      "fileWrites": [],
+      "configWrites": [],
+      "configReads": [],
+      "credentials": [],
+      "environment": [],
+      "dynamicCode": [],
+      "selfUpdate": [],
+      "telemetry": []
+    },
+    "hosts": {
+      "dsh.internal": [
+        "index.js"
+      ]
+    },
+    "envVars": {},
+    "dependencyTree": {
+      "count": 0,
+      "truncated": false,
+      "packages": [],
+      "withInstallScripts": [],
+      "licensesOutsideList": [],
+      "unresolved": []
+    }
+  },
+  "trial": {
+    "dshVersion": "0.2.2-rc.1",
+    "ok": true,
+    "installs": [
+      {
+        "spec": "@vibedev-si/dsh-media-viewer@0.2.2",
+        "application": "applied",
+        "version": "0.2.2"
+      }
+    ],
+    "entries": {
+      "afterInstall": [
+        "media-viewer=ACTIVE"
+      ],
+      "afterRestart": [
+        "media-viewer=ACTIVE"
+      ]
+    },
+    "network": {
+      "supported": true,
+      "samples": 15,
+      "dshWeb": [
+        "127.0.0.1:49790"
+      ],
+      "listeners": [],
+      "loopbackOnly": true,
+      "direct": [],
+      "processes": []
+    },
+    "leftoverProcesses": [],
+    "files": [
+      {
+        "checkpoint": "install",
+        "counts": {
+          "added": 2,
+          "changed": 1,
+          "removed": 0
+        },
+        "added": [
+          "home/profiles/web/.plugin-manager/logs/operation-qkiwrP/pnpm.log (670 B)",
+          "home/profiles/web/pnpm-lock.yaml (713 B)"
+        ],
+        "changed": [
+          "home/profiles/web/package.json (364 B)"
+        ],
+        "removed": []
+      },
+      {
+        "checkpoint": "restart",
+        "counts": {
+          "added": 0,
+          "changed": 1,
+          "removed": 0
+        },
+        "added": [],
+        "changed": [
+          "home/profiles/web/cordis.yml (223 B)"
+        ],
+        "removed": []
+      }
+    ],
+    "patch": [
+      {
+        "checkpoint": "baseline",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      },
+      {
+        "checkpoint": "install",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      },
+      {
+        "checkpoint": "restart",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      }
+    ],
+    "registrations": {
+      "tools": [],
+      "skills": [],
+      "webRoutes": [
+        "/mp"
+      ],
+      "connectionRoutes": []
+    },
+    "processes": [],
+    "programs": [],
+    "installTraffic": [
+      "registry.npmjs.org:443 ×3"
+    ],
+    "connections": [],
+    "fetches": [],
+    "credentialReads": [],
+    "calls": []
+  }
+}
