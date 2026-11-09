@@ -5,7 +5,7 @@
 
 ## 结论 · Verdict
 
-- 结论 · Verdict：**暂缓（建议，待负责人确认）· defer (recommended, awaiting the product owner)**
+- 结论 · Verdict：**暂缓（负责人决定，2026-11-09）· defer (product owner's decision, 2026-11-09)**
   - 代码层面没有问题：第一方（维护者 crider，仓库 VibeDev-Si/dsh-vibedev），MIT，无安装脚本，无 `eval`/`new Function`（动态代码线索只是加载自己的分块）。模型、媒体和搜索请求只发往网关源 `api.vibedev.studio`，全部 `redirect: "error"`，跨源请求直接拒绝（`lib/index.js:6688`）。只在登录期间于 `127.0.0.1` 随机端口监听回调（`lib/index.js:5027`）。子进程只用来在系统浏览器打开登录页（Windows `rundll32 url.dll,FileProtocolHandler`、macOS `open`、Linux `xdg-open`，不经 shell，`lib/index.js:4586`）；另有随包 Anthropic SDK 的技能解压助手（`unzip`/`tar`，`lib/node-CcLPV4RA.js:368`），插件自身代码不走这条路径。没有遥测：「Usage analytics」是账户中心里用户自己的用量面板。
   - 暂缓的原因是收录标准第 9 条（不自我更新、不修改其他插件或 VibeDev 内置插件）：本包依赖 `@vibedev-si/dsh-ecosystem@0.2.0`，并通过 companion 行 `vibedev-ecosystem-companion` 在没有显式生态行时自动启用它；生态会更新自己，也会安装、更新其他插件和 VibeDev 内置插件。建议等账号插件去掉 companion（退役生态的阶段 C）后再收录。
   - 现在收录对 VibeDev 用户也没有可见收益：桌面版内置这个插件，发现页对它只显示「内置」（`installationOf` 对 `availability: installation` 返回 `provided`）。
