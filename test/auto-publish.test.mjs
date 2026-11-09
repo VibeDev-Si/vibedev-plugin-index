@@ -62,6 +62,21 @@ test('firstPartyRefusal takes only releases published and maintained by firstPar
   assert.match(firstPartyRefusal(otherOwner, '1.1.0', firstParty), /owned by someone/u)
 })
 
+test('firstPartyRefusal takes a GitHub trusted-publishing release only from first-party maintainers and organization', () => {
+  // What npm records for an OIDC release (dsh-film@0.9.1): no first-party account published it.
+  const oidc = { name: 'GitHub Actions', email: 'npm-oidc-no-reply@github.com', trustedPublisher: { id: 'github', oidcConfigId: 'c6d0bc6c' } }
+  const release = (user, repository = 'git+https://github.com/VibeDev-Si/dsh-film.git', maintainers = [{ name: 'crider' }]) => ({
+    maintainers, versions: { '0.9.1': { _npmUser: user, repository } },
+  })
+  assert.equal(firstPartyRefusal(release(oidc), '0.9.1', firstParty), undefined)
+  // The display name alone is not npm's trusted-publishing record.
+  assert.match(firstPartyRefusal(release({ name: 'GitHub Actions' }), '0.9.1', firstParty), /neither one of firstParty.npmPublishers nor a GitHub trusted publisher/u)
+  assert.match(firstPartyRefusal(release({ ...oidc, trustedPublisher: { id: 'gitlab' } }), '0.9.1', firstParty), /npm account GitHub Actions/u)
+  // Trusted publishing is configured by maintainers, so it vouches only when every maintainer is first party.
+  assert.match(firstPartyRefusal(release(oidc, undefined, [{ name: 'crider' }, { name: 'mallory' }]), '0.9.1', firstParty), /maintainers include mallory/u)
+  assert.match(firstPartyRefusal(release(oidc, 'https://github.com/someone/dsh-film'), '0.9.1', firstParty), /owned by someone/u)
+})
+
 test('humanReviewedBaseline is the newest version a person reviewed', () => {
   const versions = [
     { version: '0.8.0', review: { reviewer: 'VibeDev' } },

@@ -2,10 +2,12 @@
  * Rules for taking a first-party release into the curated list without a human review (scripts/auto-publish.mjs).
  *
  * A plugin opts in with `autoPublish: true`; the list declares who first party is under `firstParty`. A release is
- * taken only when the npm account that published it and every current npm maintainer are VibeDev's own accounts,
- * and the package's source repository is owned by VibeDev's GitHub organization. A package over the size limit keeps
- * the size exception of the last version a human reviewed, as long as it has not grown beyond SIZE_GROWTH_LIMIT of
- * that version.
+ * taken only when every current npm maintainer is one of VibeDev's own accounts, the release was published either by
+ * one of those accounts or through GitHub trusted publishing (OIDC), and the package's source repository is owned by
+ * VibeDev's GitHub organization. Trusted publishing counts because only a package's maintainers can configure it: a
+ * release npm records under a GitHub trusted publisher came from a workflow first party authorized. A package over
+ * the size limit keeps the size exception of the last version a human reviewed, as long as it has not grown beyond
+ * SIZE_GROWTH_LIMIT of that version.
  */
 import semver from 'semver'
 import { repositoryUrl } from './display.mjs'
@@ -30,6 +32,16 @@ export function githubOwner(repository) {
 }
 
 /**
+ * Whether npm recorded a release as published through trusted publishing (OIDC) from GitHub Actions. npm writes
+ * `_npmUser.trustedPublisher` itself for such a release; the display name ("GitHub Actions") alone proves nothing.
+ * @param {unknown} user - `_npmUser` of the release.
+ * @returns {boolean} whether npm names a GitHub trusted publisher.
+ */
+export function githubTrustedPublishing(user) {
+  return user?.trustedPublisher?.id === 'github'
+}
+
+/**
  * Why a release may not be taken automatically as a first-party release.
  * @param {object} packument - the full registry document of the package.
  * @param {string} version - the release.
@@ -40,8 +52,11 @@ export function firstPartyRefusal(packument, version, firstParty) {
   const allowed = new Set(firstParty.npmPublishers)
   const manifest = packument?.versions?.[version]
   if (manifest === undefined) return `npm has no manifest for ${version}`
-  const publisher = manifest._npmUser?.name
-  if (!allowed.has(publisher)) return `published by ${publisher === undefined ? 'an unknown npm account' : `npm account ${publisher}`}, which is not one of firstParty.npmPublishers`
+  const user = manifest._npmUser
+  const publisher = user?.name
+  if (!allowed.has(publisher) && !githubTrustedPublishing(user)) {
+    return `published by ${publisher === undefined ? 'an unknown npm account' : `npm account ${publisher}`}, which is neither one of firstParty.npmPublishers nor a GitHub trusted publisher`
+  }
   const maintainers = (Array.isArray(packument.maintainers) ? packument.maintainers : []).map(person => person?.name)
   if (maintainers.length === 0) return 'npm lists no maintainers for the package'
   const outsiders = maintainers.filter(name => !allowed.has(name))

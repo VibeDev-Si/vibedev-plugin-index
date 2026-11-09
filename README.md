@@ -94,8 +94,10 @@ VibeDev 使用上游 DeepSeek Harness 自带的插件市场：Host 端服务 `@d
 
 ### 第一方插件的自动跟随
 
-VibeDev 自己的插件可以在 `plugins.yml` 里标 `autoPublish: true`（目前是 `@vibedev-si/dsh-remote` 和 `dsh-film`）。清单顶部的
-`firstParty` 写明谁是第一方：VibeDev 发布用的 npm 账号（`npmPublishers`）和源码仓库所属的 GitHub 组织（`repositoryOwner`）。
+VibeDev 自己的插件可以在 `plugins.yml` 里标 `autoPublish: true`（目前是 `@vibedev-si/dsh-remote`、`@vibedev-si/dsh-media-viewer`
+和 `dsh-film`）。清单顶部的 `firstParty` 写明谁是第一方：VibeDev 发布用的 npm 账号（`npmPublishers`）
+和源码仓库所属的 GitHub 组织（`repositoryOwner`）。新版本要由这些账号发布，或经 GitHub 可信发布（OIDC）发布——npm 会在版本上记下
+`_npmUser.trustedPublisher`，而可信发布只有包维护者能配置；同时全部 npm 维护者都必须是这些账号，仓库必须属于该组织。
 
 Auto-publish 有两个触发来源：下载服务器每 10 分钟对比 npm 与已发布的索引，发现新稳定版就立即触发一次（见「镜像到 VibeDev 下载服务器」），
 新版本通常半小时内出现在发现页；GitHub 上的每小时定时运行作为兜底（GitHub 的定时触发常常晚几个小时，有时直接跳过）。
@@ -335,9 +337,12 @@ A removal needs only steps 3–6: delete the version or the whole plugin from `p
 
 ### First-party auto-follow
 
-VibeDev's own plugins may set `autoPublish: true` in `plugins.yml` (currently `@vibedev-si/dsh-remote` and `dsh-film`).
-The list's `firstParty` block says who first party is: the npm accounts VibeDev publishes from (`npmPublishers`) and the
-GitHub owner of its source repositories (`repositoryOwner`).
+VibeDev's own plugins may set `autoPublish: true` in `plugins.yml` (currently `@vibedev-si/dsh-remote`,
+`@vibedev-si/dsh-media-viewer` and `dsh-film`). The list's `firstParty` block says who first
+party is: the npm accounts VibeDev publishes from (`npmPublishers`) and the GitHub owner of its source repositories
+(`repositoryOwner`). A release must be published by one of those accounts or through GitHub trusted publishing (OIDC;
+npm records `_npmUser.trustedPublisher` on the version, and only a package's maintainers can configure trusted
+publishing), every npm maintainer must be one of those accounts, and the repository must be owned by that organization.
 
 Auto-publish has two triggers: every 10 minutes the download server compares npm with the published index and dispatches
 it as soon as a newer stable release appears (see Mirroring to the VibeDev download server), so a new version usually
