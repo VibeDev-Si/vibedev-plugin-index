@@ -27,3 +27,17 @@
 
 网络主机与子进程与上一版本一致 · Network hosts and child processes match the previous reviewed version：
 127.0.0.1, lan.invalid, remote.vibedev.studio, vibedev.studio
+
+## 复测 · Retest：DSH 0.2.2-rc.1（2026-11-09）
+
+- 方式 · Method：`test/dsh-composition/install-trial.mjs`，DSH 为 vibedev-app `release/desktop-0.2.2-rc.1` 分支的已构建检出
+  （`dshVersion` 0.2.2-rc.1），临时 DSH_HOME 与用户目录，除 npm 仓库外的外连一律拒绝并记录。
+  Install trial on a built checkout of vibedev-app `release/desktop-0.2.2-rc.1` (`dshVersion` 0.2.2-rc.1), in temporary
+  DSH_HOME and user directories, with every outbound connection but the npm registry refused and logged.
+- 结果 · Result：`installBundle("@vibedev-si/dsh-remote@0.1.15")` applied 并启用；两次启动 `mobile-gateway` 行均为 ACTIVE；
+  外连只有安装时的 registry.npmjs.org（0 次被拒）；无子进程、无凭据读取、无残留进程；注册 Web 路由
+  `/vibedev/remote/callback` 与 `/mgw`。远程访问默认关闭，所以没有中继连接。
+  Applied and enabled; row `mobile-gateway` active on both starts; the only outbound connections were registry.npmjs.org
+  during installation (none refused); no child process, no credential read, no process left running; web routes
+  `/vibedev/remote/callback` and `/mgw`. Remote access is off by default, so no relay connection was made.
+- `testedOn` 增加 0.2.2-rc.1 · adds 0.2.2-rc.1.
