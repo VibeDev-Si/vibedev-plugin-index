@@ -31,7 +31,7 @@ VibeDev 使用上游 DeepSeek Harness 自带的插件市场：Host 端服务 `@d
 1. **开源许可**：`package.json` 的 `license` 是 OSI 批准的 SPDX 许可证（见 `scripts/lib/manifest.mjs` 的列表），且与审核记录一致；包内应附带许可证文本（缺失会警告，需在记录中说明）。
 2. **发布在 npm**：来自 registry.npmjs.org，并声明 `dsh.bundle`（可安装的 DSH bundle）。不收录 Git、tarball 或私有源。
 3. **精确版本**：每个版本单独审核，记录版本号和 npm 的 `dist.integrity`（sha512）。不接受范围（`^1.0.0`）或标签（`latest`）。
-4. **兼容当前 VibeDev 的 DSH 版本**（`plugins.yml` 的 `target.dsh`，现在是 `0.2.1-rc.2`）：发现页的兼容判断和安装时的检查都必须通过；完全没有 DSH 声明（无 `engines.dsh`、无 dsh peer）的包，必须由审核人在目标版本上实际运行过（`testedOn`）。
+4. **兼容当前 VibeDev 的 DSH 版本**（`plugins.yml` 的 `target.dsh`，现在是 `0.2.2-rc.2`）：发现页的兼容判断和安装时的检查都必须通过；完全没有 DSH 声明（无 `engines.dsh`、无 dsh peer）的包，必须由审核人在目标版本上实际运行过（`testedOn`）。
 5. **行为已声明**：网络（访问哪些主机；`*` 表示用户或 Agent 选择的网站，例如它驱动的浏览器）、文件（none/read/write）、DSH 配置（none/read/write）、子进程（启动哪些程序）都写进审核记录；构建时据此给条目加上「联网」「运行外部程序」「写入文件」「修改 DSH 配置」「安装脚本」标签。遥测必须写明，默认开启的第三方遥测要产品负责人批准。
 6. **没有未经审核的安装脚本**：包自身的 `preinstall`/`install`/`postinstall` 和 `binding.gyp` 必须逐项记录在 `installScripts`，否则校验失败；依赖树里的安装脚本用 `npm run inspect -- <name>@<version> --deps` 检查。
 7. **体量限制**：解包后不超过 20 MiB（`policy.maxUnpackedBytes`），超出时必须写 `sizeException` 说明理由；依赖越少越好。
@@ -283,7 +283,7 @@ A version must meet all of these; `npm run validate` checks the machine-checkabl
 1. **Open-source license**: `package.json` `license` is an OSI-approved SPDX license (list in `scripts/lib/manifest.mjs`) and matches the review record; the package should ship its license text (a missing file is a warning to explain in the record).
 2. **Published on npm** (registry.npmjs.org) and declares `dsh.bundle`. No Git, tarball, or private sources.
 3. **Exact version**: each version is reviewed on its own and recorded with its npm `dist.integrity` (sha512). No ranges (`^1.0.0`) or tags (`latest`).
-4. **Compatible with the DSH version VibeDev ships** (`target.dsh`, now `0.2.1-rc.2`) in both the Discover check and the install-time check; a package with no DSH declaration at all must have been run on the target by the reviewer (`testedOn`).
+4. **Compatible with the DSH version VibeDev ships** (`target.dsh`, now `0.2.2-rc.2`) in both the Discover check and the install-time check; a package with no DSH declaration at all must have been run on the target by the reviewer (`testedOn`).
 5. **Declared behavior**: network hosts (`*` for sites the user or the agent chooses, such as a browser it drives), file access (none/read/write), DSH configuration access (none/read/write), and programs started are recorded; the build turns them into the labels Uses the network, Runs programs, Writes files, Changes DSH settings, and Install scripts. Telemetry must be declared; third-party telemetry that is on by default needs the product owner's approval.
 6. **No unreviewed install scripts**: `preinstall`/`install`/`postinstall` and `binding.gyp` must each be listed in `installScripts`, or validation fails; check the dependency tree with `npm run inspect -- <name>@<version> --deps`.
 7. **Size**: at most 20 MiB unpacked (`policy.maxUnpackedBytes`) unless `sizeException` gives the reason; few dependencies.
