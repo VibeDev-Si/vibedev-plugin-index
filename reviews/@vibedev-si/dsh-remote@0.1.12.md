@@ -85,3 +85,20 @@ closes both channels immediately.
   during installation (none refused); no child process, no credential read, no process left running; web routes
   `/vibedev/remote/callback` and `/mgw`. Remote access is off by default, so no relay connection was made.
 - `testedOn` 增加 0.2.2-rc.1 · adds 0.2.2-rc.1.
+
+## 复测 · Retest：DSH 0.2.2-rc.2（2026-11-13）
+
+- 方式 · Method：`test/dsh-composition/install-trial.mjs`，DSH 为 vibedev-app `release/desktop-0.2.2-rc.2` 分支的已构建检出
+  （`dshVersion` 0.2.2-rc.2），临时 DSH_HOME 与用户目录，除 npm 仓库外的外连一律拒绝并记录。
+  Install trial on a built checkout of vibedev-app `release/desktop-0.2.2-rc.2` (`dshVersion` 0.2.2-rc.2), in temporary
+  DSH_HOME and user directories, with every outbound connection but the npm registry refused and logged.
+- 结果 · Result：`installBundle("@vibedev-si/dsh-remote@0.1.12")` applied 并启用；两次启动 `mobile-gateway` 行均为 ACTIVE；
+  外连只有安装时的 registry.npmjs.org（0 次被拒）；无子进程、无凭据读取、无残留进程；注册 Web 路由
+  `/vibedev/remote/callback` 与 `/mgw`。远程访问默认关闭，所以没有中继连接。第二次启动时插件记了一次会话控制流重试
+  （`session control stream failed retrying`），随后照常转发会话归档状态和队列基线，到停止前没有再出错。
+  Applied and enabled; row `mobile-gateway` active on both starts; the only outbound connections were registry.npmjs.org
+  during installation (none refused); no child process, no credential read, no process left running; web routes
+  `/vibedev/remote/callback` and `/mgw`. Remote access is off by default, so no relay connection was made. On the second
+  start the plugin logged one retry of its session control stream (`session control stream failed retrying`), then
+  forwarded the session archive state and queue baseline as usual, with no further failure before the stop.
+- `testedOn` 增加 0.2.2-rc.2 · adds 0.2.2-rc.2.

@@ -27,7 +27,7 @@ index:
 target:
   # The DSH runtime version VibeDev ships (@deepseek-ai/dsh-app-boot). Every listed version must be compatible with it.
   # 当前 VibeDev 内置的 DSH 版本。每个收录版本都必须与之兼容。
-  dsh: 0.2.2-rc.1
+  dsh: 0.2.2-rc.2
 
 policy:
   # Largest unpacked package accepted without review.sizeException (20 MiB).
@@ -281,7 +281,7 @@ plugins:
           reviewer: VibeDev
           date: 2026-10-29
           license: MIT
-          testedOn: [0.2.1-rc.2, 0.2.2-rc.1]
+          testedOn: [0.2.1-rc.2, 0.2.2-rc.1, 0.2.2-rc.2]
           capabilities:
             network: [vibedev.studio, remote.vibedev.studio:24443, github.com, 127.0.0.1]
             files: write
@@ -309,14 +309,16 @@ plugins:
             there across restarts with a real account, phone pairing, history, approvals and file reads. Retested
             2026-11-09 on DSH 0.2.2-rc.1 (install trial of the vibedev-app release/desktop-0.2.2-rc.1 checkout):
             installBundle applied and enabled, row mobile-gateway active on both starts, no outbound connection beyond
-            the npm registry, no child process, no credential read, no process left running.
+            the npm registry, no child process, no credential read, no process left running. Retested 2026-11-13 on DSH
+            0.2.2-rc.2 (install trial of the vibedev-app release/desktop-0.2.2-rc.2 checkout) with the same result; on
+            the second start the plugin logged one retry of its session control stream and went on.
       - version: 0.1.15
         integrity: sha512-GEjwcVAwJV9Bc/eCqDvwVtYZrPkPwGzrV4BXjzWAy7bPObM8JKynZ+xXUcdahzwag9K5ALDXlAoHNA4zZwP8jg==
         review:
           reviewer: VibeDev (automated)
           date: 2026-11-02
           license: MIT
-          testedOn: [0.2.1-rc.2, 0.2.2-rc.1]
+          testedOn: [0.2.1-rc.2, 0.2.2-rc.1, 0.2.2-rc.2]
           capabilities:
             network: [vibedev.studio, remote.vibedev.studio:24443, github.com, 127.0.0.1]
             files: write
@@ -328,7 +330,9 @@ plugins:
             notes are unchanged from 0.1.12. Retested 2026-11-09 on DSH 0.2.2-rc.1 (install trial of the vibedev-app
             release/desktop-0.2.2-rc.1 checkout): installBundle applied and enabled, row mobile-gateway active on both
             starts, no outbound connection beyond the npm registry, no child process, no credential read, no process left
-            running.
+            running. Retested 2026-11-13 on DSH 0.2.2-rc.2 (install trial of the vibedev-app release/desktop-0.2.2-rc.2
+            checkout) with the same result; on the second start the plugin logged one retry of its session control
+            stream and went on.
   - name: dsh-film
     category: media
     tags: [vibedev]
@@ -492,7 +496,7 @@ plugins:
           reviewer: VibeDev
           date: 2026-11-09
           license: MIT
-          testedOn: [0.2.2-rc.1]
+          testedOn: [0.2.2-rc.1, 0.2.2-rc.2]
           capabilities:
             network: []
             files: read
@@ -507,4 +511,5 @@ plugins:
             dsh-better-sidebar and @deepseek-ai/schemastery are optional. Trial on DSH 0.2.2-rc.1 (installBundle into a
             temporary profile of the vibedev-app release/desktop-0.2.2-rc.1 checkout): installed and active after hot
             install and after restart; web route /mp registered; no child processes, no outbound connections outside
-            installation, no credential reads, no listener of its own, nothing left running.
+            installation, no credential reads, no listener of its own, nothing left running. Retested 2026-11-13 on DSH
+            0.2.2-rc.2 (install trial of the vibedev-app release/desktop-0.2.2-rc.2 checkout) with the same result.

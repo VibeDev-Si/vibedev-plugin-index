@@ -125,3 +125,16 @@ npm run review -- @vibedev-si/dsh-media-viewer@0.2.2 --dsh C:\vdp-wt\vdmerge-rc1
 npm run inspect -- @vibedev-si/dsh-media-viewer@0.2.2 --deps --json
 node test/dsh-composition/install-trial.mjs --dsh C:\vdp-wt\vdmerge-rc1 --pnpm <pnpm.mjs> --settle 12000 --out trial.json @vibedev-si/dsh-media-viewer@0.2.2
 ```
+
+## 复测 · Retest：DSH 0.2.2-rc.2（2026-11-13）
+
+- 方式 · Method：`test/dsh-composition/install-trial.mjs`，DSH 为 vibedev-app `release/desktop-0.2.2-rc.2` 分支的已构建检出
+  （`dshVersion` 0.2.2-rc.2），临时 DSH_HOME 与用户目录，除 npm 仓库外的外连一律拒绝并记录。
+  Install trial on a built checkout of vibedev-app `release/desktop-0.2.2-rc.2` (`dshVersion` 0.2.2-rc.2), in temporary
+  DSH_HOME and user directories, with every outbound connection but the npm registry refused and logged.
+- 结果 · Result：`installBundle("@vibedev-si/dsh-media-viewer@0.2.2")` applied 并启用；两次启动 `media-viewer` 行均为 ACTIVE；
+  外连只有安装时的 registry.npmjs.org（0 次被拒）；无子进程、无凭据读取、没有自己的监听端口、无残留进程；注册 Web 路由 `/mp`。
+  Applied and enabled; row `media-viewer` active on both starts; the only outbound connections were registry.npmjs.org
+  during installation (none refused); no child process, no credential read, no listener of its own, no process left
+  running; web route `/mp`.
+- `testedOn` 增加 0.2.2-rc.2 · adds 0.2.2-rc.2.
