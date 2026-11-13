@@ -613,3 +613,17 @@ plugins:
             0.1 s and enabling started it again; remove_bundle stopped it and left no process and no package directory;
             the island's settings and todos were byte-identical before and after. The trial replaced an already loaded
             copy of the plugin, which DSH runs until the next restart; a fresh install loads at once.
+      - version: 0.2.0
+        integrity: sha512-RiLLI5wVq+sVtpR+j+SV2fnedRW7X2fh98gPXXcqcbPUJEPelE5cD80K/AZfRmSs2H3ut0Shmqy1O9V/g40ijQ==
+        review:
+          reviewer: VibeDev (automated)
+          date: 2026-11-13
+          license: MIT
+          testedOn: [0.2.2-rc.2]
+          capabilities:
+            network: [imap.qq.com, api.deepseek.com]
+            files: write
+            config: none
+            childProcess: [vibedev-island, powershell, explorer]
+          installScripts: []
+          notes: Automated first-party release 0.2.0 from @vibedev-si/dsh-island; capabilities, install scripts and risk notes are unchanged from 0.1.0.
