@@ -484,6 +484,21 @@ plugins:
           installScripts: []
           sizeException: "自动收录：解包 45.6 MiB，未超过 0.9.0 人工审核时 45.5 MiB 的 125%，沿用其体量说明。Recorded automatically: unpacks to 45.6 MiB, within 125% of the 45.5 MiB reviewed by hand for 0.9.0, whose size reasoning carries over. 解包 47,694,848 B（45.5 MiB，46,577 KiB），超过 20 MiB 上限：包内随附三个平台的 Bun 运行时（用来启动本地 Film 服务）、 FFmpeg 与文档解析 Worker，以及工作台 Web 产物和内置节点/工具/技能。这些是本地处理能力，不是可裁剪的依赖； Bun 可选依赖按平台只安装一个。0.9.0 是 0.8.0 人工审核时 44.8 MiB 的 101.5%，未超过 125%。 Unpacks to 45.5 MiB for the three platforms' Bun runtimes that run the local Film server, the FFmpeg and document-parsing workers, the workbench Web build and the built-in nodes/tools/skills - the local processing capability rather than trimmable dependencies, with one platform's Bun package installed per user. 101.5% of the 44.8 MiB reviewed by hand for 0.8.0, within 125%."
           notes: Automated first-party release 0.10.0 from dsh-film; capabilities, install scripts and risk notes are unchanged from 0.9.1.
+      - version: 0.10.1
+        integrity: sha512-ly9U/O2+GhEzyEIOnmNyUiYg39P/PgwMruDixepuLsRaI5LcIPduWaqHniMZTv2nF+BB6B3LZtvtwUHDrky7Aw==
+        review:
+          reviewer: VibeDev (automated)
+          date: 2026-11-13
+          license: MIT
+          testedOn: [0.2.1-rc.3]
+          capabilities:
+            network: [127.0.0.1]
+            files: write
+            config: none
+            childProcess: [bun, ffmpeg, ffprobe]
+          installScripts: []
+          sizeException: "自动收录：解包 45.4 MiB，未超过 0.9.0 人工审核时 45.5 MiB 的 125%，沿用其体量说明。Recorded automatically: unpacks to 45.4 MiB, within 125% of the 45.5 MiB reviewed by hand for 0.9.0, whose size reasoning carries over. 解包 47,694,848 B（45.5 MiB，46,577 KiB），超过 20 MiB 上限：包内随附三个平台的 Bun 运行时（用来启动本地 Film 服务）、 FFmpeg 与文档解析 Worker，以及工作台 Web 产物和内置节点/工具/技能。这些是本地处理能力，不是可裁剪的依赖； Bun 可选依赖按平台只安装一个。0.9.0 是 0.8.0 人工审核时 44.8 MiB 的 101.5%，未超过 125%。 Unpacks to 45.5 MiB for the three platforms' Bun runtimes that run the local Film server, the FFmpeg and document-parsing workers, the workbench Web build and the built-in nodes/tools/skills - the local processing capability rather than trimmable dependencies, with one platform's Bun package installed per user. 101.5% of the 44.8 MiB reviewed by hand for 0.8.0, within 125%."
+          notes: Automated first-party release 0.10.1 from dsh-film; capabilities, install scripts and risk notes are unchanged from 0.10.0.
   - name: "@vibedev-si/dsh-media-viewer"
     category: media
     tags: [vibedev]
