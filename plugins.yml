@@ -528,3 +528,69 @@ plugins:
             install and after restart; web route /mp registered; no child processes, no outbound connections outside
             installation, no credential reads, no listener of its own, nothing left running. Retested 2026-11-13 on DSH
             0.2.2-rc.2 (install trial of the vibedev-app release/desktop-0.2.2-rc.2 checkout) with the same result.
+  - name: "@vibedev-si/dsh-island"
+    category: session
+    tags: [vibedev]
+    autoPublish: true
+    maintainer: https://github.com/VibeDev-Si/dsh-island/issues
+    display:
+      title:
+        en: VibeDev Island
+        zh: VibeDev 岛屿
+      description:
+        en: >-
+          An always-on status bar at the top of the screen (Windows only): VibeDev session progress and the approvals and
+          questions waiting for you, which you can answer right on the island while you are away from VibeDev (deletions,
+          force pushes and the like stay in VibeDev). It also keeps todos, clipboard history with secrets masked, music
+          controls, screenshots with annotation, translation of selected text through VibeDev's own translator, and
+          WeChat and QQ message reminders. The island is a separate program shipped in the package; the plugin starts it
+          and quits it when disabled. Clipboard history and screenshots stay on this computer, and the screenshot
+          shortcut uses a global keyboard hook. WeChat's "show contacts and message text" is off by default; turning it
+          on changes one setting inside the running WeChat, so read the note in the settings first.
+        zh: >-
+          屏幕顶部常驻的状态条（仅支持 Windows）：VibeDev 会话的进度，以及等你处理的审批和提问；你不在 VibeDev 里时可以直接在岛上答复，
+          删除、强推这类看起来危险的仍只能回 VibeDev。还有待办、剪贴板历史（自动给密钥打码）、音乐控制、截图与标注、选中文字翻译
+          （走 VibeDev 自己的翻译服务），以及微信、QQ 的新消息提醒。岛屿是随包附带的独立程序，由插件启动，停用插件即退出。
+          剪贴板历史和截图只存在本机；截图快捷键用了全局键盘钩子。微信「显示联系人和消息内容」默认关闭，打开后会改动正在运行的微信里的一个设置，
+          打开前先读设置里的说明。
+    versions:
+      - version: 0.1.0
+        integrity: sha512-JCE+S7ayKB5MFXj7yxIKAYgbBuR//Ck68rl2wnGblnjcTzPdXJLdtU1QehiBsrEfFM2Hx8vEAfF/f6BuSYK3AQ==
+        review:
+          reviewer: VibeDev
+          date: 2026-11-13
+          license: MIT
+          testedOn: [0.2.2-rc.2]
+          capabilities:
+            network: [imap.qq.com, api.deepseek.com]
+            files: write
+            config: none
+            childProcess: [vibedev-island, powershell, explorer]
+          installScripts: []
+          notes: >-
+            First-party status bar published by crider from the private repository github.com/VibeDev-Si/dsh-island
+            (commit b53667f); no dependencies, no install scripts, no npm provenance. The package ships the island
+            program bin/win32-x64/vibedev-island.exe (Tauri 2 + WebView2, x64, 17.8 MiB), built from the same commit;
+            THIRD-PARTY-NOTICES.txt reproduces the licenses of fly-island (MIT, which the program is adapted from), the
+            Fusion Pixel font (OFL-1.1) and the 326 Rust and 7 web components compiled into it. The host half starts the
+            program through DSH's subprocess service (argv --rpc stdio), speaks JSON-RPC over its stdio, restarts it after
+            a crash and stops it when disabled; explorer.exe is started only to show the log or an exported diagnostics
+            file. The program never activates its own window, registers the global shortcuts set in its settings, and
+            installs a low-level keyboard hook only to catch the screenshot shortcut. Files: settings and remembered theme
+            under %APPDATA%\VibeDev, the log in %TEMP%, todos, clipboard history (secrets masked) and screenshots under
+            %APPDATA%\com.vibedev.island or the folder the user picks. Network: IMAP to imap.qq.com only after the user
+            adds a QQ mailbox (authorization code in Windows Credential Manager); translation goes through DSH's
+            translator service, with a fallback to api.deepseek.com only when the user stores a DeepSeek key of their own
+            (also in Credential Manager). Messages: QQ reminders run Windows PowerShell with a built-in script that
+            repairs QQ's notification registration; WeChat reminders follow taskbar flashes, and the opt-in "show
+            contacts and message text" reads WeChat's chat list through UI Automation after flipping one accessibility
+            flag byte in the running WeChat process, set back when switched off; clicking a reminder brings WeChat or QQ
+            forward. Reading text selected in other applications is opt-in. Approvals: while the user is away from
+            VibeDev a pending approval can be answered on the island by an explicit click; requests that look dangerous
+            (deletion, force push, system changes, privilege, installs, killing processes) are answered only in VibeDev,
+            and unanswered ones go back to VibeDev after 60 seconds. Sending clipboard items or screenshots to a session
+            happens only on the user's action, through the VibeDev page. It provides an island service through which
+            other plugins can show tasks and notices; the user can switch that off per plugin. No telemetry, no eval, no
+            self-update. Ran on DSH 0.2.2-rc.2 in the VibeDev desktop profile from the linked source checkout at the
+            published commit (the same plugin files; the bundled program is byte-identical to the one that ran); a
+            hands-on install from npm is still to be done before this is merged.

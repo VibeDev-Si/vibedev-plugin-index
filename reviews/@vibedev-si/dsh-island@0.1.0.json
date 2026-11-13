@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "package": "@vibedev-si/dsh-island",
+  "version": "0.1.0",
+  "date": "2026-11-13",
+  "target": "0.2.2-rc.2",
+  "command": "npm run review -- @vibedev-si/dsh-island@0.1.0",
+  "tool": {
+    "index": "70121ea"
+  },
+  "static": {
+    "name": "@vibedev-si/dsh-island",
+    "version": "0.1.0",
+    "published": "2026-11-13T12:46:45.669Z",
+    "distTags": {
+      "latest": "0.1.0"
+    },
+    "versionsPublished": 2,
+    "versionsLast30Days": 2,
+    "deprecated": null,
+    "integrity": "sha512-JCE+S7ayKB5MFXj7yxIKAYgbBuR//Ck68rl2wnGblnjcTzPdXJLdtU1QehiBsrEfFM2Hx8vEAfF/f6BuSYK3AQ==",
+    "license": "MIT",
+    "licenseAccepted": true,
+    "licenseFiles": [
+      "LICENSE"
+    ],
+    "provenance": null,
+    "bundle": true,
+    "enginesDsh": ">=0.2.2-rc.2 <0.3.0-0",
+    "dshPeers": {},
+    "otherPeers": {},
+    "indexEnginesDsh": ">=0.2.2-rc.2 <0.3.0-0",
+    "declaresDsh": true,
+    "target": "0.2.2-rc.2",
+    "compatibleInDiscover": true,
+    "compatibleAtInstall": true,
+    "unmet": {},
+    "installScripts": [],
+    "npmHasInstallScript": false,
+    "unpackedBytes": 19383379,
+    "fileCount": 29,
+    "tarballBytes": 7329200,
+    "dependencies": {},
+    "optionalDependencies": {},
+    "description": "VibeDev 岛屿：在屏幕顶部常驻显示 VibeDev 会话进度、等你处理的审批和提问、插件后台任务，以及待办、剪贴板、音乐与截图。岛屿是独立的原生程序，由本插件启动和管理；仅支持 Windows · VibeDev Island: an always-on status surface for VibeDev, started and managed by this plugin (Windows only)",
+    "keywords": [
+      "dsh",
+      "dsh-plugin",
+      "deepseek-harness",
+      "vibedev",
+      "island"
+    ],
+    "repository": "https://github.com/VibeDev-Si/dsh-island",
+    "homepage": "https://github.com/VibeDev-Si/dsh-island#readme",
+    "bugs": null,
+    "maintainers": [
+      "crider"
+    ],
+    "hints": {
+      "childProcess": [],
+      "network": [
+        "client.js"
+      ],
+      "fileWrites": [
+        "index.js",
+        "log.js",
+        "settings.js"
+      ],
+      "configWrites": [],
+      "configReads": [],
+      "credentials": [],
+      "environment": [
+        "index.js",
+        "settings.js"
+      ],
+      "dynamicCode": [],
+      "selfUpdate": [],
+      "telemetry": []
+    },
+    "hosts": {},
+    "envVars": {
+      "APPDATA": [
+        "settings.js"
+      ],
+      "LOCALAPPDATA": [
+        "index.js"
+      ],
+      "USERPROFILE": [
+        "index.js",
+        "settings.js"
+      ]
+    },
+    "dependencyTree": {
+      "count": 0,
+      "truncated": false,
+      "packages": [],
+      "withInstallScripts": [],
+      "licensesOutsideList": [],
+      "unresolved": []
+    }
+  },
+  "trial": {
+    "skipped": "no DSH checkout (--dsh or DSH_CHECKOUT)"
+  }
+}
