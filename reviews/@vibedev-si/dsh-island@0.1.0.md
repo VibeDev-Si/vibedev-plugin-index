@@ -5,7 +5,7 @@
 
 ## 结论 · Verdict
 
-- 结论 · Verdict：**收 · include**（合并前先在 VibeDev 里从 npm 安装试用 · merge after a hands-on install from npm in VibeDev）—— 第一方插件（维护者与发布者 crider，仓库 VibeDev-Si/dsh-island，私有），无依赖、无安装脚本。包里带一个编译好的 Windows 原生程序 `bin/win32-x64/vibedev-island.exe`（Tauri 2 + WebView2，17.8 MiB），由宿主一半经 DSH 的 subprocess 服务以 `--rpc stdio` 启动、停用插件时退出；第三方组件的许可全文在 `THIRD-PARTY-NOTICES.txt`。行为逐项见 `plugins.yml` 的 notes：全局键盘钩子只用来接截图快捷键；剪贴板历史只存本机并给密钥打码；微信「显示联系人和消息内容」默认关闭，打开后会改正在运行的微信进程里的一个无障碍开关字节；QQ 通知会用 Windows PowerShell 运行内置脚本修复 QQ 的通知注册；QQ 邮箱走 imap.qq.com，授权码在 Windows 凭据管理器；翻译走 DSH 的翻译服务，没有时可以用用户自己的 DeepSeek 密钥直连 api.deepseek.com。审批只在用户点了之后才在岛上答复，看起来危险的只能回 VibeDev。没有遥测、动态代码和自我更新。之后的版本按 `autoPublish` 自动收录。
+- 结论 · Verdict：**收 · include**（已在 VibeDev 里从 npm 安装试用 · tried hands-on from npm in VibeDev）—— 第一方插件（维护者与发布者 crider，仓库 VibeDev-Si/dsh-island，私有），无依赖、无安装脚本。包里带一个编译好的 Windows 原生程序 `bin/win32-x64/vibedev-island.exe`（Tauri 2 + WebView2，17.8 MiB），由宿主一半经 DSH 的 subprocess 服务以 `--rpc stdio` 启动、停用插件时退出；第三方组件的许可全文在 `THIRD-PARTY-NOTICES.txt`。行为逐项见 `plugins.yml` 的 notes：全局键盘钩子只用来接截图快捷键；剪贴板历史只存本机并给密钥打码；微信「显示联系人和消息内容」默认关闭，打开后会改正在运行的微信进程里的一个无障碍开关字节；QQ 通知会用 Windows PowerShell 运行内置脚本修复 QQ 的通知注册；QQ 邮箱走 imap.qq.com，授权码在 Windows 凭据管理器；翻译走 DSH 的翻译服务，没有时可以用用户自己的 DeepSeek 密钥直连 api.deepseek.com。审批只在用户点了之后才在岛上答复，看起来危险的只能回 VibeDev。没有遥测、动态代码和自我更新。之后的版本按 `autoPublish` 自动收录。
   First-party (maintainer and publisher crider, private repository VibeDev-Si/dsh-island); no dependencies or install scripts. The package ships a compiled Windows program, `bin/win32-x64/vibedev-island.exe` (Tauri 2 + WebView2, 17.8 MiB), which the host half starts through DSH's subprocess service with `--rpc stdio` and stops when the plugin is disabled; third-party licenses are reproduced in `THIRD-PARTY-NOTICES.txt`. Behaviour is itemised in the `plugins.yml` notes: a global keyboard hook only for the screenshot shortcut; clipboard history kept locally with secrets masked; WeChat's "show contacts and message text" is off by default and, when on, flips one accessibility flag byte in the running WeChat process; QQ notifications run Windows PowerShell with a built-in script that repairs QQ's notification registration; QQ mail over imap.qq.com with the authorization code in Windows Credential Manager; translation through DSH's translator service, falling back to api.deepseek.com with the user's own DeepSeek key. Approvals are answered on the island only after the user clicks, and ones that look dangerous only in VibeDev. No telemetry, dynamic code or self-update. Later releases follow `autoPublish`.
 - 用户可见的风险提示 · User-visible risk notes：仅支持 Windows；岛屿是随包附带、由插件启动的独立程序；截图快捷键用全局键盘钩子；剪贴板历史和截图只存在本机；微信「显示联系人和消息内容」默认关闭，打开后会改动正在运行的微信。 Windows only; the island is a separate program shipped in the package and started by the plugin; the screenshot shortcut uses a global keyboard hook; clipboard history and screenshots stay on this computer; WeChat's "show contacts and message text" is off by default and changes the running WeChat when turned on.
 - 收录状态 · Listing：未收录的新插件 · new plugin, not listed
@@ -55,7 +55,17 @@
 
 ## 三、安装试用 · Install trial
 
-未运行 · Not run：no DSH checkout (--dsh or DSH_CHECKOUT)。需要人工安装试用后再填写 testedOn · Run a hands-on trial before filling in testedOn.
+脚本试用未运行（本机没有 DSH 检出）· The scripted trial did not run (no DSH checkout here)。改为人工试用 · Hands-on trial instead：
+
+| 项目 · Item | 结果 · Result |
+|---|---|
+| 环境 · Environment | VibeDev 桌面版，DSH 0.2.2-rc.2，Windows 10 专业版 19044 · VibeDev desktop, DSH 0.2.2-rc.2, Windows 10 Pro 19044 |
+| 安装 · Install | `installBundle("@vibedev-si/dsh-island@0.1.0")` → applied；重启后插件启动了包里自带的程序（`bin/win32-x64/vibedev-island.exe`）· after a restart the plugin started the program shipped in its package |
+| 使用 · Use | 岛屿出现、不抢前台（每 100 毫秒采样）；会话、深浅、给其它插件的 island 服务正常 · the island came up without taking the foreground; sessions, theme and the island service worked |
+| 停用 / 启用 · Disable / enable | 停用后 0.1 秒内程序退出；启用后重新启动 · the program quit within 0.1 s and started again |
+| 卸载 · Uninstall | `remove_bundle` 后没有残留进程，包目录已删除 · no process and no package directory left |
+| 用户数据 · User data | 岛屿的设置与待办试用前后逐字节相同 · the island's settings and todos were byte-identical before and after |
+| 说明 · Note | 这次是替换一份已经加载的插件，DSH 在重启前继续运行旧的那份；全新安装立即加载 · replacing an already loaded copy needs a restart; a fresh install loads at once |
 
 ## 四、plugins.yml 草稿 · Draft entry
 

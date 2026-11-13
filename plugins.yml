@@ -591,6 +591,10 @@ plugins:
             and unanswered ones go back to VibeDev after 60 seconds. Sending clipboard items or screenshots to a session
             happens only on the user's action, through the VibeDev page. It provides an island service through which
             other plugins can show tasks and notices; the user can switch that off per plugin. No telemetry, no eval, no
-            self-update. Ran on DSH 0.2.2-rc.2 in the VibeDev desktop profile from the linked source checkout at the
-            published commit (the same plugin files; the bundled program is byte-identical to the one that ran); a
-            hands-on install from npm is still to be done before this is merged.
+            self-update. Hands-on trial 2026-11-13 in VibeDev desktop on DSH 0.2.2-rc.2 (Windows 10 Pro 19044):
+            installBundle of 0.1.0 into the desktop profile applied, and after a restart the plugin started the program
+            shipped in its package (bin/win32-x64) - the island came up without taking the foreground (sampled every
+            100 ms), sessions, theme and the island service for other plugins worked; disabling quit the program within
+            0.1 s and enabling started it again; remove_bundle stopped it and left no process and no package directory;
+            the island's settings and todos were byte-identical before and after. The trial replaced an already loaded
+            copy of the plugin, which DSH runs until the next restart; a fresh install loads at once.
