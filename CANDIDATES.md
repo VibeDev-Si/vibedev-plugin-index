@@ -11,7 +11,7 @@
 | `@wxg-prc-cpg/browser-skill-dsh-plugin@0.3.3`（腾讯 BrowserSkill） | **收** | MIT，含 LICENSE；peers `^0.1.5-rc.3 \|\| ^0.2.0-rc.1` 兼容；无依赖、无安装脚本、465 KiB。唯一子进程是用户自装的 `bsk` CLI（配置 `bskPath`，默认从 PATH 找；包内不附带），不经 shell 以 `bsk <cmd> --json` 启动：每次加载 `bsk --version`、调用 bsk_* 工具时、会话活跃时每 1.5 s `bsk screenshot`（`lib/index.mjs:3075-3109, 6114, 955-968`）。插件本身不联网。试用：安装 applied，重启后仍 ACTIVE，无任何外连。无 npm provenance。 | 需另装 bsk；会启动 bsk 进程；浏览器访问 Agent 选择的网站；记录写在 `~/.bsk` |
 | `dsh-context@0.73.2` | **收**（附披露） | Apache-2.0；provenance 指向 tag v0.73.2；`engines.dsh` 兼容；1 个依赖（zod）。只在面板请求 `/api/dsh-context/balance` 时读取凭据：试用中恰好 1 次读取 `DEEPSEEK_API_KEY`、1 次请求 `https://api.deepseek.com/v1/tools/user/balance`。原因：它优先找设置项 `llm-deepseek`，找不到时退回第一个带 `apiKeyEnv` 的设置项；VibeDev web 组合里只有 `web-deepseek-api` 一项，所以余额可能显示为空，但 key 只发往 api.deepseek.com。浏览器端访问 models.dev（价格）和 npm 镜像（每小时查一次自身新版本，只显示提示和 GitHub 链接）。启动时无外连。 | 用你的 DeepSeek key 查询余额；从 models.dev 取价格；会提示有新版本（新版本未经审核） |
 | `@michengai/dsh-skills-manager@1.2.7`（npm 最新；审核期间又发了 1.2.8） | **有条件**（不进 `plugins.yml`） | Apache-2.0；provenance 指向 tag v1.2.7；peers 明确列出 0.2.1-rc.2；依赖 fflate；试用 applied/ACTIVE，注册工具 `create_skill`，启动时无外连。**问题**：内置更新器无条件注册（`lib/index.js:280-284`，无配置开关）。打开「检查更新」对话框时 GET 端点，查询 `registry.npmjs.org/<pkg>/latest`（试用中返回 latest 1.2.8、updateAvailable:true）；点击「更新」后 POST，安装 npm 最新版（`plugin-updater.js:466-522`）。在 VibeDev 桌面（profile 名为 `desktop`，宿主通过 argv 传入 pnpm）走 `pnpm add --config.minimumReleaseAge=0 <pkg>@<latest> --registry=https://registry.npmjs.org/`，绕过 `pluginManager.installBundle` 的兼容检查，还会改写 profile 的 `pnpm-workspace.yaml`（`:263-456`）。此外它会从 ClawHub、skills.sh 和 GitHub 压缩包安装第三方技能，这些内容我们无法审核；并读写其他 Agent 的技能目录（~/.claude、~/.codex 等）。30 天发了 29 个版本。 | — |
-| `dsh-univer-office@0.3.7`（dream-num/Univer） | **暂缓（负责人决定）**，审核记录见 [reviews/dsh-univer-office@0.3.7.md](reviews/dsh-univer-office@0.3.7.md) | 见下文「暂缓插件的证据与收录条件」：216 MiB、闭源/混淆部分、`@univerjs-pro/*` 无许可证字段、默认开启遥测（有开关）、免费版水印。 | — |
+| `dsh-univer-office@0.3.7`（dream-num/Univer） | **暂缓（负责人决定）**，审核记录见 [reviews/dsh-univer-office@0.3.7.md](reviews/dsh-univer-office@0.3.7.md)；2026-11-13 复查 0.4.0 仍暂缓（[记录](reviews/dsh-univer-office@0.4.0.md)，见下文「0.4.0 复查」） | 见下文「暂缓插件的证据与收录条件」：216 MiB、闭源/混淆部分、`@univerjs-pro/*` 无许可证字段、默认开启遥测（有开关）、免费版水印。 | — |
 | `@linxin666/dsh-remote-web-ui@0.4.7` | **暂缓（负责人决定）**，审核记录见 [reviews/@linxin666/dsh-remote-web-ui@0.4.7.md](reviews/@linxin666/dsh-remote-web-ui@0.4.7.md) | 见下文：浏览器端每日心跳无开关、隧道开启时默认经 dsh-market.com 中转、cloudflared 安装脚本、家族更新器绕过 `installBundle`。 | — |
 
 ## 暂缓插件的证据与收录条件（2026-10-20）
@@ -52,6 +52,17 @@
 3. 遥测：`telemetry: false` 开关已有，满足最低要求；希望同时尊重 DSH 的 `DSH_TELEMETRY_DISABLED`（`profileContext.telemetryDisabledEnv`）。VibeDev 收录时必须在显示文字里写明默认开启及关闭方法。
 4. 说明截图和打印时为什么使用 `--no-sandbox`，最好去掉。
 5. VibeDev 侧：给 216 MiB 写 `sizeException`；风险提示写明遥测、`127.0.0.1:9080` 本地服务、使用本机 Chrome/Edge、免费版水印和页数限制。
+
+#### 0.4.0 复查（2026-11-13，静态检查，未安装试用）
+
+结论：**仍暂缓（负责人决定），之后再收**。审核记录见 [reviews/dsh-univer-office@0.4.0.md](reviews/dsh-univer-office@0.4.0.md)。
+
+- **有改进**：解包从 216 MiB 降到 154.85 MiB（tarball 36.88 MiB）；DSH peers 兼容目标 0.2.2-rc.2（`^0.2.1-rc.3`）；包和依赖树都没有安装脚本（`uninstall` 遥测脚本还在）。包里内置了一份 Univer 授权（`lib/index.js:10501` 的 `UNIVER_LICENSE`，域名列表从 `localhost` 开始，可用环境变量 `UNIVER_LICENSE` 覆盖），可能去掉了免费版水印——没有试用，未验证；`Univer free version, powered by univer.ai.` 字样仍在 viewer 和 render-machine 资源里。
+- **条件 1 未满足**：依赖树 37 个包里 13 个没有许可证字段（`@univerjs-pro/cli-assets@0.1.0`，32.2 MiB；`@univerjs-pro/exchange-node-binding@1.0.4`、`@univerjs-pro/engine-formula-rust-binding@1.0.3` 和它们的平台包）。npm 上这些包的最新版（含 `@univerjs-pro/license@1.4.0`）也都没有许可证字段；README 只写了主包 Apache-2.0。
+- **条件 2 未满足**：没有 npm provenance；`lib/index.js` 和 `artifacts/`（`gateway.cjs`、viewer / render-machine 资源、worker chunks）仍有字符串表混淆。
+- **条件 3 未满足**：遥测默认开启，发到 `https://univer.ai/api/telemetry/cli`（`lib/build-info.json`），可用 `telemetry: false` 或 `DO_NOT_TRACK` 关闭（README 第 217、223 行），仍不认 `DSH_TELEMETRY_DISABLED`。
+- **条件 4 未满足**：`--no-sandbox` 仍在 `lib/index.js:10237` 的混淆字符串表里。
+- 其他：Gateway 默认端口仍是 9080（`lib/index.js:3744`）；代码里的 `47.100.177.253`、`baidu.com` 只出现在内置 API 文档的示例里，不会连接；没有找到下载 Chrome 的地址。和 VibeDev 自带的 Office 能力（文档技能、文档预览）部分重叠，由负责人判断。
 
 ### @linxin666/dsh-remote-web-ui@0.4.7
 

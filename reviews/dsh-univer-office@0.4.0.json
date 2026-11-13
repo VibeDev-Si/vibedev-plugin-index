@@ -1,0 +1,496 @@
+{
+  "schema": 1,
+  "package": "dsh-univer-office",
+  "version": "0.4.0",
+  "date": "2026-11-13",
+  "target": "0.2.2-rc.2",
+  "command": "npm run review -- dsh-univer-office@0.4.0",
+  "tool": {
+    "index": "21eb540"
+  },
+  "static": {
+    "name": "dsh-univer-office",
+    "version": "0.4.0",
+    "published": "2026-11-02T11:33:31.274Z",
+    "distTags": {
+      "alpha": "0.2.0-alpha",
+      "latest": "0.4.0"
+    },
+    "versionsPublished": 27,
+    "versionsLast30Days": 3,
+    "deprecated": null,
+    "integrity": "sha512-VSKiVZvHvlON27KWxamP5EWNty/aGJQNMaLWTJb2R4S2pERloJCm2r3KwuDPMrSChKMX0QQhX8EUcHGx9jmgnA==",
+    "license": "Apache-2.0",
+    "licenseAccepted": true,
+    "licenseFiles": [
+      "LICENSE"
+    ],
+    "provenance": null,
+    "bundle": true,
+    "enginesDsh": null,
+    "dshPeers": {
+      "@deepseek-ai/dsh-attachment": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1 || ^0.2.1-rc.3",
+      "@deepseek-ai/dsh-host-webserver": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1 || ^0.2.1-rc.3",
+      "@deepseek-ai/dsh-llm": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1 || ^0.2.1-rc.3",
+      "@deepseek-ai/dsh-session": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1 || ^0.2.1-rc.3",
+      "@deepseek-ai/dsh-settings": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1 || ^0.2.1-rc.3",
+      "@deepseek-ai/dsh-skill": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1 || ^0.2.1-rc.3",
+      "@deepseek-ai/dsh-tools": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1 || ^0.2.1-rc.3"
+    },
+    "otherPeers": {},
+    "indexEnginesDsh": "^0.1.5-rc.3 || ^0.1.7-rc.1 || ^0.2.0-rc.1 || ^0.2.1-rc.3",
+    "declaresDsh": true,
+    "target": "0.2.2-rc.2",
+    "compatibleInDiscover": true,
+    "compatibleAtInstall": true,
+    "unmet": {},
+    "installScripts": [],
+    "npmHasInstallScript": false,
+    "unpackedBytes": 162371937,
+    "fileCount": 367,
+    "tarballBytes": 38675580,
+    "dependencies": {
+      "@puppeteer/browsers": "^3.2.0",
+      "@univerjs-pro/cli-assets": "0.1.0",
+      "puppeteer-core": "^25.7.0",
+      "@univerjs-pro/engine-formula-rust-binding": "1.0.3",
+      "@univerjs-pro/exchange-node-binding": "1.0.4"
+    },
+    "optionalDependencies": {},
+    "description": "DSH × Univer integration with a bundled collaboration Gateway and Viewer: inline previews, live floating Worktree windows, and session-end review actions in DeepSeek Harness.",
+    "keywords": [
+      "dsh",
+      "dsh-plugin",
+      "deepseek-harness",
+      "univer",
+      "spreadsheet",
+      "preview",
+      "worktree"
+    ],
+    "repository": "https://github.com/dream-num/dsh-univer-office",
+    "homepage": "https://github.com/dream-num/dsh-univer-office",
+    "bugs": "https://github.com/dream-num/dsh-univer-office/issues",
+    "maintainers": [
+      "jikkai",
+      "hexf00"
+    ],
+    "hints": {
+      "childProcess": [
+        "lib/index.js",
+        "scripts/telemetry-entry.mjs"
+      ],
+      "network": [
+        "artifacts/viewer/assets/es-CSV2z1os.js",
+        "artifacts/viewer/assets/it-IT-DwPcW3W_.js",
+        "lib/client.js",
+        "lib/index.js",
+        "lib/telemetry-entry.js"
+      ],
+      "fileWrites": [
+        "artifacts/unit-content-worker.mjs",
+        "artifacts/viewer/assets/es-CSV2z1os.js",
+        "lib/index.js",
+        "scripts/copy-gateway-dependencies.mjs"
+      ],
+      "configWrites": [],
+      "configReads": [
+        "lib/index.js"
+      ],
+      "credentials": [],
+      "environment": [
+        "lib/index.js",
+        "lib/telemetry-entry.js"
+      ],
+      "dynamicCode": [
+        "lib/index.js",
+        "lib/worker-child.mjs"
+      ],
+      "selfUpdate": [],
+      "telemetry": [
+        "lib/index.js",
+        "lib/telemetry-entry.js",
+        "scripts/telemetry-entry.mjs"
+      ]
+    },
+    "hosts": {
+      "127.0.0.1": [
+        "lib/index.js"
+      ],
+      "47.100.177.253": [
+        "lib/index.js"
+      ],
+      "avatars.githubusercontent.com": [
+        "lib/index.js"
+      ],
+      "baidu.com": [
+        "lib/index.js"
+      ],
+      "docs.univer.ai": [
+        "lib/index.js"
+      ],
+      "pro.univer.ai": [
+        "artifacts/viewer/assets/ca-ES-tzbxnqI5.js",
+        "artifacts/viewer/assets/de-DE-CRdznc2F.js",
+        "artifacts/viewer/assets/en-US-CssTuZRB.js",
+        "artifacts/viewer/assets/es-ES-Dz2jVy3U.js",
+        "artifacts/viewer/assets/fr-FR-koG33Z-_.js",
+        "artifacts/viewer/assets/id-ID-LCAyhFsM.js",
+        "artifacts/viewer/assets/it-IT-DwPcW3W_.js",
+        "artifacts/viewer/assets/ja-JP-EQXEj-p-.js",
+        "artifacts/viewer/assets/ko-KR-DC7szPt5.js",
+        "artifacts/viewer/assets/pl-PL-cC3n_lZz.js",
+        "artifacts/viewer/assets/pt-BR-B5A4evOp.js",
+        "artifacts/viewer/assets/ru-RU-YYxG8H5j.js",
+        "artifacts/viewer/assets/sk-SK-SHWLoc-I.js",
+        "artifacts/viewer/assets/vi-VN-B7kktFDg.js",
+        "artifacts/viewer/assets/zh-CN-DO1XeULz.js",
+        "artifacts/viewer/assets/zh-HK-B7qHR_xq.js",
+        "artifacts/viewer/assets/zh-TW-C2P-B5h2.js"
+      ],
+      "rxjs.dev": [
+        "lib/index.js"
+      ],
+      "support.google.com": [
+        "artifacts/viewer/assets/ca-ES-tzbxnqI5.js",
+        "artifacts/viewer/assets/de-DE-CRdznc2F.js",
+        "artifacts/viewer/assets/en-US-CssTuZRB.js",
+        "artifacts/viewer/assets/es-ES-Dz2jVy3U.js",
+        "artifacts/viewer/assets/fr-FR-koG33Z-_.js",
+        "artifacts/viewer/assets/id-ID-LCAyhFsM.js",
+        "artifacts/viewer/assets/it-IT-DwPcW3W_.js",
+        "artifacts/viewer/assets/ja-JP-EQXEj-p-.js",
+        "artifacts/viewer/assets/ko-KR-DC7szPt5.js",
+        "artifacts/viewer/assets/pl-PL-cC3n_lZz.js",
+        "artifacts/viewer/assets/pt-BR-B5A4evOp.js",
+        "artifacts/viewer/assets/ru-RU-YYxG8H5j.js",
+        "artifacts/viewer/assets/sk-SK-SHWLoc-I.js",
+        "artifacts/viewer/assets/vi-VN-B7kktFDg.js",
+        "artifacts/viewer/assets/zh-CN-DO1XeULz.js",
+        "artifacts/viewer/assets/zh-TW-BA0p9R2Z-DdVKxLVS.js"
+      ],
+      "support.microsoft.com": [
+        "artifacts/viewer/assets/ca-ES-tzbxnqI5.js",
+        "artifacts/viewer/assets/de-DE-CRdznc2F.js",
+        "artifacts/viewer/assets/en-US-CssTuZRB.js",
+        "artifacts/viewer/assets/es-ES-Dz2jVy3U.js",
+        "artifacts/viewer/assets/fr-FR-koG33Z-_.js",
+        "artifacts/viewer/assets/id-ID-LCAyhFsM.js",
+        "artifacts/viewer/assets/it-IT-DwPcW3W_.js",
+        "artifacts/viewer/assets/ja-JP-EQXEj-p-.js",
+        "artifacts/viewer/assets/ko-KR-DC7szPt5.js",
+        "artifacts/viewer/assets/pl-PL-cC3n_lZz.js",
+        "artifacts/viewer/assets/pt-BR-B5A4evOp.js",
+        "artifacts/viewer/assets/ru-RU-YYxG8H5j.js",
+        "artifacts/viewer/assets/sk-SK-SHWLoc-I.js",
+        "artifacts/viewer/assets/vi-VN-B7kktFDg.js",
+        "artifacts/viewer/assets/zh-CN-DO1XeULz.js",
+        "artifacts/viewer/assets/zh-TW-BA0p9R2Z-DdVKxLVS.js",
+        "lib/index.js"
+      ],
+      "univer.ai": [
+        "artifacts/viewer/assets/ca-ES-tzbxnqI5.js",
+        "artifacts/viewer/assets/de-DE-CRdznc2F.js",
+        "artifacts/viewer/assets/en-US-CssTuZRB.js",
+        "artifacts/viewer/assets/es-ES-Dz2jVy3U.js",
+        "artifacts/viewer/assets/fr-FR-koG33Z-_.js",
+        "artifacts/viewer/assets/id-ID-LCAyhFsM.js",
+        "artifacts/viewer/assets/it-IT-DwPcW3W_.js",
+        "artifacts/viewer/assets/ja-JP-EQXEj-p-.js",
+        "artifacts/viewer/assets/ko-KR-DC7szPt5.js",
+        "artifacts/viewer/assets/pl-PL-cC3n_lZz.js",
+        "artifacts/viewer/assets/pt-BR-B5A4evOp.js",
+        "artifacts/viewer/assets/ru-RU-YYxG8H5j.js",
+        "artifacts/viewer/assets/sk-SK-SHWLoc-I.js",
+        "artifacts/viewer/assets/vi-VN-B7kktFDg.js",
+        "artifacts/viewer/assets/zh-CN-DO1XeULz.js",
+        "artifacts/viewer/assets/zh-HK-B7qHR_xq.js",
+        "artifacts/viewer/assets/zh-TW-C2P-B5h2.js",
+        "lib/build-info.json",
+        "lib/index.js"
+      ],
+      "www.wps.cn": [
+        "artifacts/viewer/assets/ca-ES-tzbxnqI5.js",
+        "artifacts/viewer/assets/de-DE-CRdznc2F.js",
+        "artifacts/viewer/assets/en-US-CssTuZRB.js",
+        "artifacts/viewer/assets/es-ES-Dz2jVy3U.js",
+        "artifacts/viewer/assets/fr-FR-koG33Z-_.js",
+        "artifacts/viewer/assets/id-ID-LCAyhFsM.js",
+        "artifacts/viewer/assets/it-IT-DwPcW3W_.js",
+        "artifacts/viewer/assets/ja-JP-EQXEj-p-.js",
+        "artifacts/viewer/assets/ko-KR-DC7szPt5.js",
+        "artifacts/viewer/assets/pl-PL-cC3n_lZz.js",
+        "artifacts/viewer/assets/pt-BR-B5A4evOp.js",
+        "artifacts/viewer/assets/ru-RU-YYxG8H5j.js",
+        "artifacts/viewer/assets/sk-SK-SHWLoc-I.js",
+        "artifacts/viewer/assets/vi-VN-B7kktFDg.js",
+        "artifacts/viewer/assets/zh-CN-DO1XeULz.js",
+        "artifacts/viewer/assets/zh-TW-BA0p9R2Z-DdVKxLVS.js"
+      ]
+    },
+    "envVars": {
+      "NODE_PATH": [
+        "lib/index.js"
+      ],
+      "UNIVER_DSH_GATEWAY_DEBUG": [
+        "lib/index.js"
+      ],
+      "UNIVER_LICENSE": [
+        "lib/index.js"
+      ],
+      "WS_NO_BUFFER_UTIL": [
+        "lib/index.js"
+      ],
+      "WS_NO_UTF_8_VALIDATE": [
+        "lib/index.js"
+      ]
+    },
+    "dependencyTree": {
+      "count": 37,
+      "truncated": false,
+      "packages": [
+        {
+          "name": "@puppeteer/browsers",
+          "version": "3.2.7",
+          "license": "Apache-2.0",
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/cli-assets",
+          "version": "0.1.0",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/engine-formula-rust-binding",
+          "version": "1.0.3",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/engine-formula-rust-binding-darwin-arm64",
+          "version": "1.0.3",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/engine-formula-rust-binding-darwin-x64",
+          "version": "1.0.3",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/engine-formula-rust-binding-linux-arm64-gnu",
+          "version": "1.0.3",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/engine-formula-rust-binding-linux-x64-gnu",
+          "version": "1.0.3",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/engine-formula-rust-binding-win32-x64-msvc",
+          "version": "1.0.3",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/exchange-node-binding",
+          "version": "1.0.4",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/exchange-node-binding-darwin-arm64",
+          "version": "1.0.4",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/exchange-node-binding-darwin-x64",
+          "version": "1.0.4",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/exchange-node-binding-linux-arm64-gnu",
+          "version": "1.0.4",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/exchange-node-binding-linux-x64-gnu",
+          "version": "1.0.4",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "@univerjs-pro/exchange-node-binding-win32-x64-msvc",
+          "version": "1.0.4",
+          "license": null,
+          "installScript": false
+        },
+        {
+          "name": "ansi-regex",
+          "version": "6.6.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "ansi-styles",
+          "version": "6.2.3",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "chromium-bidi",
+          "version": "157.0.8090-0",
+          "license": "Apache-2.0",
+          "installScript": false
+        },
+        {
+          "name": "cliui",
+          "version": "9.0.1",
+          "license": "ISC",
+          "installScript": false
+        },
+        {
+          "name": "devtools-protocol",
+          "version": "0.0.1717327",
+          "license": "BSD-3-Clause",
+          "installScript": false
+        },
+        {
+          "name": "emoji-regex",
+          "version": "10.6.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "escalade",
+          "version": "3.2.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "get-caller-file",
+          "version": "2.0.5",
+          "license": "ISC",
+          "installScript": false
+        },
+        {
+          "name": "get-east-asian-width",
+          "version": "1.7.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "mitt",
+          "version": "3.0.1",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "modern-tar",
+          "version": "0.8.6",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "puppeteer-core",
+          "version": "25.17.0",
+          "license": "Apache-2.0",
+          "installScript": false
+        },
+        {
+          "name": "string-width",
+          "version": "7.2.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "string-width",
+          "version": "8.3.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "strip-ansi",
+          "version": "7.2.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "typed-query-selector",
+          "version": "2.12.3",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "webdriver-bidi-protocol",
+          "version": "1.0.2",
+          "license": "Apache-2.0",
+          "installScript": false
+        },
+        {
+          "name": "wrap-ansi",
+          "version": "9.0.2",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "ws",
+          "version": "8.23.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "y18n",
+          "version": "5.0.8",
+          "license": "ISC",
+          "installScript": false
+        },
+        {
+          "name": "yargs",
+          "version": "18.2.0",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "yargs-parser",
+          "version": "22.0.0",
+          "license": "ISC",
+          "installScript": false
+        },
+        {
+          "name": "zod",
+          "version": "4.6.7",
+          "license": "MIT",
+          "installScript": false
+        }
+      ],
+      "withInstallScripts": [],
+      "licensesOutsideList": [
+        "@univerjs-pro/cli-assets@0.1.0 (null)",
+        "@univerjs-pro/engine-formula-rust-binding@1.0.3 (null)",
+        "@univerjs-pro/engine-formula-rust-binding-darwin-arm64@1.0.3 (null)",
+        "@univerjs-pro/engine-formula-rust-binding-darwin-x64@1.0.3 (null)",
+        "@univerjs-pro/engine-formula-rust-binding-linux-arm64-gnu@1.0.3 (null)",
+        "@univerjs-pro/engine-formula-rust-binding-linux-x64-gnu@1.0.3 (null)",
+        "@univerjs-pro/engine-formula-rust-binding-win32-x64-msvc@1.0.3 (null)",
+        "@univerjs-pro/exchange-node-binding@1.0.4 (null)",
+        "@univerjs-pro/exchange-node-binding-darwin-arm64@1.0.4 (null)",
+        "@univerjs-pro/exchange-node-binding-darwin-x64@1.0.4 (null)",
+        "@univerjs-pro/exchange-node-binding-linux-arm64-gnu@1.0.4 (null)",
+        "@univerjs-pro/exchange-node-binding-linux-x64-gnu@1.0.4 (null)",
+        "@univerjs-pro/exchange-node-binding-win32-x64-msvc@1.0.4 (null)"
+      ],
+      "unresolved": []
+    }
+  },
+  "trial": {
+    "skipped": "no DSH checkout (--dsh or DSH_CHECKOUT)"
+  }
+}
