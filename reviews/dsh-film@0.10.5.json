@@ -1,0 +1,599 @@
+{
+  "schema": 1,
+  "package": "dsh-film",
+  "version": "0.10.5",
+  "date": "2026-11-27",
+  "target": "0.2.3-alpha.2",
+  "command": "npm run review -- dsh-film@0.10.5 --previous 0.10.2 --dsh C:\\src\\vibedev",
+  "tool": {
+    "index": "c606543",
+    "dsh": "04636f70f7 (DSH 0.2.2-rc.5)"
+  },
+  "static": {
+    "name": "dsh-film",
+    "version": "0.10.5",
+    "published": "2026-11-26T15:56:23.353Z",
+    "distTags": {
+      "latest": "0.10.5"
+    },
+    "versionsPublished": 36,
+    "versionsLast30Days": 10,
+    "deprecated": null,
+    "integrity": "sha512-1L7Z7dnnaQ3gilpUD1Htwr0hjE0pFmNBhXq/l5IpHBO7PVncMEaIX8GvbPkygkHsG8sX9ia1PFKqNMX3uZVmpg==",
+    "license": "MIT",
+    "licenseAccepted": true,
+    "licenseFiles": [
+      "LICENSE"
+    ],
+    "provenance": null,
+    "bundle": true,
+    "enginesDsh": null,
+    "dshPeers": {
+      "@deepseek-ai/dsh-client-connection": ">=0.2.0-rc.2 <0.3.0",
+      "@deepseek-ai/dsh-tools": ">=0.2.0-rc.2 <0.3.0"
+    },
+    "otherPeers": {
+      "@vibedev-si/dsh-vibedev": ">=0.2.7"
+    },
+    "indexEnginesDsh": ">=0.2.0-rc.2 <0.3.0",
+    "declaresDsh": true,
+    "target": "0.2.3-alpha.2",
+    "compatibleInDiscover": true,
+    "compatibleAtInstall": true,
+    "unmet": {},
+    "installScripts": [],
+    "npmHasInstallScript": false,
+    "unpackedBytes": 52561003,
+    "fileCount": 1142,
+    "tarballBytes": 25039301,
+    "dependencies": {
+      "yaml": "^2.9.1",
+      "zod": "^3.25.76"
+    },
+    "optionalDependencies": {
+      "@oven/bun-windows-x64": "1.4.4",
+      "@oven/bun-darwin-aarch64": "1.3.13",
+      "@oven/bun-darwin-x64": "1.3.13",
+      "@oven/bun-linux-x64": "1.4.4",
+      "@oven/bun-linux-aarch64": "1.4.4"
+    },
+    "description": "VibeDev 影视工作台：在 DeepSeek Harness 和 VibeDev 的右侧栏打开画布式影视工作台（剧本、分镜画布、图片/视频/音频生成、剪辑成片），模型与费用统一走 VibeDev 账号 · VibeDev Film: a canvas film workbench in the right sidebar of DeepSeek Harness and VibeDev (script, storyboard canvas, image/video/audio generation, editing), with every model and charge through the VibeDev account",
+    "keywords": [
+      "dsh",
+      "dsh-plugin",
+      "deepseek-harness",
+      "vibedev",
+      "film",
+      "screenplay",
+      "storyboard"
+    ],
+    "repository": "https://github.com/VibeDev-Si/dsh-film",
+    "homepage": "https://github.com/VibeDev-Si/dsh-film#readme",
+    "bugs": "https://github.com/VibeDev-Si/dsh-film/issues",
+    "maintainers": [
+      "crider"
+    ],
+    "hints": {
+      "childProcess": [
+        "apps/toonflow/build/server/ffmpegWorker.js",
+        "apps/toonflow/build/tools/trumanMap.tool.js",
+        "lib/index.js",
+        "scripts/verify-package.mjs",
+        "scripts/workbench-source.mjs"
+      ],
+      "network": [
+        "apps/toonflow/build/nodes/audioGenerationNode.umd.js",
+        "apps/toonflow/build/nodes/audioNode.umd.js",
+        "apps/toonflow/build/nodes/director3dNode.umd.js",
+        "apps/toonflow/build/nodes/frameAnalysisNode.umd.js",
+        "apps/toonflow/build/nodes/imageGenerationNode.umd.js",
+        "apps/toonflow/build/nodes/imageNode.umd.js",
+        "apps/toonflow/build/nodes/libraryCardNode.umd.js",
+        "apps/toonflow/build/nodes/textNode.umd.js",
+        "apps/toonflow/build/nodes/videoGenerationNode.umd.js",
+        "apps/toonflow/build/nodes/videoNode.umd.js",
+        "apps/toonflow/build/nodes/webEpisodeEditorProNode.umd.js",
+        "apps/toonflow/build/providers/media/apiMart.ts",
+        "apps/toonflow/build/providers/media/compshare.ts",
+        "apps/toonflow/build/providers/media/metaso.ts",
+        "apps/toonflow/build/providers/media/tfRouter.ts",
+        "apps/toonflow/build/tools/novelToTxt.tool.js",
+        "apps/toonflow/build/tools/trumanMap.tool.js",
+        "apps/toonflow/build/web/assets/about-B7hVyp5r.js",
+        "apps/toonflow/build/web/assets/addCustomProviderDialog--CFn9voa.js",
+        "apps/toonflow/build/web/assets/addCustomProviderDialog-DbExnrHO.js",
+        "apps/toonflow/build/web/assets/addProviderDialog-CLMCOTcB.js",
+        "apps/toonflow/build/web/assets/axios-dkTnsBT8.js",
+        "apps/toonflow/build/web/assets/blade-DPPr6MF0.js",
+        "apps/toonflow/build/web/assets/clipboard-DfqEhA9i.js",
+        "apps/toonflow/build/web/assets/code-block-DHMOMJDf-BaYEMHL5.js",
+        "apps/toonflow/build/web/assets/coffee-BP03ytLP.js",
+        "apps/toonflow/build/web/assets/developer-Coxtry7b.js",
+        "apps/toonflow/build/web/assets/document-Bq0V4Pfa.js",
+        "apps/toonflow/build/web/assets/editProviderDialog-B6DSfU62.js",
+        "apps/toonflow/build/web/assets/filmProjects-BbKXQQD7.js",
+        "apps/toonflow/build/web/assets/filmQuickstart-Dd9yxpDk.js",
+        "apps/toonflow/build/web/assets/formCreate-C79q8gCT.js",
+        "apps/toonflow/build/web/assets/general-DT1-xYCJ.js",
+        "apps/toonflow/build/web/assets/hello-B1SegJmS.js",
+        "apps/toonflow/build/web/assets/home-CyDs7wEp.js",
+        "apps/toonflow/build/web/assets/index-C5JAxxqc.js",
+        "apps/toonflow/build/web/assets/installPluginFile-f7HZFkZk.js",
+        "apps/toonflow/build/web/assets/katex--I9wbx8F.js",
+        "apps/toonflow/build/web/assets/languageModel-BX04JimA.js",
+        "apps/toonflow/build/web/assets/mcp-CSeikRuy.js",
+        "apps/toonflow/build/web/assets/mediaModel-S2aURL_c.js",
+        "apps/toonflow/build/web/assets/mermaid.core-l9UfWCHi.js",
+        "apps/toonflow/build/web/assets/messageMarkdown-CnKo7WJ2.js",
+        "apps/toonflow/build/web/assets/mobile-UmTIh_1i.js",
+        "apps/toonflow/build/web/assets/nodeAi-BeJDScDs.js",
+        "apps/toonflow/build/web/assets/opening-Cwk7y0gK.js",
+        "apps/toonflow/build/web/assets/php-m5Ug_San.js",
+        "apps/toonflow/build/web/assets/pluginConfigDialog-otWpKe8v.js",
+        "apps/toonflow/build/web/assets/pluginMarket-ClN5J5zf.js",
+        "apps/toonflow/build/web/assets/providerAgentDialog-B4x9KAfn.js",
+        "apps/toonflow/build/web/assets/providerDebugDialog-CGz-OgnG.js",
+        "apps/toonflow/build/web/assets/providers-BtL4xIVs.js",
+        "apps/toonflow/build/web/assets/replyStream-xVBztRP2.js",
+        "apps/toonflow/build/web/assets/settings-Di_B4np1.js",
+        "apps/toonflow/build/web/assets/systemPromptDialog-BtOBS6tr.js",
+        "apps/toonflow/build/web/assets/tf-BIbdzCq5.js",
+        "apps/toonflow/build/web/assets/tfAccount-DNe1QNKx.js",
+        "apps/toonflow/build/web/assets/tfRechargeDialog-71lhTRSv.js",
+        "apps/toonflow/build/web/assets/tfRouter-yluGOe7H.js",
+        "apps/toonflow/build/web/assets/useApi-BPuI6ZR9-BKl5oCMM.js",
+        "apps/toonflow/build/web/assets/workspace-CZ-5kB9r.js",
+        "apps/toonflow/build/web/assets/workspaceFiles-CQv3LdUw.js",
+        "apps/toonflow/build/web/assets/workspacePicker-D6F_3PEi.js",
+        "apps/toonflow/build/web/index.html",
+        "client/client.js",
+        "lib/index.js",
+        "scripts/verify-package.mjs"
+      ],
+      "fileWrites": [
+        "apps/toonflow/build/ext/ext-md.umd.js",
+        "apps/toonflow/build/nodes/audioGenerationNode.umd.js",
+        "apps/toonflow/build/nodes/audioNode.umd.js",
+        "apps/toonflow/build/nodes/director3dNode.umd.js",
+        "apps/toonflow/build/nodes/frameAnalysisNode.umd.js",
+        "apps/toonflow/build/nodes/imageGenerationNode.umd.js",
+        "apps/toonflow/build/nodes/imageNode.umd.js",
+        "apps/toonflow/build/nodes/libraryCardNode.umd.js",
+        "apps/toonflow/build/nodes/textNode.umd.js",
+        "apps/toonflow/build/nodes/trumanMap.umd.js",
+        "apps/toonflow/build/nodes/videoGenerationNode.umd.js",
+        "apps/toonflow/build/nodes/videoNode.umd.js",
+        "apps/toonflow/build/nodes/webEpisodeEditorProNode.umd.js",
+        "apps/toonflow/build/providers/media/compshare.ts",
+        "apps/toonflow/build/server/ffmpegWorker.js",
+        "apps/toonflow/build/tools/mediaGeneration.tool.js",
+        "apps/toonflow/build/tools/novelToTxt.tool.js",
+        "apps/toonflow/build/tools/trumanMap.tool.js",
+        "apps/toonflow/build/tools/videoComposer.tool.js",
+        "apps/toonflow/build/tools/workspace.tool.js",
+        "apps/toonflow/build/web/assets/addCustomProviderDialog-DbExnrHO.js",
+        "apps/toonflow/build/web/assets/angular-ts-ocjSXnvf.js",
+        "apps/toonflow/build/web/assets/blade-DPPr6MF0.js",
+        "apps/toonflow/build/web/assets/chunk-FOHPRMQF-DzxwRta7.js",
+        "apps/toonflow/build/web/assets/chunk-GMAD6QVW-BzwpK_Mz.js",
+        "apps/toonflow/build/web/assets/dist-CsyB0UlE.js",
+        "apps/toonflow/build/web/assets/document-Bq0V4Pfa.js",
+        "apps/toonflow/build/web/assets/filmQuickstart-Dd9yxpDk.js",
+        "apps/toonflow/build/web/assets/formCreate-C79q8gCT.js",
+        "apps/toonflow/build/web/assets/imba-DsUTQ-LC.js",
+        "apps/toonflow/build/web/assets/javascript-DcMHgNcu.js",
+        "apps/toonflow/build/web/assets/jsx-BUUYi3qs.js",
+        "apps/toonflow/build/web/assets/messageMarkdown-CnKo7WJ2.js",
+        "apps/toonflow/build/web/assets/nodeAi-BeJDScDs.js",
+        "apps/toonflow/build/web/assets/php-m5Ug_San.js",
+        "apps/toonflow/build/web/assets/pluginConfigDialog-otWpKe8v.js",
+        "apps/toonflow/build/web/assets/providers-BtL4xIVs.js",
+        "apps/toonflow/build/web/assets/replyStream-xVBztRP2.js",
+        "apps/toonflow/build/web/assets/tiptapHost-dWTvDqkI.js",
+        "apps/toonflow/build/web/assets/tsx-DvWhG4dC.js",
+        "apps/toonflow/build/web/assets/typescript-BTGs5etX.js",
+        "apps/toonflow/build/web/assets/vue-vine-By_xyXdL.js",
+        "apps/toonflow/build/web/assets/workspace-CZ-5kB9r.js",
+        "apps/toonflow/build/web/assets/workspacePicker-D6F_3PEi.js",
+        "lib/index.js",
+        "scripts/verify-package.mjs"
+      ],
+      "configWrites": [],
+      "configReads": [],
+      "credentials": [
+        "apps/toonflow/build/providers/language/deepSeek.ts",
+        "apps/toonflow/build/providers/language/tfRouter.ts",
+        "apps/toonflow/build/providers/media/apiMart.ts",
+        "apps/toonflow/build/providers/media/compshare.ts",
+        "apps/toonflow/build/providers/media/metaso.ts",
+        "apps/toonflow/build/providers/media/tfRouter.ts",
+        "apps/toonflow/build/web/assets/addCustomProviderDialog--CFn9voa.js",
+        "apps/toonflow/build/web/assets/addCustomProviderDialog-DbExnrHO.js",
+        "apps/toonflow/build/web/assets/addProviderDialog-CLMCOTcB.js",
+        "apps/toonflow/build/web/assets/blade-DPPr6MF0.js",
+        "apps/toonflow/build/web/assets/chunk-FOHPRMQF-DzxwRta7.js",
+        "apps/toonflow/build/web/assets/editProviderDialog-B6DSfU62.js",
+        "apps/toonflow/build/web/assets/filmQuickstart-Dd9yxpDk.js",
+        "apps/toonflow/build/web/assets/hello-B1SegJmS.js",
+        "apps/toonflow/build/web/assets/index-C5JAxxqc.js",
+        "apps/toonflow/build/web/assets/languageModel-BX04JimA.js",
+        "apps/toonflow/build/web/assets/mcp-CSeikRuy.js",
+        "apps/toonflow/build/web/assets/mediaModel-S2aURL_c.js",
+        "apps/toonflow/build/web/assets/php-m5Ug_San.js",
+        "apps/toonflow/build/web/assets/pluginMarket-ClN5J5zf.js",
+        "apps/toonflow/build/web/assets/providers-BtL4xIVs.js",
+        "apps/toonflow/build/web/assets/tf-BIbdzCq5.js",
+        "apps/toonflow/build/web/assets/tfAccount-DNe1QNKx.js",
+        "apps/toonflow/build/web/assets/tfRechargeDialog-71lhTRSv.js",
+        "apps/toonflow/build/web/assets/tfRouter-B9pmKmP7.js",
+        "apps/toonflow/build/web/assets/tfRouter-yluGOe7H.js",
+        "apps/toonflow/build/web/assets/workspace-CZ-5kB9r.js",
+        "lib/index.js",
+        "scripts/verify-package.mjs"
+      ],
+      "environment": [
+        "apps/toonflow/build/server/documentWorker.js",
+        "apps/toonflow/build/server/ffmpegWorker.js",
+        "apps/toonflow/build/tools/trumanMap.tool.js",
+        "apps/toonflow/build/tools/videoComposer.tool.js",
+        "lib/index.js",
+        "scripts/verify-package.mjs"
+      ],
+      "dynamicCode": [
+        "apps/toonflow/build/tools/trumanMap.tool.js",
+        "apps/toonflow/build/web/assets/angular-ts-ocjSXnvf.js",
+        "apps/toonflow/build/web/assets/javascript-DcMHgNcu.js",
+        "apps/toonflow/build/web/assets/jsx-BUUYi3qs.js",
+        "apps/toonflow/build/web/assets/messageMarkdown-CnKo7WJ2.js",
+        "apps/toonflow/build/web/assets/sass-DXrisJhu.js",
+        "apps/toonflow/build/web/assets/tiptapHost-dWTvDqkI.js",
+        "apps/toonflow/build/web/assets/tsx-DvWhG4dC.js",
+        "apps/toonflow/build/web/assets/typescript-BTGs5etX.js",
+        "apps/toonflow/build/web/assets/vue-vine-By_xyXdL.js",
+        "apps/toonflow/build/web/assets/workspace-CZ-5kB9r.js",
+        "lib/index.js"
+      ],
+      "selfUpdate": [
+        "apps/toonflow/build/web/assets/about-B7hVyp5r.js"
+      ],
+      "telemetry": [
+        "apps/toonflow/build/web/assets/chunk-FOHPRMQF-DzxwRta7.js",
+        "apps/toonflow/build/web/assets/index-C5JAxxqc.js",
+        "apps/toonflow/build/web/assets/workspace-CZ-5kB9r.js"
+      ]
+    },
+    "hosts": {
+      "127.0.0.1": [
+        "lib/index.js",
+        "scripts/verify-package.mjs"
+      ],
+      "api.apib.ai": [
+        "apps/toonflow/build/providers/media/apiMart.ts",
+        "apps/toonflow/build/web/assets/addCustomProviderDialog-DbExnrHO.js",
+        "apps/toonflow/build/web/assets/providers-BtL4xIVs.js"
+      ],
+      "api.apimart.ai": [
+        "apps/toonflow/build/providers/media/apiMart.ts",
+        "apps/toonflow/build/web/assets/addCustomProviderDialog-DbExnrHO.js",
+        "apps/toonflow/build/web/assets/providers-BtL4xIVs.js"
+      ],
+      "api.deepseek.com": [
+        "apps/toonflow/build/providers/language/deepSeek.ts",
+        "apps/toonflow/build/web/assets/providers-BtL4xIVs.js"
+      ],
+      "api.modelverse.cn": [
+        "apps/toonflow/build/providers/media/compshare.ts",
+        "apps/toonflow/build/web/assets/addCustomProviderDialog-DbExnrHO.js",
+        "apps/toonflow/build/web/assets/providers-BtL4xIVs.js"
+      ],
+      "api.toonflow.net": [
+        "apps/toonflow/build/providers/language/tfRouter.ts",
+        "apps/toonflow/build/providers/media/tfRouter.ts",
+        "apps/toonflow/build/web/assets/hello-B1SegJmS.js",
+        "apps/toonflow/build/web/assets/index-C5JAxxqc.js",
+        "apps/toonflow/build/web/assets/pluginMarket-ClN5J5zf.js",
+        "apps/toonflow/build/web/assets/providers-BtL4xIVs.js",
+        "apps/toonflow/build/web/assets/tf-BIbdzCq5.js",
+        "apps/toonflow/build/web/assets/tfAccount-DNe1QNKx.js",
+        "apps/toonflow/build/web/assets/tfRouter-B9pmKmP7.js",
+        "apps/toonflow/build/web/assets/tfRouter-yluGOe7H.js"
+      ],
+      "bit.ly": [
+        "apps/toonflow/build/web/assets/workspace-CZ-5kB9r.js"
+      ],
+      "cdn.jsdelivr.net": [
+        "apps/toonflow/build/nodes/director3dNode.umd.js"
+      ],
+      "chevrotain.io": [
+        "apps/toonflow/build/web/assets/chunk-FOHPRMQF-DzxwRta7.js"
+      ],
+      "console.compshare.cn": [
+        "apps/toonflow/build/providers/media/compshare.ts",
+        "apps/toonflow/build/web/assets/addCustomProviderDialog-DbExnrHO.js",
+        "apps/toonflow/build/web/assets/providers-BtL4xIVs.js"
+      ],
+      "cp.compshare.cn": [
+        "apps/toonflow/build/providers/media/compshare.ts",
+        "apps/toonflow/build/web/assets/addCustomProviderDialog-DbExnrHO.js",
+        "apps/toonflow/build/web/assets/providers-BtL4xIVs.js"
+      ],
+      "developer.microsoft.com": [
+        "apps/toonflow/build/web/assets/index-C5JAxxqc.js"
+      ],
+      "element-plus.org": [
+        "apps/toonflow/build/web/assets/checkbox-B3DqNdAE.js",
+        "apps/toonflow/build/web/assets/css-B_zXXEro.js",
+        "apps/toonflow/build/web/assets/css-BcJ5Qckm.js",
+        "apps/toonflow/build/web/assets/css-DjbyalBc.js",
+        "apps/toonflow/build/web/assets/index-C5JAxxqc.js",
+        "apps/toonflow/build/web/assets/pluginConfigDialog-otWpKe8v.js",
+        "apps/toonflow/build/web/assets/replyStream-xVBztRP2.js"
+      ],
+      "example.invalid": [
+        "apps/toonflow/build/web/assets/addCustomProviderDialog-DbExnrHO.js"
+      ],
+      "fonts.googleapis.com": [
+        "apps/toonflow/build/web/assets/dist-CsyB0UlE.js"
+      ],
+      "foo.bar": [
+        "apps/toonflow/build/tools/novelToTxt.tool.js"
+      ],
+      "geo.datav.aliyun.com": [
+        "apps/toonflow/build/web/assets/workspace-CZ-5kB9r.js"
+      ],
+      "github.githubassets.com": [
+        "apps/toonflow/build/web/assets/workspace-CZ-5kB9r.js"
+      ],
+      "go.apimart.ai": [
+        "apps/toonflow/build/providers/media/apiMart.ts",
+        "apps/toonflow/build/web/assets/addCustomProviderDialog-DbExnrHO.js",
+        "apps/toonflow/build/web/assets/providers-BtL4xIVs.js"
+      ],
+      "langium.org": [
+        "apps/toonflow/build/web/assets/chunk-FOHPRMQF-DzxwRta7.js"
+      ],
+      "metaso.cn": [
+        "apps/toonflow/build/providers/media/metaso.ts",
+        "apps/toonflow/build/web/assets/addCustomProviderDialog-DbExnrHO.js",
+        "apps/toonflow/build/web/assets/providers-BtL4xIVs.js"
+      ],
+      "ns.adobe.com": [
+        "apps/toonflow/build/tools/novelToTxt.tool.js"
+      ],
+      "prosemirror.net": [
+        "apps/toonflow/build/web/assets/tiptapHost-dWTvDqkI.js"
+      ],
+      "rolldown.rs": [
+        "apps/toonflow/build/web/assets/rolldown-runtime-Dd_uD5pT.js"
+      ],
+      "vuejs.org": [
+        "apps/toonflow/build/web/assets/runtime-core.esm-bundler-BQN2Yjms.js"
+      ],
+      "work.weixin.qq.com": [
+        "apps/toonflow/build/web/assets/about-B7hVyp5r.js"
+      ],
+      "www.compshare.cn": [
+        "apps/toonflow/build/providers/media/compshare.ts",
+        "apps/toonflow/build/web/assets/addCustomProviderDialog-DbExnrHO.js",
+        "apps/toonflow/build/web/assets/providers-BtL4xIVs.js"
+      ],
+      "www.eclipse.org": [
+        "apps/toonflow/build/web/assets/dist-CsyB0UlE.js"
+      ],
+      "www.xfa.org": [
+        "apps/toonflow/build/tools/novelToTxt.tool.js"
+      ]
+    },
+    "envVars": {
+      "FFMPEG_PATH": [
+        "apps/toonflow/build/server/ffmpegWorker.js",
+        "apps/toonflow/build/tools/videoComposer.tool.js"
+      ],
+      "FFPROBE_PATH": [
+        "apps/toonflow/build/server/ffmpegWorker.js"
+      ],
+      "FLVMETA_PATH": [
+        "apps/toonflow/build/server/ffmpegWorker.js"
+      ],
+      "FLVTOOL2_PATH": [
+        "apps/toonflow/build/server/ffmpegWorker.js"
+      ],
+      "LOG_TOKENS": [
+        "lib/index.js"
+      ],
+      "OSTYPE": [
+        "apps/toonflow/build/server/ffmpegWorker.js"
+      ],
+      "PATH": [
+        "apps/toonflow/build/server/ffmpegWorker.js"
+      ],
+      "PATHEXT": [
+        "apps/toonflow/build/server/ffmpegWorker.js"
+      ],
+      "TOONFLOW_FFMPEG_PATH": [
+        "apps/toonflow/build/tools/videoComposer.tool.js"
+      ],
+      "TOONFLOW_PLATFORM": [
+        "apps/toonflow/build/server/documentWorker.js",
+        "apps/toonflow/build/server/ffmpegWorker.js",
+        "apps/toonflow/build/tools/trumanMap.tool.js"
+      ]
+    },
+    "dependencyTree": {
+      "count": 7,
+      "truncated": false,
+      "packages": [
+        {
+          "name": "@oven/bun-darwin-aarch64",
+          "version": "1.3.13",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@oven/bun-darwin-x64",
+          "version": "1.3.13",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@oven/bun-linux-aarch64",
+          "version": "1.4.4",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@oven/bun-linux-x64",
+          "version": "1.4.4",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "@oven/bun-windows-x64",
+          "version": "1.4.4",
+          "license": "MIT",
+          "installScript": false
+        },
+        {
+          "name": "yaml",
+          "version": "2.9.1",
+          "license": "ISC",
+          "installScript": false
+        },
+        {
+          "name": "zod",
+          "version": "3.25.76",
+          "license": "MIT",
+          "installScript": false
+        }
+      ],
+      "withInstallScripts": [],
+      "licensesOutsideList": [],
+      "unresolved": []
+    }
+  },
+  "trial": {
+    "dshVersion": "0.2.2-rc.5",
+    "ok": true,
+    "installs": [
+      {
+        "spec": "dsh-film@0.10.5",
+        "application": "applied",
+        "version": "0.10.5"
+      }
+    ],
+    "entries": {
+      "afterInstall": [
+        "dsh-film=ACTIVE"
+      ],
+      "afterRestart": [
+        "dsh-film=ACTIVE"
+      ]
+    },
+    "network": {
+      "supported": true,
+      "samples": 26,
+      "dshWeb": [
+        "127.0.0.1:62150"
+      ],
+      "listeners": [],
+      "loopbackOnly": true,
+      "direct": [],
+      "processes": []
+    },
+    "leftoverProcesses": [],
+    "files": [
+      {
+        "checkpoint": "install",
+        "counts": {
+          "added": 2,
+          "changed": 2,
+          "removed": 0
+        },
+        "added": [
+          "home/profiles/web/.plugin-manager/logs/operation-NOj8GL/pnpm.log (1434 B)",
+          "home/profiles/web/pnpm-lock.yaml (2581 B)"
+        ],
+        "changed": [
+          "home/profiles/web/package.json (325 B)",
+          "home/profiles/web/pnpm-workspace.yaml (107 B)"
+        ],
+        "removed": []
+      },
+      {
+        "checkpoint": "restart",
+        "counts": {
+          "added": 0,
+          "changed": 1,
+          "removed": 0
+        },
+        "added": [],
+        "changed": [
+          "home/profiles/web/cordis.yml (223 B)"
+        ],
+        "removed": []
+      }
+    ],
+    "patch": [
+      {
+        "checkpoint": "baseline",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      },
+      {
+        "checkpoint": "install",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      },
+      {
+        "checkpoint": "restart",
+        "exists": true,
+        "sha256": "ef189a8c27db6d63",
+        "rows": []
+      }
+    ],
+    "registrations": {
+      "tools": [
+        "film_call",
+        "film_studio_open",
+        "film_tools"
+      ],
+      "skills": [],
+      "webRoutes": [
+        "/film"
+      ],
+      "connectionRoutes": [
+        "GET /api/dsh-film-studio/opens",
+        "POST /api/dsh-film-studio/close",
+        "POST /api/dsh-film-studio/open"
+      ]
+    },
+    "processes": [],
+    "programs": [],
+    "installTraffic": [
+      "registry.npmjs.org:443 ×9"
+    ],
+    "connections": [],
+    "fetches": [],
+    "credentialReads": [],
+    "calls": []
+  },
+  "previous": {
+    "version": "0.10.2",
+    "highlights": [
+      "直接依赖 · Dependencies",
+      "线索：子进程 · Child processes",
+      "线索：凭据与密钥 · Credentials and keys",
+      "线索：动态代码 · Dynamic code",
+      "线索：自我更新线索 · Self-update hints",
+      "线索：遥测线索 · Telemetry hints",
+      "试用：注册项 · Trial: registrations"
+    ],
+    "files": {
+      "added": 132,
+      "removed": 129,
+      "changed": 15
+    }
+  }
+}

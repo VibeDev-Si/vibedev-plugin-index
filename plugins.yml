@@ -365,13 +365,18 @@ plugins:
           gateway through the account plugin. Models and media go through the VibeDev account plugin, so no API key is entered here, and the
           bundled local server listens on 127.0.0.1 only and stops when VibeDev exits. Local processing needs FFmpeg:
           install it with your system package manager or from the workbench's own plugin market. The package ships the
-          Bun runtime for three platforms, so it is large (about 46 MiB unpacked, one runtime installed per platform).
+          Bun runtime for several platforms, so it is large (about 50 MiB unpacked, one runtime installed per platform).
+          The white-box previs can build new 3D props with the Kiln modeling engine: the first time its kilnPrepare tool
+          is called it downloads @instruktlabs/kiln 1.6.0 and its dependencies from npm (versions not fixed by a lockfile)
+          and then runs them with the system Node.js 22.2+; nothing is downloaded unless that tool is called.
         zh: >-
           画布式影视工作台：剧本与分镜画布、图片/视频/音频生成、导演台和剪辑成片，还能本地切镜并提取关键帧、片段和原音轨，
           可选 AI 逐镜头描述与整段分析。画布工具栏的创作库可以浏览约 1.6 万个带示例图的条目，把提示词插进节点、把风格做成卡片，
           内容经账号插件从 VibeDev 网关按需下载。模型与媒体统一走 VibeDev 账号插件，不需要在这里填写 API Key；随包的本地服务只监听
           127.0.0.1，VibeDev 退出后自行关闭。本地处理需要 FFmpeg：用系统包管理器安装，或在工作台里的插件市场下载。
-          包装了三个平台的 Bun 运行时，所以体积较大（解包约 46 MiB，每个平台只装一个）。
+          包装了多个平台的 Bun 运行时，所以体积较大（解包约 50 MiB，每个平台只装一个）。白模预演可以用 Kiln 建模引擎制作新的三维物件：
+          第一次调用其 kilnPrepare 工具时会从 npm 下载 @instruktlabs/kiln 1.6.0 及其依赖（依赖版本没有锁文件固定），之后用系统里的
+          Node.js 22.2+ 运行；不调用该工具就不会下载。
     versions:
       - version: 0.8.0
         integrity: sha512-DlmR0u0BZw2CtHHeYDDWs3yKGp5UAD9XQJvwAX4aCk5/RmN4NzA8f2xPVRZjrs9i3SzgVLAA+QNCB8eCz2fRXg==
@@ -528,6 +533,66 @@ plugins:
           installScripts: []
           sizeException: "自动收录：解包 45.4 MiB，未超过 0.9.0 人工审核时 45.5 MiB 的 125%，沿用其体量说明。Recorded automatically: unpacks to 45.4 MiB, within 125% of the 45.5 MiB reviewed by hand for 0.9.0, whose size reasoning carries over. 解包 47,694,848 B（45.5 MiB，46,577 KiB），超过 20 MiB 上限：包内随附三个平台的 Bun 运行时（用来启动本地 Film 服务）、 FFmpeg 与文档解析 Worker，以及工作台 Web 产物和内置节点/工具/技能。这些是本地处理能力，不是可裁剪的依赖； Bun 可选依赖按平台只安装一个。0.9.0 是 0.8.0 人工审核时 44.8 MiB 的 101.5%，未超过 125%。 Unpacks to 45.5 MiB for the three platforms' Bun runtimes that run the local Film server, the FFmpeg and document-parsing workers, the workbench Web build and the built-in nodes/tools/skills - the local processing capability rather than trimmable dependencies, with one platform's Bun package installed per user. 101.5% of the 44.8 MiB reviewed by hand for 0.8.0, within 125%."
           notes: Automated first-party release 0.10.2 from dsh-film; capabilities, install scripts and risk notes are unchanged from 0.10.1.
+      - version: 0.10.5
+        integrity: sha512-1L7Z7dnnaQ3gilpUD1Htwr0hjE0pFmNBhXq/l5IpHBO7PVncMEaIX8GvbPkygkHsG8sX9ia1PFKqNMX3uZVmpg==
+        review:
+          reviewer: VibeDev
+          date: 2026-11-27
+          license: MIT
+          testedOn: [0.2.2-rc.5]
+          capabilities:
+            network: [127.0.0.1, registry.npmjs.org]
+            files: write
+            config: none
+            childProcess: [bun, node, ffmpeg, ffprobe]
+          installScripts: []
+          sizeException: >-
+            解包 52,561,003 B（50.1 MiB，1142 个文件；npm 元数据 dist.unpackedSize 记为 69,880,592 B），超过 20 MiB 上限：
+            包内随附 Bun 运行时可选依赖（0.10.5 新增 linux-x64/linux-aarch64，按平台只装一个）、本地 Film 服务
+            （server/film.js 11.4 MB）、文档解析原生模块与 WASM（anydoc 8.3 MB + 6.7 MB）、FFmpeg Worker、工作台 Web 产物，
+            以及新增的白模预演节点 trumanMap.umd.js（4.7 MB）和工具 trumanMap.tool.js。这些是本地处理能力，不是可裁剪的依赖。
+            是 0.9.0 人工审核时 45.5 MiB 的 110%。 Unpacks to 50.1 MiB (npm's dist.unpackedSize says 69,880,592 B) for the
+            Bun runtime optional packages (Linux x64/arm64 added in 0.10.5, one installed per platform), the local Film
+            server, the document-parsing native module and WASM, the FFmpeg worker, the workbench Web build, and the new
+            white-box previs node and tool - local processing capability rather than trimmable dependencies. 110% of the
+            45.5 MiB reviewed by hand for 0.9.0.
+          notes: >-
+            Listed by exception after a human review; the automatic rules refused it (issue #16) because
+            apps/toonflow/build/tools/trumanMap.tool.js imports child_process. New in 0.10.5: Linux support (Bun
+            linux-x64/linux-aarch64 packages), same-origin reverse proxy for remote access (web route /film), showing
+            several results per node, six audio fields, and the white-box previs (TrumanMap) node and tools shipped in the
+            package. EXCEPTION - RUNTIME DOWNLOAD: the trumanMap tool kilnPrepare, when the user or the agent calls it
+            explicitly, writes a package.json depending on @instruktlabs/kiln 1.6.0 (pinned; MIT;
+            github.com/instruktlabs/kiln) and an evaluatorBridge.mjs into the plugin-private directory
+            pluginResources/trumanMap/ next to the tool, then runs the bundled Bun as "bun install --production
+            --ignore-scripts --no-progress" there (3-minute timeout), downloading from registry.npmjs.org. Kiln's own
+            dependencies are caret ranges and no lockfile is written, so the dependency tree fetched on a user's first
+            kilnPrepare can differ from any tree reviewed here: zod ^4.6.5, sharp ^0.35.5, xatlasjs ^0.2.0, acorn
+            ^8.18.0, acorn-walk ^8.3.5, manifold-3d ^3.5.4, @types/three ^0.186.0, @modelcontextprotocol/client ^2.3.0 and
+            @modelcontextprotocol/server ^2.3.0 float; pngjs 7.0.0, three 0.186.1, smol-toml 1.9.1, minisearch 7.2.0,
+            jsonc-parser 3.3.1, meshoptimizer 1.3.0, gltf-validator 2.0.0-dev.3.10, three-subdivide 1.1.5,
+            @gltf-transform/core|functions|extensions 4.5.1 and @modelcontextprotocol/ext-apps 2.0.3 are pinned but their
+            own dependencies are not; optional native packages webgpu 0.6.2 and @napi-rs/canvas 1.0.11 (and sharp's
+            prebuilt platform binaries) may be installed. Install scripts are disabled by --ignore-scripts. The downloaded
+            Kiln modules are then imported into the Film server's Bun process (kiln/mcp, evaluator and others), and
+            kilnTool renders AI-written model programs by spawning the system Node.js from PATH (version 22.2 or newer,
+            probed with node --version) on evaluatorBridge.mjs, which calls Kiln's renderGLBViaSubprocess. Limits enforced
+            by the tool and Kiln: Kiln's AST allowlist rejects imports, host I/O, reflection and dynamic property access;
+            each program at most 64 KiB, 50,000 triangles, 16 MiB GLB, 45 s, 512 MiB Node heap, one render at a time;
+            systemSandbox is false (no OS sandbox). Gate: the code reaches the install only from kilnPrepare; kilnTool and
+            the render path only load an existing install and otherwise ask for kilnPrepare, so without that call nothing
+            is downloaded and no node process starts. The author states that the rest of the white-box previs (staging,
+            blocking, storyboard, export) does not depend on Kiln. Storage: the download stays in
+            pluginResources/trumanMap/; exported models go to assets/trumanMap/kiln/ in the workspace without overwriting
+            or deleting existing work. Otherwise unchanged from 0.10.2: no npm provenance; dependencies are the Bun
+            optional packages, yaml and zod (7 resolved packages, no install scripts); the bundled server listens on
+            127.0.0.1 only; model and media traffic goes through @vibedev-si/dsh-vibedev. Static hosts are the same 29
+            as 0.10.2. Trial on DSH 0.2.2-rc.5 (installBundle into a temporary profile, checkout 04636f70f7): installed
+            and ACTIVE after hot install and after restart; registered tools film_call, film_studio_open, film_tools,
+            web route /film and the /api/dsh-film-studio open/opens/close routes; no child processes, no connections
+            outside installation, no credential reads, no listener, nothing left running. The trial did not call
+            kilnPrepare or kilnTool; the author reports kilnPrepare/kilnTool working on a cloud Linux machine. Limits:
+            not trial-installed on the target DSH 0.2.3-alpha.2.
   - name: "@vibedev-si/dsh-media-viewer"
     category: media
     tags: [vibedev]
