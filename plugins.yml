@@ -27,7 +27,7 @@ index:
 target:
   # The DSH runtime version VibeDev ships (@deepseek-ai/dsh-app-boot). Every listed version must be compatible with it.
   # 当前 VibeDev 内置的 DSH 版本。每个收录版本都必须与之兼容。
-  dsh: 0.2.2-rc.2
+  dsh: 0.2.3-alpha.2
 
 policy:
   # Largest unpacked package accepted without review.sizeException (20 MiB).
@@ -281,7 +281,7 @@ plugins:
           reviewer: VibeDev
           date: 2026-10-29
           license: MIT
-          testedOn: [0.2.1-rc.2, 0.2.2-rc.1, 0.2.2-rc.2]
+          testedOn: [0.2.1-rc.2, 0.2.2-rc.1, 0.2.2-rc.2, 0.2.3-alpha.2]
           capabilities:
             network: [vibedev.studio, remote.vibedev.studio:24443, github.com, 127.0.0.1]
             files: write
@@ -318,7 +318,7 @@ plugins:
           reviewer: VibeDev (automated)
           date: 2026-11-02
           license: MIT
-          testedOn: [0.2.1-rc.2, 0.2.2-rc.1, 0.2.2-rc.2]
+          testedOn: [0.2.1-rc.2, 0.2.2-rc.1, 0.2.2-rc.2, 0.2.3-alpha.2]
           capabilities:
             network: [vibedev.studio, remote.vibedev.studio:24443, github.com, 127.0.0.1]
             files: write
@@ -339,7 +339,7 @@ plugins:
           reviewer: VibeDev (automated)
           date: 2026-11-26
           license: MIT
-          testedOn: [0.2.1-rc.2, 0.2.2-rc.1, 0.2.2-rc.2]
+          testedOn: [0.2.1-rc.2, 0.2.2-rc.1, 0.2.2-rc.2, 0.2.3-alpha.2]
           capabilities:
             network: [vibedev.studio, remote.vibedev.studio:24443, github.com, 127.0.0.1]
             files: write
@@ -555,7 +555,7 @@ plugins:
           reviewer: VibeDev
           date: 2026-11-09
           license: MIT
-          testedOn: [0.2.2-rc.1, 0.2.2-rc.2]
+          testedOn: [0.2.2-rc.1, 0.2.2-rc.2, 0.2.3-alpha.2]
           capabilities:
             network: []
             files: read
@@ -687,3 +687,221 @@ plugins:
             no self-update. Desktop trial on DSH 0.2.3-alpha.2: install/enable/restart/disable and the main island
             pages, approval card, translation, text selection and settings were exercised; the package is 39 files,
             21.5 MiB unpacked, exactly the reviewed archive.
+
+  - name: "@deepseek-ai/dsh-feishu"
+    category: integration
+    tags: []
+    maintainer: https://github.com/deepseek-ai/deepseek-harness/issues
+    display:
+      title:
+        en: "Feishu (Lark) connector"
+        zh: "飞书连接器"
+      description:
+        en: "Lets the agent work with Feishu (Lark) documents and wiki, sheets, Base, Drive files, messages and group chats, calendar, video meetings and minutes, tasks, approvals, mail and contacts, through the official lark-cli and the guides embedded in it. You link an app and sign in from the Plugins page. A command-line (CLI) connector: it shares its account configuration and sign-in with the lark-cli in your own terminal, so linking an app replaces that configuration and signing out also signs out your terminal. The agent runs lark-cli as a program on this computer, the CLI talks to Feishu/Lark servers, and credentials and settings are saved on this computer. Installing pulls the official @larksuite/cli package, whose install script downloads its native binary; pnpm blocks it until you approve it on the Plugins page. macOS and Windows x64 only; needs VibeDev with DSH 0.2.3-alpha.2."
+        zh: "让 Agent 通过官方 lark-cli 和它内置的使用指南处理飞书（Lark）的文档与知识库、多维表格、电子表格、云空间文件、消息与群聊、日程、视频会议与妙记、任务、审批、邮件和通讯录。在「插件」页关联应用并登录。这是命令行（CLI）型连接器：和你终端里的 lark-cli 共用同一份账号配置和登录状态，所以「关联应用」会替换那份配置，「退出登录」也会让你终端里的 lark-cli 退出登录。Agent 会在这台电脑上运行 lark-cli，CLI 会连接飞书/Lark 服务器，凭据和设置保存在本机。安装时会拉取官方 @larksuite/cli 包，它的安装脚本要下载原生程序，pnpm 默认拦截，需要你在「插件」页批准后才能用。仅支持 macOS 和 Windows x64；需要 DSH 0.2.3-alpha.2 的 VibeDev。"
+    versions:
+      - version: 0.2.3-alpha.2
+        integrity: sha512-yWita+DUvLMLlDk3mTqsBo7ACYCWx3kq0ERpRWJIGodWHO1bzlWqiXWbaqEY1NbmGgP0+zwWj3DB3wOWOYYeJg==
+        review:
+          reviewer: VibeDev
+          date: 2026-11-26
+          license: MIT
+          testedOn: [0.2.3-alpha.2]
+          capabilities:
+            network: ["*"]
+            files: write
+            config: none
+            childProcess: ["lark-cli"]
+          installScripts: []
+          notes: >-
+            Official DeepSeek Harness connector, reviewed by VibeDev and carried from the
+            previous download-server index. Behaviour is declared from the package manifest
+            and the vendor documentation; the connector talks only to the vendor service the
+            user signs in to and writes its own account/config files. No telemetry, no self-update.
+
+  - name: "@deepseek-ai/dsh-dingtalk"
+    category: integration
+    tags: []
+    maintainer: https://github.com/deepseek-ai/deepseek-harness/issues
+    display:
+      title:
+        en: "DingTalk connector"
+        zh: "钉钉连接器"
+      description:
+        en: "Lets the agent use DingTalk calendar, to-dos, docs, AI tables, group chats and contacts through the official DingTalk Workspace CLI (dws) and the official DingTalk skills. You sign in from the Plugins page. A command-line (CLI) connector: it shares its sign-in with the dws in your own terminal (kept in ~/.dws and the system keychain), so signing out here also signs your terminal out. On first load it downloads dws and the skills from a pinned release on GitHub (or Gitee) into the DSH cache; the agent then runs dws as a program on this computer and dws talks to DingTalk servers. macOS and Windows x64 only; needs VibeDev with DSH 0.2.3-alpha.2."
+        zh: "让 Agent 通过官方钉钉工作台 CLI（dws）和官方钉钉技能使用钉钉的日程、待办、文档、AI 表格、群聊和通讯录。在「插件」页登录。这是命令行（CLI）型连接器：和你终端里的 dws 共用同一份登录状态（保存在 ~/.dws 和系统钥匙串），所以在这里退出登录也会让你终端里的 dws 退出登录。首次加载时会从 GitHub（或 Gitee）上固定版本的发布包下载 dws 和技能到 DSH 缓存；之后 Agent 会在这台电脑上运行 dws，dws 会连接钉钉服务器。仅支持 macOS 和 Windows x64；需要 DSH 0.2.3-alpha.2 的 VibeDev。"
+    versions:
+      - version: 0.2.3-alpha.2
+        integrity: sha512-rVDlaxbRFrQn+bqQpIhCa8Ey7+GiHyAFL2Hvci3SLADrCoEo0NJqiGEbMvIGOi9Byk4Hfs3RbLzOf660iEB91g==
+        review:
+          reviewer: VibeDev
+          date: 2026-11-26
+          license: MIT
+          testedOn: [0.2.3-alpha.2]
+          capabilities:
+            network: ["*"]
+            files: write
+            config: none
+            childProcess: ["dws"]
+          installScripts: []
+          notes: >-
+            Official DeepSeek Harness connector, reviewed by VibeDev and carried from the
+            previous download-server index. Behaviour is declared from the package manifest
+            and the vendor documentation; the connector talks only to the vendor service the
+            user signs in to and writes its own account/config files. No telemetry, no self-update.
+
+  - name: "@deepseek-ai/dsh-wecom"
+    category: integration
+    tags: []
+    maintainer: https://github.com/deepseek-ai/deepseek-harness/issues
+    display:
+      title:
+        en: "WeCom connector"
+        zh: "企业微信连接器"
+      description:
+        en: "Lets the agent use WeCom docs, calendar, meetings, to-dos and messages through the official wecom-cli and the official WeCom skills. You bind a bot from the Plugins page with a QR code. A command-line (CLI) connector: it shares the bot credentials with the wecom-cli in your own terminal (the CLI's default configuration). The agent runs wecom-cli as a program on this computer and the CLI talks to WeCom servers; the skills are downloaded from the CLI's GitHub repository at a pinned commit into the DSH cache. macOS and Windows x64 only; needs VibeDev with DSH 0.2.3-alpha.2."
+        zh: "让 Agent 通过官方 wecom-cli 和官方企业微信技能使用企业微信的文档、日程、会议、待办和消息。在「插件」页用二维码绑定机器人。这是命令行（CLI）型连接器：和你终端里的 wecom-cli 共用同一份机器人凭据（CLI 的默认配置）。Agent 会在这台电脑上运行 wecom-cli，CLI 会连接企业微信服务器；技能从 CLI 的 GitHub 仓库按固定提交下载到 DSH 缓存。仅支持 macOS 和 Windows x64；需要 DSH 0.2.3-alpha.2 的 VibeDev。"
+    versions:
+      - version: 0.2.3-alpha.2
+        integrity: sha512-P0xIK2Q/b1KTK8XB11MVv8rpIE9jM4wmNlThm/CiQr9rZZ+kPKjqv4FqUBkL6U/MJrAbEebJRHYyfOM1hMLGtw==
+        review:
+          reviewer: VibeDev
+          date: 2026-11-26
+          license: MIT
+          testedOn: [0.2.3-alpha.2]
+          capabilities:
+            network: ["*"]
+            files: write
+            config: none
+            childProcess: ["wecom-cli"]
+          installScripts: []
+          notes: >-
+            Official DeepSeek Harness connector, reviewed by VibeDev and carried from the
+            previous download-server index. Behaviour is declared from the package manifest
+            and the vendor documentation; the connector talks only to the vendor service the
+            user signs in to and writes its own account/config files. No telemetry, no self-update.
+
+  - name: "@deepseek-ai/dsh-tencent-meeting"
+    category: integration
+    tags: []
+    maintainer: https://github.com/deepseek-ai/deepseek-harness/issues
+    display:
+      title:
+        en: "Tencent Meeting connector"
+        zh: "腾讯会议连接器"
+      description:
+        en: "Lets the agent use Tencent Meeting meetings, recordings, minutes and meeting reports through the official tmeet CLI and its skill. You sign in from the Plugins page. A command-line (CLI) connector: it shares its sign-in with the tmeet in your own terminal (the CLI's default configuration), so signing out here also signs your terminal out. The agent runs tmeet as a program on this computer and tmeet talks to Tencent Meeting servers; the skill is downloaded from the CLI's GitHub repository into the DSH cache. Installing pulls @tencentcloud/tmeet, which has a postinstall script. macOS and Windows x64 only; needs VibeDev with DSH 0.2.3-alpha.2."
+        zh: "让 Agent 通过官方 tmeet CLI 和它的技能使用腾讯会议的会议、录制、纪要和会议报告。在「插件」页登录。这是命令行（CLI）型连接器：和你终端里的 tmeet 共用同一份登录状态（CLI 的默认配置），所以在这里退出登录也会让你终端里的 tmeet 退出登录。Agent 会在这台电脑上运行 tmeet，tmeet 会连接腾讯会议服务器；技能从 CLI 的 GitHub 仓库下载到 DSH 缓存。安装时会拉取 @tencentcloud/tmeet，它带有一个 postinstall 脚本。仅支持 macOS 和 Windows x64；需要 DSH 0.2.3-alpha.2 的 VibeDev。"
+    versions:
+      - version: 0.2.3-alpha.2
+        integrity: sha512-YWpO080/xjPnD20BxZa+9poFq4aLQnwCe4YhhWPqd2nvzstsSMv4jJ/jsikr9SJMfcoQ6xOMnKMiKu4XP9wfZg==
+        review:
+          reviewer: VibeDev
+          date: 2026-11-26
+          license: MIT
+          testedOn: [0.2.3-alpha.2]
+          capabilities:
+            network: ["*"]
+            files: write
+            config: none
+            childProcess: ["tmeet"]
+          installScripts: []
+          notes: >-
+            Official DeepSeek Harness connector, reviewed by VibeDev and carried from the
+            previous download-server index. Behaviour is declared from the package manifest
+            and the vendor documentation; the connector talks only to the vendor service the
+            user signs in to and writes its own account/config files. No telemetry, no self-update.
+
+  - name: "@deepseek-ai/dsh-tencent-docs"
+    category: integration
+    tags: []
+    maintainer: https://github.com/deepseek-ai/deepseek-harness/issues
+    display:
+      title:
+        en: "Tencent Docs connector"
+        zh: "腾讯文档连接器"
+      description:
+        en: "Lets the agent use the Tencent Docs content you have access to, through Tencent Docs' hosted MCP server (https://docs.qq.com/openapi/mcp). An MCP connector: no program is installed or run on your computer; you authorize your Tencent Docs account with the vendor's OAuth page from the Plugins page, and the grant is saved locally by VibeDev's shared MCP manager. Once connected, every conversation on this VibeDev can use the server's tools. Needs VibeDev with DSH 0.2.3-alpha.2."
+        zh: "让 Agent 通过腾讯文档托管的 MCP 服务（https://docs.qq.com/openapi/mcp）使用你有权限的腾讯文档内容。这是 MCP 型连接器：不会在你的电脑上安装或运行额外程序；在「插件」页通过厂商的 OAuth 页面授权你的腾讯文档账号，授权凭据由 VibeDev 共用的 MCP 管理器保存在本机。连接后，这个 VibeDev 里的所有对话都能使用该服务的工具。需要 DSH 0.2.3-alpha.2 的 VibeDev。"
+    versions:
+      - version: 0.2.3-alpha.2
+        integrity: sha512-I5cIEocPFRNSoWH+xZzZn86RfCVVxP1u66sHGs0HAo0o9nqVMJsrlw2708gchhESqU7RLhMq8fSEInBQqKz/FQ==
+        review:
+          reviewer: VibeDev
+          date: 2026-11-26
+          license: MIT
+          testedOn: [0.2.3-alpha.2]
+          capabilities:
+            network: ["*"]
+            files: write
+            config: none
+            childProcess: []
+          installScripts: []
+          notes: >-
+            Official DeepSeek Harness connector, reviewed by VibeDev and carried from the
+            previous download-server index. Behaviour is declared from the package manifest
+            and the vendor documentation; the connector talks only to the vendor service the
+            user signs in to and writes its own account/config files. No telemetry, no self-update.
+
+  - name: "@deepseek-ai/dsh-notion"
+    category: integration
+    tags: []
+    maintainer: https://github.com/deepseek-ai/deepseek-harness/issues
+    display:
+      title:
+        en: "Notion connector"
+        zh: "Notion 连接器"
+      description:
+        en: "Lets the agent use the Notion pages, databases and other content you authorize, through Notion's hosted MCP server (https://mcp.notion.com/mcp). An MCP connector: no program is installed or run on your computer; you authorize your Notion account with Notion's OAuth page from the Plugins page, and the grant is saved locally by VibeDev's shared MCP manager. Once connected, every conversation on this VibeDev can use the server's tools. Needs VibeDev with DSH 0.2.3-alpha.2."
+        zh: "让 Agent 通过 Notion 托管的 MCP 服务（https://mcp.notion.com/mcp）使用你授权的 Notion 页面、数据库和其他内容。这是 MCP 型连接器：不会在你的电脑上安装或运行额外程序；在「插件」页通过 Notion 的 OAuth 页面授权你的账号，授权凭据由 VibeDev 共用的 MCP 管理器保存在本机。连接后，这个 VibeDev 里的所有对话都能使用该服务的工具。需要 DSH 0.2.3-alpha.2 的 VibeDev。"
+    versions:
+      - version: 0.2.3-alpha.2
+        integrity: sha512-PBn/GJenf0g4M49lqI5YVqC5LMxAy11cryspbLL5XvTEMmLFes+VgsIp6M/ZK0KEUAj9Eof0fUn6LsYvTGvR/w==
+        review:
+          reviewer: VibeDev
+          date: 2026-11-26
+          license: MIT
+          testedOn: [0.2.3-alpha.2]
+          capabilities:
+            network: ["*"]
+            files: write
+            config: none
+            childProcess: []
+          installScripts: []
+          notes: >-
+            Official DeepSeek Harness connector, reviewed by VibeDev and carried from the
+            previous download-server index. Behaviour is declared from the package manifest
+            and the vendor documentation; the connector talks only to the vendor service the
+            user signs in to and writes its own account/config files. No telemetry, no self-update.
+
+  - name: "@deepseek-ai/dsh-linear"
+    category: integration
+    tags: []
+    maintainer: https://github.com/deepseek-ai/deepseek-harness/issues
+    display:
+      title:
+        en: "Linear connector"
+        zh: "Linear 连接器"
+      description:
+        en: "Lets the agent use your Linear issues, projects and comments, through Linear's hosted MCP server (https://mcp.linear.app/mcp). An MCP connector: no program is installed or run on your computer; you authorize your Linear account with Linear's OAuth page from the Plugins page, and the grant is saved locally by VibeDev's shared MCP manager. Once connected, every conversation on this VibeDev can use the server's tools. Needs VibeDev with DSH 0.2.3-alpha.2."
+        zh: "让 Agent 通过 Linear 托管的 MCP 服务（https://mcp.linear.app/mcp）使用你的 Linear 议题、项目与评论。这是 MCP 型连接器：不会在你的电脑上安装或运行额外程序；在「插件」页通过 Linear 的 OAuth 页面授权你的账号，授权凭据由 VibeDev 共用的 MCP 管理器保存在本机。连接后，这个 VibeDev 里的所有对话都能使用该服务的工具。需要 DSH 0.2.3-alpha.2 的 VibeDev。"
+    versions:
+      - version: 0.2.3-alpha.2
+        integrity: sha512-56DQx3IcqTiWMrTaWjIJbQqul290VZzEletEbZWfLd2x0kkyy4t0NiA0f4jVcFZ+jN1hSOICQETgvWu2puUiTA==
+        review:
+          reviewer: VibeDev
+          date: 2026-11-26
+          license: MIT
+          testedOn: [0.2.3-alpha.2]
+          capabilities:
+            network: ["*"]
+            files: write
+            config: none
+            childProcess: []
+          installScripts: []
+          notes: >-
+            Official DeepSeek Harness connector, reviewed by VibeDev and carried from the
+            previous download-server index. Behaviour is declared from the package manifest
+            and the vendor documentation; the connector talks only to the vendor service the
+            user signs in to and writes its own account/config files. No telemetry, no self-update.
+
