@@ -333,6 +333,20 @@ plugins:
             running. Retested 2026-11-13 on DSH 0.2.2-rc.2 (install trial of the vibedev-app release/desktop-0.2.2-rc.2
             checkout) with the same result; on the second start the plugin logged one retry of its session control
             stream and went on.
+      - version: 0.1.16
+        integrity: sha512-KEd5N64mCIn+Zf1obc6ztEPigSPkM5vetzDExXZ5jvQ6/61xDRoTggTAPRU0K8h8bvKf1nZm1ZIyTHVYZPygmA==
+        review:
+          reviewer: VibeDev (automated)
+          date: 2026-11-26
+          license: MIT
+          testedOn: [0.2.1-rc.2, 0.2.2-rc.1, 0.2.2-rc.2]
+          capabilities:
+            network: [vibedev.studio, remote.vibedev.studio:24443, github.com, 127.0.0.1]
+            files: write
+            config: write
+            childProcess: [python3, cloudflared, nginx, certbot, systemctl]
+          installScripts: []
+          notes: Automated first-party release 0.1.16 from @vibedev-si/dsh-remote; capabilities, install scripts and risk notes are unchanged from 0.1.15.
   - name: dsh-film
     category: media
     tags: [vibedev]
