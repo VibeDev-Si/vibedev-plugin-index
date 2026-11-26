@@ -656,3 +656,34 @@ plugins:
             childProcess: [vibedev-island, powershell, explorer]
           installScripts: []
           notes: Automated first-party release 0.2.0 from @vibedev-si/dsh-island; capabilities, install scripts and risk notes are unchanged from 0.1.0.
+      - version: 0.3.0
+        integrity: sha512-whAA4RkgFHQdzKwOGqzVe9weypFNdzYs2yxFf8HDj84i26OjikDlaT2YT07C791DffSoVtbOxs9vKfhgL579fg==
+        review:
+          reviewer: VibeDev
+          date: 2026-11-26
+          license: MIT
+          testedOn: [0.2.2-rc.2, 0.2.3-alpha.2]
+          capabilities:
+            network: [imap.qq.com, api.deepseek.com]
+            files: write
+            config: none
+            childProcess: [vibedev-island, VibeDevCapture, powershell, explorer]
+          installScripts: []
+          sizeException: >-
+            解包 21.5 MiB（22.6 MB），超过 20 MiB 上限：包内是 Windows x64 原生岛屿程序 vibedev-island.exe（20.8 MiB，
+            岛仔 Rust/egui 原生实现）和按需截图/标注助手 VibeDevCapture.exe；两者都是随包分发的原生程序，不是可裁剪的
+            依赖，也没有跨平台副本。Unpacks to 21.5 MiB because the package ships the Windows x64 native island
+            program (20.8 MiB, Daozai Rust/egui build) and the on-demand VibeDevCapture helper; both are native programs
+            rather than trimmable dependencies, and there is no cross-platform copy.
+          notes: >-
+            First-party 0.3.0 published by crider from github.com/VibeDev-Si/dsh-island. The Windows x64 island was
+            replaced by the native Daozai build (MIT) and is still started through DSH's subprocess service over
+            JSON-RPC stdio; the package ships bin/win32-x64/vibedev-island.exe and bin/win32-x64/VibeDevCapture.exe.
+            The host half keeps the 0.2.0 behavior: sessions, approvals/questions, todos, clipboard history, music,
+            screenshots, translation through DSH's translator, and WeChat/QQ reminders. New in 0.3.0: VibeDev becomes
+            an island page, translation is an island page with selectable text, and pending approvals can surface on
+            the island. VibeDevCapture is started only for a user-triggered screenshot; PowerShell is used only for
+            the opt-in QQ notification repair; explorer.exe only to show the log or diagnostics. No telemetry, no eval,
+            no self-update. Desktop trial on DSH 0.2.3-alpha.2: install/enable/restart/disable and the main island
+            pages, approval card, translation, text selection and settings were exercised; the package is 39 files,
+            21.5 MiB unpacked, exactly the reviewed archive.
