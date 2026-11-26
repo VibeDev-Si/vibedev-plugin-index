@@ -593,6 +593,21 @@ plugins:
             outside installation, no credential reads, no listener, nothing left running. The trial did not call
             kilnPrepare or kilnTool; the author reports kilnPrepare/kilnTool working on a cloud Linux machine. Limits:
             not trial-installed on the target DSH 0.2.3-alpha.2.
+      - version: 0.10.6
+        integrity: sha512-ss4lYh6WTPxEw+g8AZS2VTBDdiGSC6YvFGt6hlKz9d7q5xjduqD/HHGfghgQEhf5PKeafTOviUIO+4hofUR5fA==
+        review:
+          reviewer: VibeDev (automated)
+          date: 2026-11-26
+          license: MIT
+          testedOn: [0.2.2-rc.5]
+          capabilities:
+            network: [127.0.0.1, registry.npmjs.org]
+            files: write
+            config: none
+            childProcess: [bun, node, ffmpeg, ffprobe]
+          installScripts: []
+          sizeException: "自动收录：解包 50.2 MiB，未超过 0.10.5 人工审核时 50.1 MiB 的 125%，沿用其体量说明。Recorded automatically: unpacks to 50.2 MiB, within 125% of the 50.1 MiB reviewed by hand for 0.10.5, whose size reasoning carries over. 解包 52,561,003 B（50.1 MiB，1142 个文件；npm 元数据 dist.unpackedSize 记为 69,880,592 B），超过 20 MiB 上限： 包内随附 Bun 运行时可选依赖（0.10.5 新增 linux-x64/linux-aarch64，按平台只装一个）、本地 Film 服务 （server/film.js 11.4 MB）、文档解析原生模块与 WASM（anydoc 8.3 MB + 6.7 MB）、FFmpeg Worker、工作台 Web 产物， 以及新增的白模预演节点 trumanMap.umd.js（4.7 MB）和工具 trumanMap.tool.js。这些是本地处理能力，不是可裁剪的依赖。 是 0.9.0 人工审核时 45.5 MiB 的 110%。 Unpacks to 50.1 MiB (npm's dist.unpackedSize says 69,880,592 B) for the Bun runtime optional packages (Linux x64/arm64 added in 0.10.5, one installed per platform), the local Film server, the document-parsing native module and WASM, the FFmpeg worker, the workbench Web build, and the new white-box previs node and tool - local processing capability rather than trimmable dependencies. 110% of the 45.5 MiB reviewed by hand for 0.9.0."
+          notes: Automated first-party release 0.10.6 from dsh-film; capabilities, install scripts and risk notes are unchanged from 0.10.5.
   - name: "@vibedev-si/dsh-media-viewer"
     category: media
     tags: [vibedev]
